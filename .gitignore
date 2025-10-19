@@ -5,12 +5,7 @@
 .env.production
 .phpactor.json
 .phpunit.result.cache
-package.json
-package-lock.json
-/resources/js
-/resources/css
 /.github/workflows
-vite.config.js
 
 /.fleet
 /.idea
