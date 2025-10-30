@@ -7,31 +7,31 @@ const slides = [
         img: "/img/hero4.png",
         title: "SIÊU PHẨM<br>SMARTWATCH 2025",
         subtitle: "ƯU ĐÃI ĐẶC BIỆT CHO BẠN",
-        priceHtml: "<strong>599</strong><sup>99</sup>",
+        priceHtml: "<strong>1.290</strong><sup>.000đ</sup>",
     },
     {
         img: "/img/hero3.png",
         title: "TUYỆT ĐỈNH<br>ÂM THANH",
         subtitle: "PIN TRÂU - BASS CỰC CĂNG",
-        priceHtml: "<strong>499</strong><sup>99</sup>",
+        priceHtml: "<strong>1.690</strong><sup>.000đ</sup>",
     },
     {
         img: "/img/hero1.webp",
         title: "SIÊU NHẸ<br>CHUỘT GAMING",
         subtitle: "MƯỢT MÀ - NHANH NHẠY - CHÍNH XÁC",
-        priceHtml: "<strong>399</strong><sup>99</sup>",
+        priceHtml: "<strong>990</strong><sup>.000đ</sup>",
     },
     {
         img: "/img/hero5.webp",
         title: "CARD PC<br>MẠNH MẼ",
         subtitle: "ĐỈNH CAO CÔNG NGHỆ PC",
-        priceHtml: "<strong>899</strong><sup>99</sup>",
+        priceHtml: "<strong>2.790</strong><sup>.000đ</sup>",
     },
     {
         img: "/img/hero2.png",
         title: "PHÍM THỦ<br>KHÓ BỎ QUA",
         subtitle: "GÕ LÀ THÍCH - CHƠI LÀ MÊ",
-        priceHtml: "<strong>299</strong><sup>99</sup>",
+        priceHtml: "<strong>1.490</strong><sup>.000đ</sup>",
     },
 ];
 

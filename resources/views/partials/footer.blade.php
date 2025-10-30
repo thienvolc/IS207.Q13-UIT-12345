@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-4">
-        <h5>TechStore</h5>
+        <h5>PinkCapyStore</h5>
         <p>Cung cấp điện thoại, laptop, phụ kiện chính hãng.</p>
       </div>
       <div class="col-md-4">
@@ -16,9 +16,9 @@
       <div class="col-md-4">
         <h5>Kết nối với chúng tôi</h5>
         <div>
-          <a href="#" class="text-white me-3"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#" class="text-white me-3"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#" class="text-white"><i class="fa-brands fa-youtube"></i></a>
+          <a href="https://www.facebook.com/TruongVu0408" class="text-white me-3"><i class="fa-brands fa-facebook"></i></a>
+          <a href="https://www.instagram.com/" class="text-white me-3"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://www.youtube.com/" class="text-white"><i class="fa-brands fa-youtube"></i></a>
         </div>
       </div>
     </div>

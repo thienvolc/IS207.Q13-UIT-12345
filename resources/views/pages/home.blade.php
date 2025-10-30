@@ -11,7 +11,7 @@
       <div class="hero__meta">
         <span class="hero__from">TỪ</span>
         <span class="hero__price">
-          <span class="hero__price-currency">$</span>
+          <span class="hero__price-currency"></span>
           <strong></strong>
           <sup></sup>
         </span>

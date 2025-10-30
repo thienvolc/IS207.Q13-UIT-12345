@@ -22,8 +22,6 @@
 </head>
 <body class="pinkcapy">
   @include('partials.header')   
-  <!-- @include('partials.menu')   -->
-  @include('partials.super-deal')   
   <main class="main">
     @yield('content')
   </main>
