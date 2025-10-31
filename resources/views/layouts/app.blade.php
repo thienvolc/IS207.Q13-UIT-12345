@@ -18,8 +18,7 @@
 
 </head>
 <body class="pinkcapy">
-  @include('partials.header')     
-  @include('partials.super-deal')   
+  @include('partials.header')
   <main class="main">
     @yield('content')
   </main>

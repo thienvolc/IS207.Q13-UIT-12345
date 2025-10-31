@@ -3,7 +3,9 @@
     <button class="mbar__btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#mOffcanvas">
       <i class="fa-solid fa-bars"></i>
     </button>
-    <a href="/" class="mbar__brand">PinkCapy<b>.</b></a>
+    <a href="/" class="mbar__brand">
+      <img src="{{ asset('img/logo_pinkcapy.svg') }}" alt="PinkCapy" class="mbar__brand-img">
+    </a>
     <div class="mbar__actions">
       <button class="mbar__icon" type="button" data-bs-toggle="collapse" data-bs-target="#mSearchCollapse">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -23,9 +25,9 @@
       <button class="msearch__btn"><i class="fa-solid fa-magnifying-glass"></i></button>
     </div>
   </div>
-  <div class="grid">
+  <div class="header-main"></div>
     <!-- Header topbar -->
-    <div class="header-topbar">
+    <div class="header-topbar grid">
       <ul class="header-topbar-list">
         <li class="header-topbar-item"><a href="/">Chào mừng bạn đến với PinkCapy Store</a></li>
       </ul>
@@ -39,25 +41,13 @@
             <li class="header-topbar-submenu-item"><a href="/vi">Tiếng Việt</a></li>
           </ul>
         </li>
-        <!-- <li class="header-topbar-item"><a href="#">Đăng nhập</a> | <a href="#">Đăng ký</a></li> -->
-        <!-- Tài khoản -->
-         <li class="nav-item dropdown header-topbar-item">
-          <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{{ asset('img/LOGO_Admin.png') }}" alt="avatar" class="user-avt"> Admin
-          </a>
-          <ul class="dropdown-menu header-topbar-dropdown-menu" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="/">Tài khoản của tôi</a></li>
-            <li><a class="dropdown-item" href="/">Đơn mua</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
-          </ul>
-        </li>
       </ul>
     </div>
-    <!-- Header body -->
-    <div class="header-row">
-      <a class="logo" href="/"><span>PinkCapy</span><b>.</b></a>
+      <!-- Header body -->
+    <div class="header-row grid">
+      <a class="logo" href="/">
+        <img src="{{ asset('img/logo_pinkcapy.svg') }}" alt="PinkCapy" class="logo-img">
+      </a>
       <div class="header-search">
           <input type="text" class="header-search-input" placeholder="Bạn muốn tìm gì hôm nay?">
           <div class="header-search-category dropdown">
@@ -65,51 +55,66 @@
               data-bs-toggle="dropdown" aria-expanded="false">
               Danh mục
             </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Laptops</a></li>
-              <li><a class="dropdown-item" href="#">Smartphones</a></li>
-              <li><a class="dropdown-item" href="#">Accessories</a></li>
+            <ul class="dropdown-menu header-search-category-menu">
+              <li><a class="dropdown-item" href="/laptops">Laptops</a></li>
+              <li><a class="dropdown-item" href="/smartwatches">Đồng hồ</a></li>
+              <li><a class="dropdown-item" href="/accessories">Phụ kiện</a></li>
             </ul>
           </div>
           <button type="submit" class="header-search-button"><i class="fa-solid fa-magnifying-glass"></i></button>
       </div>
-      <div class="header-cart">
-        <a class="header-cart-item"><i class="bi bi-handbag-fill"></i></a>
-        <span class="header-cart-badge">2</span>
+      <div class="header-options">
+        <div class="header-cart">
+          <a class="header-cart-item"><i class="bi bi-handbag-fill"></i></a>
+          <span class="header-cart-badge">2</span>
+        </div>
+        <div class="header-auth"><a href="#">Đăng nhập</a> <span class="separate"></span> <a href="#">Đăng ký</a></div>
+        <!-- Tài khoản -->
+         <!-- <div class="nav-item dropdown header-user">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{{ asset('img/LOGO_Admin.png') }}" alt="avatar" class="header-user-avt"> Admin
+          </a>
+          <ul class="dropdown-menu header-user-menu" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="/">Tài khoản của tôi</a></li>
+            <li><a class="dropdown-item" href="/">Đơn mua</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+          </ul>
+        </div> -->
       </div>
     </div>
     <!-- Header bottom -->
-    <nav class="under-nav">
+    <nav class="under-nav grid">
       <div class="under-nav-left">
         <div class="dropdown ">
           <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
             <i class="fa-solid fa-bars"></i> Danh mục sản phẩm
           </button>
           <ul class="dropdown-menu">
-            <li><a href="" class="dropdown-item">Laptops</a></li>
-            <li><a href="" class="dropdown-item">Đồng hồ</a></li>
-            <li><a href="" class="dropdown-item">Tai nghe</a></li>
-            <li><a href="" class="dropdown-item">Loa</a></li>
-            <li><a href="" class="dropdown-item">Webcam</a></li>
-            <li><a href="" class="dropdown-item">Chuột máy tính</a></li>
-            <li><a href="" class="dropdown-item">Bàn phím</a></li>
-            <li><a href="" class="dropdown-item">Sạc</a></li>
-            <li><a href="" class="dropdown-item">Ổ cứng</a></li>
-            <li><a href="" class="dropdown-item">Thiết bị mạng</a></li>
+            <li><a href="/laptops" class="dropdown-item">Laptops</a></li>
+            <li><a href="/smartwatches" class="dropdown-item">Đồng hồ</a></li>
+            <li><a href="/headphones" class="dropdown-item">Tai nghe</a></li>
+            <li><a href="/speakers" class="dropdown-item">Loa</a></li>
+            <li><a href="/webcams" class="dropdown-item">Webcam</a></li>
+            <li><a href="/mice" class="dropdown-item">Chuột máy tính</a></li>
+            <li><a href="/keyboards" class="dropdown-item">Bàn phím</a></li>
+            <li><a href="/chargers" class="dropdown-item">Sạc</a></li>
+            <li><a href="/hard-drives" class="dropdown-item">Ổ cứng</a></li>
+            <li><a href="/network-devices" class="dropdown-item">Thiết bị mạng</a></li>
           </ul>
         </div>
-          <a href="/super-deal" class="under-nav-item">Super Deals</a>
+          <a href="/" class="under-nav-item active">Trang chủ</a>
           <a href="/products" class="under-nav-item">Sản phẩm</a>
           <a href="/about" class="under-nav-item">Giới thiệu</a>
           <a href="/blog" class="under-nav-item">Blog</a>
           <a href="/contact" class="under-nav-item">Liên hệ</a>  
       </div>
       <div class="under-nav-right">
-            <a href="/" class="under-nav-icons-compare"><i class="fa-solid fa-code-compare"></i></a>
-            <a href="/" class="under-nav-icons-tym"><i class="bi bi-heart-fill"></i></a>
+            <a href="/compare" class="under-nav-icons-compare"><i class="fa-solid fa-code-compare"></i></a>
+            <a href="/wishlist" class="under-nav-icons-tym"><i class="bi bi-heart-fill"></i></a>
       </div>
     </nav>
-  </div>
 </header>
 
 <!-- Mobile Offcanvas Menu -->
@@ -121,7 +126,6 @@
   <div class="offcanvas-body">
     <nav>
       <a href="/" class="off-link">Trang chủ</a>
-      <a href="/super-deal" class="off-link">Super Deals</a>
       <a href="/products" class="off-link">Sản phẩm</a>
       <a href="/about" class="off-link">Giới thiệu</a>
       <a href="/blog" class="off-link">Blog</a>
