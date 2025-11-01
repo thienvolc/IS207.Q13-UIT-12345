@@ -1,31 +1,100 @@
-/* base.css */
-@import "bootstrap/dist/css/bootstrap.min.css";
-
 :root {
-    --primary-gradient: linear-gradient(90deg, #e91e63 -13%, #f44336 100%);
     --primary: #f6244e;
-    --light: #fff7f9;
+    --light: #fee1e4;
     --text: #444444;
-    --black: #111111;
+    --text-2: #288ad6;
+    --text-3: #dd2f2c;
+    --border: #f0f0f0;
+    --black: #000;
     --white: #fff;
+    --bg-color: #f5f5f5;
 }
-
 * {
+    box-sizing: inherit;
+}
+html {
+    font-size: 62.5%;
+    line-height: 1.6rem;
+    font-family: "Poppins", Arial, sans-serif;
     box-sizing: border-box;
 }
 
-html {
-    font-size: 62.5%;
-    font-family: "Poppins", Arial, sans-serif;
+.grid {
+    width: 1200px;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
-body {
-    font-size: 1.6rem;
-    line-height: 1.6;
+.mb-5 {
+    margin-bottom: 36px;
+}
+
+.grid-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.grid__col-3 {
+    max-width: 25%;
+    flex: 0 0 25%;
+    padding: 0 15px;
+}
+
+.grid__col-4 {
+    width: 33.3333%;
+    padding: 0 5px;
+}
+
+.grid__col-6 {
+    width: 50%;
+    padding: 0 5px;
+}
+
+.grid__col-9 {
+    width: 75%;
+    padding: 0 15px;
+}
+
+/* Responsive cho grid columns */
+@media (max-width: 767.98px) {
+    .grid__col-3,
+    .grid__col-4,
+    .grid__col-6 {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+        padding: 0 10px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+    .grid__col-3 {
+        width: 50%;
+        max-width: 50%;
+        flex: 0 0 50%;
+    }
+}
+
+.dropdown-menu {
+    width: 100%;
+    border-radius: 4px;
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    font-size: 14px;
     color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 120ms ease, background 120ms ease;
+}
+.dropdown-item:hover {
+    color: var(--text) !important;
+    background: var(--light) !important;
 }
 
-/* Animations */
+/* Animation */
 @keyframes notify-growth {
     0% {
         transform: scale(0);
@@ -34,6 +103,7 @@ body {
         transform: scale(1);
     }
 }
+
 @keyframes growth {
     from {
         transform: scale(var(--growth-from));
@@ -42,6 +112,7 @@ body {
         transform: scale(var(--growth-to));
     }
 }
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -52,6 +123,7 @@ body {
         transform: translateY(0);
     }
 }
+
 @keyframes zoomIn {
     from {
         transform: scale(0);
@@ -62,6 +134,7 @@ body {
         opacity: 1;
     }
 }
+
 @keyframes popIn {
     0% {
         transform: scale(0.5);
@@ -75,6 +148,7 @@ body {
         transform: scale(1);
     }
 }
+
 @keyframes fadeHero {
     from {
         opacity: 0.7;
