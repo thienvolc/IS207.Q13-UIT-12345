@@ -1,4 +1,5 @@
 <header class="header">
+  <!-- Mobile Navbar -->
   <nav class="mbar d-lg-none">
     <button
       class="mbar__btn"
@@ -8,7 +9,11 @@
     >
       <i class="fa-solid fa-bars"></i>
     </button>
-    <a href="/" class="mbar__brand">PinkCapy<b>.</b></a>
+
+    <a href="/" class="mbar__brand">
+      PinkCapy<b>.</b>
+    </a>
+
     <div class="mbar__actions">
       <button
         class="mbar__icon"
@@ -18,9 +23,11 @@
       >
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
+
       <a href="/account" class="mbar__icon">
         <i class="fa-regular fa-user"></i>
       </a>
+
       <a href="/cart" class="mbar__icon position-relative">
         <i class="bi bi-handbag-fill"></i>
         <span class="mbar__badge">2</span>
@@ -28,7 +35,7 @@
     </div>
   </nav>
 
-  <!-- search collapse mobile -->
+  <!-- Search Collapse Mobile -->
   <div class="collapse d-lg-none" id="mSearchCollapse">
     <div class="msearch">
       <input
@@ -43,22 +50,23 @@
   </div>
 
   <div class="grid">
-    <!-- Header topbar -->
+    <!-- Header Topbar -->
     <div class="header-topbar">
       <ul class="header-topbar-list">
         <li class="header-topbar-item">
           <a href="/">Chào mừng bạn đến với PinkCapy Store</a>
         </li>
       </ul>
+
       <ul class="header-topbar-list">
         <li class="header-topbar-item">
-          <i class="fa-solid fa-location-dot"></i>Thành phố Hồ Chí Minh
+          <i class="fa-solid fa-location-dot"></i> Thành phố Hồ Chí Minh
         </li>
         <li class="header-topbar-item">
           <i class="fa-solid fa-truck-fast"></i> Giao hàng nhanh chóng
         </li>
         <li class="header-topbar-item">
-          <i class="fa-solid fa-language"></i>Ngôn ngữ
+          <i class="fa-solid fa-language"></i> Ngôn ngữ
           <ul class="header-topbar-submenu">
             <li class="header-topbar-submenu-item">
               <a href="/en">Tiếng Anh</a>
@@ -69,7 +77,7 @@
           </ul>
         </li>
 
-        <!-- Tài khoản -->
+        <!-- Dropdown Tài khoản -->
         <li class="nav-item dropdown header-topbar-item">
           <a
             class="nav-link dropdown-toggle"
@@ -85,6 +93,7 @@
             />
             Admin
           </a>
+
           <ul
             class="dropdown-menu header-topbar-dropdown-menu"
             aria-labelledby="userDropdown"
@@ -98,7 +107,7 @@
       </ul>
     </div>
 
-    <!-- Header body -->
+    <!-- Header Body -->
     <div class="header-row">
       <a class="logo" href="/">
         <img
@@ -114,6 +123,7 @@
           class="header-search-input"
           placeholder="Bạn muốn tìm gì hôm nay?"
         />
+
         <div class="header-search-category dropdown">
           <button
             class="btn dropdown-toggle search-cat-btn"
@@ -123,12 +133,14 @@
           >
             Danh mục
           </button>
+
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="#">Tai nghe</a></li>
             <li><a class="dropdown-item" href="#">Đồng hồ</a></li>
             <li><a class="dropdown-item" href="#">Phụ kiện</a></li>
           </ul>
         </div>
+
         <button type="submit" class="header-search-button">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
@@ -142,7 +154,7 @@
       </div>
     </div>
 
-    <!-- Header bottom -->
+    <!-- Header Bottom -->
     <nav class="under-nav">
       <div class="under-nav-left">
         <div class="dropdown">
@@ -155,6 +167,7 @@
           >
             <i class="fa-solid fa-bars"></i> Danh mục sản phẩm
           </button>
+
           <ul class="dropdown-menu">
             <li><a href="" class="dropdown-item">Đồng hồ</a></li>
             <li><a href="" class="dropdown-item">Tai nghe</a></li>
@@ -169,11 +182,11 @@
           </ul>
         </div>
 
-        <a href="/super-deal" class="under-nav-item">Super Deals</a>
-        <a href="/products" class="under-nav-item">Sản phẩm</a>
-        <a href="/about" class="under-nav-item">Giới thiệu</a>
-        <a href="/blog" class="under-nav-item">Blog</a>
-        <a href="/contact" class="under-nav-item">Liên hệ</a>
+        <a href="{{ route('super-deal') }}" class="under-nav-item">Super Deals</a>
+        <a href="{{ route('products.index') }}" class="under-nav-item">Sản phẩm</a>
+        <a href="{{ route('about') }}" class="under-nav-item">Giới thiệu</a>
+        <a href="{{ route('blog.index') }}" class="under-nav-item">Blog</a>
+        <a href="{{ route('contact') }}" class="under-nav-item">Liên hệ</a>
       </div>
 
       <div class="under-nav-right">
