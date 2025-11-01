@@ -1,0 +1,247 @@
+# 📘 API Design Document
+**Dự án:** PinkCapy E-Commerce
+**Phiên bản:** v1
+**Mục đích:** Chuẩn hóa thiết kế API từ dữ liệu thô thành cấu trúc RESTful có thể sinh ra OpenAPI (Swagger) dễ dàng.
+
+---
+
+## I. Nguyên tắc thiết kế
+1. **Cấu trúc RESTful:**
+   - Sử dụng HTTP methods theo chuẩn:
+     - `GET` → Truy vấn hoặc xem dữ liệu  
+     - `POST` → Tạo mới dữ liệu  
+     - `PUT` / `PATCH` → Cập nhật dữ liệu  
+     - `DELETE` → Xóa dữ liệu  
+2. **Phản hồi thống nhất (Response Wrapper):**
+   ```json
+   {
+     "meta": {
+       "code": "200000",
+       "type": "SUCCESS",
+       "message": "Success",
+       "extra_meta": {}
+     },
+     "data": { ... }
+   }
+   ```
+3. **Phân quyền truy cập:**
+   - `public`: Ai cũng xem được (sản phẩm, danh mục).
+   - `user`: Yêu cầu `Authorization: user <user_id>`.
+   - `admin`: Yêu cầu `Authorization: admin <user_id>`.
+4. **Pagination & Filter:**
+   - Query params chung cho danh sách:
+     ```
+     offset, limit, sort, category, price_min, price_max
+     ```
+5. **Trạng thái (status):**
+   - Sản phẩm: 1=Active, 2=Out of Stock, 3=Hidden, ...
+   - Đơn hàng: Enum (pending, processing, shipped, completed, cancelled).
+
+---
+
+## II. Các nhóm API chính
+
+### 1️⃣. **Sản phẩm (Products)**
+
+#### 📍 GET /products
+**Mục đích:** Lấy danh sách sản phẩm có phân trang và lọc.  
+**Tham số:**
+| Tên | Kiểu | Mô tả |
+|------|------|--------|
+| offset | int | Vị trí bắt đầu |
+| limit | int | Số lượng trả về |
+| sort | string | Tiêu chí sắp xếp (vd: price:asc, created_at:desc) |
+| category | int | ID danh mục |
+| price_min | decimal | Giá nhỏ nhất |
+| price_max | decimal | Giá lớn nhất |
+
+**Phản hồi mẫu:**
+```json
+{
+  "meta": { "code": "200000", "type": "SUCCESS", "message": "Success" },
+  "data": {
+    "limit": 1,
+    "offset": 1,
+    "total_count": 2,
+    "has_more": false,
+    "data": [
+      {
+        "id": 1,
+        "category_id": 3,
+        "title": "Tai nghe Bluetooth Sony WH-1000XM5",
+        "slug": "tai-nghe-bluetooth-sony-wh-1000xm5",
+        "thumb": "https://cdn.pinkcapy.vn/products/sony-wh1000xm5-thumb.jpg",
+        "price": "8990000",
+        "quantity": "25",
+        "discount": 10,
+        "ends_at": "2025-11-10T23:59:59Z"
+      }
+    ]
+  }
+}
+```
+
+#### 📍 GET /products/{id}
+**Mục đích:** Xem chi tiết sản phẩm.  
+**Phản hồi mẫu:**  
+(đúng theo dữ liệu thô đã cho)
+
+---
+
+### 2️⃣. **Giỏ hàng (Carts)**
+
+#### 📍 GET /me/carts
+**Authorization:** user  
+**Mục đích:** Xem giỏ hàng hiện tại của người dùng.  
+**Phản hồi:**
+```json
+{
+  "meta": { "code": "200000", "type": "SUCCESS" },
+  "data": {
+    "id": 1,
+    "total_count": 2,
+    "items": [
+      {
+        "id": 101,
+        "product_id": 23,
+        "quantity": 2,
+        "price": 8990000,
+        "discount": 500000,
+        "note": "Gói quà sinh nhật"
+      }
+    ]
+  }
+}
+```
+
+#### 📍 POST /me/carts/items
+**Authorization:** user  
+**Mục đích:** Thêm sản phẩm vào giỏ hàng.  
+**Request body:**
+```json
+{
+  "product_id": 23,
+  "quantity": 2
+}
+```
+**Response:**
+```json
+{
+  "meta": { "code": "200000", "type": "SUCCESS" },
+  "data": {
+    "id": 101,
+    "cart_id": 5,
+    "product_id": 23,
+    "quantity": 2,
+    "price": 8990000,
+    "discount": 500000,
+    "note": "Gói quà sinh nhật"
+  }
+}
+```
+
+---
+
+### 3️⃣. **Đơn hàng (Orders)**
+
+#### 📍 POST /me/orders
+**Authorization:** user  
+**Mục đích:** Đặt hàng.  
+**Request body:**
+```json
+{
+  "promo": "SUMMER2025",
+  "note": "Giao buổi sáng, gọi trước khi tới",
+  "items": 1
+}
+```
+**Response:**  
+(đúng như mẫu trong dữ liệu thô)
+
+---
+
+#### 📍 GET /me/orders/{id}/status
+**Authorization:** user  
+**Mục đích:** Kiểm tra trạng thái đơn hàng của người dùng.  
+**Response:**
+```json
+{
+  "meta": { "code": "200000", "type": "SUCCESS" },
+  "data": { "id": 1001, "status": 3 }
+}
+```
+
+---
+
+### 4️⃣. **Quản trị đơn hàng (Admin Orders)**
+
+#### 📍 GET /admin/orders/{id}/status
+**Authorization:** admin  
+**Mục đích:** Xem trạng thái đơn hàng của người dùng (admin).  
+
+#### 📍 PUT /admin/orders/{id}/confirm
+**Authorization:** admin  
+**Mục đích:** Xác nhận đơn hàng.  
+**Response:**
+```json
+{
+  "meta": { "code": "200000", "type": "SUCCESS" },
+  "data": { "id": 1001, "status": 3 }
+}
+```
+
+---
+
+## III. Cấu trúc dữ liệu chính
+
+### 🧱 Product
+| Trường | Kiểu | Mô tả |
+|--------|------|--------|
+| id | int | Mã sản phẩm |
+| category_id | int | Danh mục |
+| title | string | Tên sản phẩm |
+| slug | string | URL thân thiện |
+| thumb | string | Ảnh đại diện |
+| desc | text | Mô tả chi tiết |
+| summary | string | Tóm tắt |
+| type | string | Loại (headphone, keyboard, ...) |
+| price | decimal | Giá bán |
+| quantity | int | Tồn kho |
+| status | int | Trạng thái |
+| discount | decimal | Giảm giá |
+| ends_at | datetime | Thời gian kết thúc khuyến mãi |
+
+### 🧱 Cart Item
+| Trường | Kiểu | Mô tả |
+|--------|------|--------|
+| id | int | Mã mục |
+| product_id | int | Sản phẩm |
+| quantity | int | Số lượng |
+| price | decimal | Giá từng đơn vị |
+| discount | decimal | Mức giảm |
+| note | string | Ghi chú người mua |
+
+### 🧱 Order
+| Trường | Kiểu | Mô tả |
+|--------|------|--------|
+| id | int | Mã đơn hàng |
+| user_id | int | Người đặt |
+| subtotal | decimal | Tổng tiền hàng |
+| tax | decimal | Thuế |
+| shipping | decimal | Phí vận chuyển |
+| total | decimal | Tổng tiền trước giảm |
+| discount_total | decimal | Tổng giảm giá |
+| promo | string | Mã khuyến mãi |
+| grand_total | decimal | Tổng thanh toán |
+| status | enum | pending / processing / completed |
+| note | string | Ghi chú giao hàng |
+| created_at / updated_at | datetime | Thời điểm tạo/cập nhật |
+
+---
+
+## IV. Hướng dẫn triển khai
+1. **Bước 1:** Tạo cấu trúc DB tương ứng (`products`, `carts`, `cart_items`, `orders`, `order_items`).  
+2. **Bước 2:** Sinh mô hình ORM (Eloquent / Sequelize / Prisma).  
+3. **Bước 3:** Định nghĩa route theo chuẩn RESTful.  
+4. **Bước 4:** Xây dựng `Response Wrapper` chuẩn hóa cho tất cả API.  
+5. **Bước 5:** Viết `Swagger/OpenAPI` để sinh docs tự động.  

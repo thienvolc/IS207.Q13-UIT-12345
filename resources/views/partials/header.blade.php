@@ -4,7 +4,7 @@
       <i class="fa-solid fa-bars"></i>
     </button>
     <a href="/" class="mbar__brand">
-      <img src="{{ asset('img/logo_pinkcapy.svg') }}" alt="PinkCapy" class="mbar__brand-img">
+      <img src="{{ asset('img/logo.svg') }}" alt="PinkCapy" class="mbar__brand-img">
     </a>
     <div class="mbar__actions">
       <button class="mbar__icon" type="button" data-bs-toggle="collapse" data-bs-target="#mSearchCollapse">
@@ -46,7 +46,7 @@
       <!-- Header body -->
     <div class="header-row grid">
       <a class="logo" href="/">
-        <img src="{{ asset('img/logo_pinkcapy.svg') }}" alt="PinkCapy" class="logo-img">
+        <img src="{{ asset('img/logo.svg') }}" alt="PinkCapy" class="logo-img">
       </a>
       <div class="header-search">
           <input type="text" class="header-search-input" placeholder="Bạn muốn tìm gì hôm nay?">
@@ -85,38 +85,45 @@
       </div>
     </div>
     <!-- Header bottom -->
-    <nav class="under-nav grid">
-      <div class="under-nav-left">
-        <div class="dropdown ">
-          <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
-            <i class="fa-solid fa-bars"></i> Danh mục sản phẩm
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="/laptops" class="dropdown-item">Laptops</a></li>
-            <li><a href="/smartwatches" class="dropdown-item">Đồng hồ</a></li>
-            <li><a href="/headphones" class="dropdown-item">Tai nghe</a></li>
-            <li><a href="/speakers" class="dropdown-item">Loa</a></li>
-            <li><a href="/webcams" class="dropdown-item">Webcam</a></li>
-            <li><a href="/mice" class="dropdown-item">Chuột máy tính</a></li>
-            <li><a href="/keyboards" class="dropdown-item">Bàn phím</a></li>
-            <li><a href="/chargers" class="dropdown-item">Sạc</a></li>
-            <li><a href="/hard-drives" class="dropdown-item">Ổ cứng</a></li>
-            <li><a href="/network-devices" class="dropdown-item">Thiết bị mạng</a></li>
-          </ul>
-        </div>
-          <a href="/" class="under-nav-item active">Trang chủ</a>
-          <a href="/products" class="under-nav-item">Sản phẩm</a>
-          <a href="/about" class="under-nav-item">Giới thiệu</a>
-          <a href="/blog" class="under-nav-item">Blog</a>
-          <a href="/contact" class="under-nav-item">Liên hệ</a>  
-      </div>
-      <div class="under-nav-right">
-            <a href="/compare" class="under-nav-icons-compare"><i class="fa-solid fa-code-compare"></i></a>
-            <a href="/wishlist" class="under-nav-icons-tym"><i class="bi bi-heart-fill"></i></a>
-      </div>
-    </nav>
+    <!-- Header bottom -->
+<nav class="under-nav grid">
+  <div class="under-nav-left">
+    <div class="dropdown">
+      <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i> Danh mục sản phẩm
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#" class="dropdown-item">Laptops</a></li>
+        <li><a href="#" class="dropdown-item">Đồng hồ</a></li>
+        <li><a href="#" class="dropdown-item">Tai nghe</a></li>
+        <li><a href="#" class="dropdown-item">Loa</a></li>
+        <li><a href="#" class="dropdown-item">Webcam</a></li>
+        <li><a href="#" class="dropdown-item">Chuột máy tính</a></li>
+        <li><a href="#" class="dropdown-item">Bàn phím</a></li>
+        <li><a href="#" class="dropdown-item">Sạc</a></li>
+        <li><a href="#" class="dropdown-item">Ổ cứng</a></li>
+        <li><a href="#" class="dropdown-item">Thiết bị mạng</a></li>
+      </ul>
+    </div>
+
+    {{-- Dùng route() thay vì href thủ công --}}
+    <a href="{{ route('home') }}" class="under-nav-item {{ request()->routeIs('home') ? 'active' : '' }}">Trang chủ</a>
+    <a href="{{ route('products.index') }}" class="under-nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">Sản phẩm</a>
+    <a href="{{ route('super-deal') }}" class="under-nav-item {{ request()->routeIs('super-deal') ? 'active' : '' }}">Khuyến mãi</a>
+    <a href="{{ route('about') }}" class="under-nav-item {{ request()->routeIs('about') ? 'active' : '' }}">Giới thiệu</a>
+    <a href="{{ route('blog.index') }}" class="under-nav-item {{ request()->routeIs('blog.*') ? 'active' : '' }}">Blog</a>
+    <a href="{{ route('contact') }}" class="under-nav-item {{ request()->routeIs('contact') ? 'active' : '' }}">Liên hệ</a>
+  </div>
+
+  <div class="under-nav-right">
+    <a href="#" class="under-nav-icons-compare"><i class="fa-solid fa-code-compare"></i></a>
+    <a href="#" class="under-nav-icons-tym"><i class="bi bi-heart-fill"></i></a>
+  </div>
+</nav>
+
 </header>
 
+<!-- Mobile Offcanvas Menu -->
 <!-- Mobile Offcanvas Menu -->
 <div class="offcanvas offcanvas-start" tabindex="-1" id="mOffcanvas" aria-labelledby="mOffcanvasLabel">
   <div class="offcanvas-header">
@@ -125,11 +132,12 @@
   </div>
   <div class="offcanvas-body">
     <nav>
-      <a href="/" class="off-link">Trang chủ</a>
-      <a href="/products" class="off-link">Sản phẩm</a>
-      <a href="/about" class="off-link">Giới thiệu</a>
-      <a href="/blog" class="off-link">Blog</a>
-      <a href="/contact" class="off-link">Liên hệ</a>
+      <a href="{{ route('home') }}" class="off-link">Trang chủ</a>
+      <a href="{{ route('products.index') }}" class="off-link">Sản phẩm</a>
+      <a href="{{ route('super-deal') }}" class="off-link">Khuyến mãi</a>
+      <a href="{{ route('about') }}" class="off-link">Giới thiệu</a>
+      <a href="{{ route('blog.index') }}" class="off-link">Blog</a>
+      <a href="{{ route('contact') }}" class="off-link">Liên hệ</a>
       <hr>
       <h6 class="px-2 text-muted">Danh mục sản phẩm</h6>
       <a href="#" class="off-link">Laptops</a>
