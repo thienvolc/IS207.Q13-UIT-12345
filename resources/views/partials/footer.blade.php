@@ -25,7 +25,7 @@
             <div class="col-lg-3 col-md-6 mb-4">
                 <div class="footer-widget">
                     <a class="footer-logo" href="/">
-                        <img src="{{ asset('img/logo.svg') }}" alt="PinkCapy">
+                        <img src="{{ asset('img/logo.png') }}" alt="PinkCapy">
                     </a>
 
                     <p class="footer-desc">Điện tử chất lượng cao, giá cả phải chăng cho mọi gia đình Việt Nam.</p>

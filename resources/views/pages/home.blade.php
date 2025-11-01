@@ -205,7 +205,7 @@
 
         <!-- Tab Content -->
         <div class="tab-content" id="productTabsContent">
-          <!-- Tab Nổi bật -->
+          <!-- Tab New -->
           <div class="tab-pane fade show active" id="featured" role="tabpanel" aria-labelledby="featured-tab">
             <div class="grid-row">
               <!-- Product 1 -->
@@ -279,6 +279,7 @@
               <!-- Product 3 -->
               <div class="grid__col-3 product-col">
                 <div class="product-item">
+                  <span class="product-item__badge">-14%</span>
                   <div class="product-item__category">
                     <a href="/">Tai nghe</a>
                   </div>
@@ -292,28 +293,29 @@
                   </div>
                   <div class="product-item__footer">
                     <div class="product-item__price">
-                      <del class="price-old">800.000đ</del>
-                      <ins class="price-sale">685.000đ</ins>
+                      <span class="price-sale">685.000đ</span>
+                      <span class="price-old">800.000đ</span>
                     </div>
                     <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
+                      <button class="product-item__btn-item btn-cart">
+                        <i class="bi bi-cart-plus"></i>
+                      </button>
+                    </div>
+                    <div class="product-item__hover-actions">
+                      <button class="product-item__btn-item btn-compare">
+                        <i class="bi bi-arrow-left-right"></i>
+                      </button>
+                      <button class="product-item__btn-item btn-wishlist">
+                        <i class="bi bi-heart"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
               <!-- Product 4 -->
               <div class="grid__col-3 product-col">
                 <div class="product-item">
+                  <span class="product-item__badge">-12%</span>
                   <div class="product-item__category">
                     <a href="/">Điện thoại</a>
                   </div>
@@ -327,22 +329,22 @@
                   </div>
                   <div class="product-item__footer">
                     <div class="product-item__price">
-                      <del class="price-old">850.000đ</del>
-                      <ins class="price-sale">750.000đ</ins>
+                      <span class="price-sale">750.000đ</span>
+                      <span class="price-old">850.000đ</span>
                     </div>
                     <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
+                      <button class="product-item__btn-item btn-cart">
+                        <i class="bi bi-cart-plus"></i>
+                      </button>
+                    </div>
+                    <div class="product-item__hover-actions">
+                      <button class="product-item__btn-item btn-compare">
+                        <i class="bi bi-arrow-left-right"></i>
+                      </button>
+                      <button class="product-item__btn-item btn-wishlist">
+                        <i class="bi bi-heart"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -418,6 +420,7 @@
               <!-- Product 7 -->
               <div class="grid__col-3 product-col">
                 <div class="product-item">
+                  <span class="product-item__badge">-11%</span>
                   <div class="product-item__category">
                     <a href="/">Phụ kiện</a>
                   </div>
@@ -431,28 +434,29 @@
                   </div>
                   <div class="product-item__footer">
                     <div class="product-item__price">
-                      <del class="price-old">900.000đ</del>
-                      <ins class="price-sale">799.000đ</ins>
+                      <span class="price-sale">799.000đ</span>
+                      <span class="price-old">900.000đ</span>
                     </div>
                     <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
+                      <button class="product-item__btn-item btn-cart">
+                        <i class="bi bi-cart-plus"></i>
+                      </button>
+                    </div>
+                    <div class="product-item__hover-actions">
+                      <button class="product-item__btn-item btn-compare">
+                        <i class="bi bi-arrow-left-right"></i>
+                      </button>
+                      <button class="product-item__btn-item btn-wishlist">
+                        <i class="bi bi-heart"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
               <!-- Product 8 -->
               <div class="grid__col-3 product-col">
                 <div class="product-item">
+                  <span class="product-item__badge">-11%</span>
                   <div class="product-item__category">
                     <a href="/">Camera</a>
                   </div>
@@ -466,36 +470,37 @@
                   </div>
                   <div class="product-item__footer">
                     <div class="product-item__price">
-                      <del class="price-old">1.000.000đ</del>
-                      <ins class="price-sale">890.000đ</ins>
+                      <span class="price-sale">890.000đ</span>
+                      <span class="price-old">1.000.000đ</span>
                     </div>
                     <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
+                      <button class="product-item__btn-item btn-cart">
+                        <i class="bi bi-cart-plus"></i>
+                      </button>
+                    </div>
+                    <div class="product-item__hover-actions">
+                      <button class="product-item__btn-item btn-compare">
+                        <i class="bi bi-arrow-left-right"></i>
+                      </button>
+                      <button class="product-item__btn-item btn-wishlist">
+                        <i class="bi bi-heart"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
               <!-- More products... -->
             </div>
           </div>
-          <!-- End Tab Nổi bật -->
+          <!-- End Tab New -->
 
-          <!-- Tab Giảm giá -->
+          <!-- Tab nổi bật -->
           <div class="tab-pane fade" id="onsale" role="tabpanel" aria-labelledby="onsale-tab">
             <div class="grid-row">
               <!-- Product 1 -->
               <div class="grid__col-3 product-col">
                 <div class="product-item">
+                  <span class="product-item__badge">-13%</span>
                   <div class="product-item__category">
                     <a href="/">Máy tính bảng</a>
                   </div>
@@ -509,8 +514,8 @@
                   </div>
                   <div class="product-item__footer">
                     <div class="product-item__price">
-                      <del class="price-old">2.299.000đ</del>
-                      <ins class="price-sale">1.999.000đ</ins>
+                      <span class="price-sale">1.999.000đ</span>
+                      <span class="price-old">2.299.000đ</span>
                     </div>
                     <div class="product-item__btn-list">
                                     <button class="product-item__btn-item btn-cart">
@@ -635,9 +640,9 @@
               </div>
             </div>
           </div>
-          <!-- End Tab Giảm giá -->
+          <!-- End Tab nổi bật -->
 
-          <!-- Tab Đánh giá cao -->
+          <!-- Tab đang giảm giá -->
           <div class="tab-pane fade" id="toprated" role="tabpanel" aria-labelledby="toprated-tab">
             <div class="grid-row">
               <!-- Product 1 -->
@@ -779,7 +784,7 @@
               </div>
             </div>
           </div>
-          <!-- End Tab Đánh giá cao -->
+          <!-- End Tab đang giảm giá -->
         </div>
         <!-- End Tab Content -->
       </div>

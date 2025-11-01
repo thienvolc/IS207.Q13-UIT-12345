@@ -1,6 +1,6 @@
 {{-- resources/views/components/pagination.blade.php --}}
 @if ($paginator->hasPages())
-<nav aria-label="Phân trang sản phẩm" class="mt-5">
+<nav aria-label="Phân trang sản phẩm" class="mt-5 mb-5">
     <ul class="pagination justify-content-center">
         {{-- Previous --}}
         @if ($paginator->onFirstPage())

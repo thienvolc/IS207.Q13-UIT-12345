@@ -5,13 +5,23 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 // ==================== TRANG CHỦ & KHÁC ====================
-Route::get('/', fn() => view('pages.home'))->name('home');
+Route::get('/', function () {
+    $allProducts = include resource_path('dummy/products.php');
+    
+    // Chia sản phẩm theo từng tab
+    $newProducts = collect($allProducts)->take(8); // 8 sản phẩm mới
+    $featuredProducts = collect($allProducts)->skip(8)->take(8); // 8 sản phẩm nổi bật
+    $saleProducts = collect($allProducts)->where('discount', '>', 0)->take(8); // 8 sản phẩm giảm giá
+    $bestSellers = collect($allProducts)->take(16); // 16 sản phẩm bán chạy (2 tabs carousel)
+    
+    return view('pages.home', compact('newProducts', 'featuredProducts', 'saleProducts', 'bestSellers'));
+})->name('home');
+
 Route::get('/gioi-thieu', fn() => view('pages.about'))->name('about');
 Route::get('/lien-he', fn() => view('pages.contact'))->name('contact');
 Route::get('/tin-tuc', fn() => view('pages.blog.index'))->name('blog.index');
 Route::get('/khuyen-mai', fn() => view('pages.super-deal'))->name('super-deal');
-Route::get('/gioi-thieu', fn() => view('pages.about'))->name('about');
-Route::get('/lien-he', fn() => view('pages.contact'))->name('contact');
+
 // ==================== SẢN PHẨM ====================
 
 // Danh sách sản phẩm

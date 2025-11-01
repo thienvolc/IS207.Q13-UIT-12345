@@ -27,10 +27,19 @@ return collect(range(1, 30))->map(function ($i) {
     $price_sale = $price - fake()->numberBetween(1000000, 15000000);
     $discount = $price > $price_sale ? round((($price - $price_sale) / $price) * 100) : 0;
 
+    $category = match (true) {
+        $i <= 3 => 'Điện thoại',
+        $i <= 5 => 'Laptop',
+        $i <= 8 => 'Phụ kiện',
+        $i <= 10 => 'Máy tính bảng',
+        default => 'Điện tử',
+    };
+
     return [
         'id' => $i,
         'name' => $name,
         'slug' => Str::slug($name),
+        'category' => $category,
         'price' => $price,
         'price_sale' => $price_sale,
         'discount' => $discount,
