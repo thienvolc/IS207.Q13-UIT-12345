@@ -241,3 +241,15 @@ CREATE TABLE configs
     `desc`         VARCHAR(255),
     updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE api_tokens
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(100) NOT NULL UNIQUE,  -- Token (phải là duy nhất)
+    expires_at DATETIME,                 -- Thời gian hết hạn
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
