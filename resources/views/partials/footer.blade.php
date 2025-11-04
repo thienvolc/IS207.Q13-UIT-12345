@@ -34,10 +34,10 @@
                         <p><i class="bi bi-envelope"></i> <strong>Email:</strong> support@pinkcapy.com</p>
                     </div>
                     <div class="footer-social">
-                        <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="social-icon"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
                     </div>
                 </div>
             </div>
@@ -47,9 +47,9 @@
                 <div class="footer-widget">
                     <h4 class="footer-title">Sản phẩm</h4>
                     <ul class="footer-menu">
-                        <li><a href="#">Laptop</a></li>
-                        <li><a href="#">Điện thoại</a></li>
-                        <li><a href="#">Tablet</a></li>
+                        <li><a href="/san-pham">Laptop</a></li>
+                        <li><a href="/san-pham">Điện thoại</a></li>
+                        <li><a href="/san-pham">Tablet</a></li>
                         <li><a href="#">Máy ảnh</a></li>
                         <li><a href="#">TV & Audio</a></li>
                         <li><a href="#">Phụ kiện</a></li>
@@ -62,12 +62,12 @@
                 <div class="footer-widget">
                     <h4 class="footer-title">Chăm sóc khách hàng</h4>
                     <ul class="footer-menu">
-                        <li><a href="#">Liên hệ</a></li>
-                        <li><a href="#">Hỏi đáp</a></li>
-                        <li><a href="#">Chính sách bảo hành</a></li>
-                        <li><a href="#">Chính sách đổi trả</a></li>
-                        <li><a href="#">Vận chuyển</a></li>
-                        <li><a href="#">Thanh toán</a></li>
+                        <li><a href="/lien-he">Liên hệ</a></li>
+                        <li><a href="/hoi-dap">Hỏi đáp</a></li>
+                        <li><a href="/chinh-sach-bao-hanh">Chính sách bảo hành</a></li>
+                        <li><a href="/chinh-sach-doi-tra">Chính sách đổi trả</a></li>
+                        <li><a href="/van-chuyen">Vận chuyển</a></li>
+                        <li><a href="/thanh-toan">Thanh toán</a></li>
                     </ul>
                 </div>
             </div>
@@ -77,12 +77,12 @@
                 <div class="footer-widget">
                     <h4 class="footer-title">Thông tin</h4>
                     <ul class="footer-menu">
-                        <li><a href="#">Về chúng tôi</a></li>
-                        <li><a href="#">Tin tức</a></li>
-                        <li><a href="#">Tuyển dụng</a></li>
-                        <li><a href="#">Điều khoản</a></li>
-                        <li><a href="#">Chính sách bảo mật</a></li>
-                        <li><a href="#">Sitemap</a></li>
+                        <li><a href="/gioi-thieu">Về chúng tôi</a></li>
+                        <li><a href="/tin-tuc">Tin tức</a></li>
+                        <li><a href="/tuyen-dung">Tuyển dụng</a></li>
+                        <li><a href="/dieu-khoan">Điều khoản</a></li>
+                        <li><a href="/chinh-sach-bao-mat">Chính sách bảo mật</a></li>
+                        <li><a href="/sitemap">Sitemap</a></li>
                     </ul>
                 </div>
             </div>
@@ -94,8 +94,8 @@
                     <div class="footer-address">
                         <p><i class="bi bi-geo-alt"></i> Khu phố 6, Phường Linh Trung, TP. Thủ Đức, TP. HCM</p>
                         <p><strong>Giờ mở cửa:</strong><br>
-                        T2 - T6: 8:00 - 20:00<br>
-                        T7 - CN: 9:00 - 21:00</p>
+                            T2 - T6: 8:00 - 20:00<br>
+                            T7 - CN: 9:00 - 21:00</p>
                     </div>
                 </div>
             </div>

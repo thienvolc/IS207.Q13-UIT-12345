@@ -8,8 +8,8 @@
     <!-- Breadcrumb -->
     <div class="mb-4">
         @include('partials.breadcrumb', [
-            'items' => [],
-            'current' => 'Sản phẩm'
+        'items' => [],
+        'current' => 'Sản phẩm'
         ])
     </div>
 
@@ -73,19 +73,19 @@
 
     <!-- Products Grid -->
     @if($products->count())
-        <div class="grid-row">
-            @foreach($products as $product)
-                <div class="grid__col-3 product-col">
-                    @include('components.product-card', ['product' => $product])
-                </div>
-            @endforeach
+    <div class="grid-row">
+        @foreach($products as $product)
+        <div class="grid__col-3 product-col">
+            @include('components.product-card', ['product' => $product])
         </div>
+        @endforeach
+    </div>
 
-        <div class="mt-5">
-            {{ $products->links('components.pagination') }}
-        </div>
+    <div class="mt-5">
+        {{ $products->links('components.pagination') }}
+    </div>
     @else
-        <p class="text-center text-muted py-5">Không có sản phẩm nào.</p>
+    <p class="text-center text-muted py-5">Không có sản phẩm nào.</p>
     @endif
 </div>
 

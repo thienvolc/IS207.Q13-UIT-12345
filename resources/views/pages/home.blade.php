@@ -36,93 +36,44 @@
   <!-- Banner recommends-->
   <div class="mb-5">
     <div class="grid-row">
-    <div class="grid__col-3">
-      <a href="/" class="recommends-item ">
-        <div class="recommends-item-wrap">
-          <div class="grid__col-6">
-            <img src="/img/rcm1.png" alt="" class="img-fluid">
-          </div>
-          <div class="grid__col-6">
-            <div class="recommends-item-title">
-              MUA NGAY
-              <strong>DEAL HOT</strong>
-              DÀNH CHO CAMERA
+      @php
+      $banners = [
+      ['img' => '/img/rcm1.png', 'title' => 'CAMERA'],
+      ['img' => '/img/rcm2.jpg', 'title' => 'LAPTOP'],
+      ['img' => '/img/rcm3.jpg', 'title' => 'GAMING'],
+      ['img' => '/img/rcm4.png', 'title' => 'AUDIO'],
+      ];
+      @endphp
+      @foreach($banners as $banner)
+      <div class="grid__col-3">
+        <a href="{{ route('products.index') }}" class="recommends-item">
+          <div class="recommends-item-wrap">
+            <div class="grid__col-6">
+              <img src="{{ $banner['img'] }}" alt="{{ $banner['title'] }}" class="img-fluid">
             </div>
-            <div class="recommends-item-link-show" href="/"
-            >Xem chi tiết
-            <span class="recommends-item-icon"><i class="bi bi-arrow-right-circle"></i></span>
-            </div>
-          </div>
-        </div>
-      </a>
-    </div>
-    <div class="grid__col-3">
-      <a href="/" class="recommends-item">
-        <div class="recommends-item-wrap">
-          <div class="grid__col-6">
-            <img src="/img/rcm2.jpg" alt="" class="img-fluid">
-          </div>
-
-          <div class="grid__col-6">
+            <div class="grid__col-6">
               <div class="recommends-item-title">
                 MUA NGAY
                 <strong>DEAL HOT</strong>
-                DÀNH CHO CAMERA
+                DÀNH CHO {{ $banner['title'] }}
               </div>
-              <div class="recommends-item-link-show" href="/"
-              >Xem chi tiết
-              <span class="recommends-item-icon"><i class="bi bi-arrow-right-circle"></i></span>
+              <div class="recommends-item-link-show">Xem chi tiết
+                <span class="recommends-item-icon"><i class="bi bi-arrow-right-circle"></i></span>
+              </div>
             </div>
           </div>
-        </div>
-      </a>
-        </div>
-    <div class="grid__col-3">
-      <a href="/" class="recommends-item">
-        <div class="recommends-item-wrap">
-          <div class="grid__col-6">
-            <img src="/img/rcm3.jpg" alt="" class="img-fluid">
-          </div>
-          <div class="grid__col-6">
-            <div class="recommends-item-title">
-              MUA NGAY
-              <strong>DEAL HOT</strong>
-              DÀNH CHO CAMERA
-            </div>
-            <div class="recommends-item-link-show" href="/"
-            >Xem chi tiết
-            <span class="recommends-item-icon"><i class="bi bi-arrow-right-circle"></i></span>
-            </div>
-          </div>
-        </div>
-      </a>
-    </div>
-    <div class="grid__col-3">
-      <a href="/" class="recommends-item">
-        <div class="recommends-item-wrap">
-          <div class="grid__col-6">
-            <img src="/img/rcm4.png" alt="" class="img-fluid">
-          </div>
-        <div class="grid__col-6">
-            <div class="recommends-item-title">
-              MUA NGAY
-              <strong>DEAL HOT</strong>
-              DÀNH CHO CAMERA
-            </div>
-          <div class="recommends-item-link-show" href="/"
-          >Xem chi tiết
-          <span class="recommends-item-icon"><i class="bi bi-arrow-right-circle"></i></span>
-            </div>
-        </div>
-        </div>
-      </a>
+        </a>
+      </div>
+      @endforeach
     </div>
   </div>
-</div>
-<!-- Deal and tabs -->
+  <!-- Deal and tabs -->
   <div class="mb-5">
     <div class="grid-row">
       <!-- Deal -->
+      @php
+      $dealProduct = $newProducts->first();
+      @endphp
       <div class="grid__col-3 deal">
         <div class="deal-wrap">
           <div class="deal-header">
@@ -131,52 +82,56 @@
             </h3>
             <div class="deal-header-coupon">
               <span>Tiết kiệm</span>
-              <div class="deal-header-coupon_price">300K</div>
+              <div class="deal-header-coupon_price">
+                {{ number_format(($dealProduct['price'] - $dealProduct['price_sale']) / 1000) }}K
+              </div>
             </div>
           </div>
           <div class="deal-img">
-            <a href="/">
-              <img src="/img/sp1.jpg" alt="" class="img-fluid">
+            <a href="{{ route('products.show', $dealProduct['slug']) }}">
+              <img src="{{ $dealProduct['thumbnail'] }}" alt="{{ $dealProduct['name'] }}" class="img-fluid">
             </a>
           </div>
-          <h5 class="deal-name-produce"><a href="/">
-            Tay cầm PS5 + USB 3.0 Cable
-          </a></h5>
+          <h5 class="deal-name-produce">
+            <a href="{{ route('products.show', $dealProduct['slug']) }}">
+              {{ $dealProduct['name'] }}
+            </a>
+          </h5>
           <div class="deal-price">
-            <del class="deal-price-main">1.234.567đ</del> <!-- Thẻ del - đánh dấu văn bản bị xóa -->
-            <ins class="deal-price-reduce">1.000.000đ</ins> <!-- Thẻ ins - đánh dấu một phần của văn bản đã được thêm vào văn bản gốc ban đầu -->
+            <del class="deal-price-main">{{ number_format($dealProduct['price']) }}đ</del>
+            <ins class="deal-price-reduce">{{ number_format($dealProduct['price_sale']) }}đ</ins>
           </div>
           <div class="deal-hang">
-            <div class="deal-soluong" >
-                <span class="">Available: <strong>3</strong></span>
-                <span class="">Already Sold: <strong>36</strong></span>
+            <div class="deal-soluong">
+              <span class="">Available: <strong>3</strong></span>
+              <span class="">Already Sold: <strong>36</strong></span>
             </div>
-        </div>
-        <div class="deal-offer-end">
-          <h6>Ưu đãi kết thúc trong:</h6>
-          <div class="js-countdown d-flex justify-content-center" data-end-date="2025/12/31" data-hours-format="%H" data-minutes-format="%M" data-seconds-format="%S">
-            <div class="countdown-item">
+          </div>
+          <div class="deal-offer-end">
+            <h6>Ưu đãi kết thúc trong:</h6>
+            <div class="js-countdown d-flex justify-content-center" data-end-date="2025/12/31" data-hours-format="%H" data-minutes-format="%M" data-seconds-format="%S">
+              <div class="countdown-item">
                 <div class="countdown-number">
-                    <span class="js-cd-hours">00</span>
+                  <span class="js-cd-hours">00</span>
                 </div>
                 <div class="countdown-label">GIỜ</div>
-            </div>
-            <div class="countdown-separator">:</div>
-            <div class="countdown-item">
+              </div>
+              <div class="countdown-separator">:</div>
+              <div class="countdown-item">
                 <div class="countdown-number">
-                    <span class="js-cd-minutes">00</span>
+                  <span class="js-cd-minutes">00</span>
                 </div>
                 <div class="countdown-label">PHÚT</div>
-            </div>
-            <div class="countdown-separator">:</div>
-            <div class="countdown-item">
+              </div>
+              <div class="countdown-separator">:</div>
+              <div class="countdown-item">
                 <div class="countdown-number">
-                    <span class="js-cd-seconds">00</span>
+                  <span class="js-cd-seconds">00</span>
                 </div>
                 <div class="countdown-label">GIÂY</div>
+              </div>
             </div>
-        </div>
-        </div>
+          </div>
         </div>
       </div>
       <!-- Tabs -->
@@ -208,288 +163,11 @@
           <!-- Tab New -->
           <div class="tab-pane fade show active" id="featured" role="tabpanel" aria-labelledby="featured-tab">
             <div class="grid-row">
-              <!-- Product 1 -->
+              @foreach($newProducts as $product)
               <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Loa</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Wireless Audio System Multiroom 360</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp1.jpg" alt="Loa Wireless" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price">685.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                      <button class="product-item__btn-item btn-cart">
-                        <i class="bi bi-cart-plus"></i>
-                      </button>
-                    </div>
-                    <div class="product-item__hover-actions">
-                      <button class="product-item__btn-item btn-compare">
-                        <i class="bi bi-arrow-left-right"></i>
-                      </button>
-                      <button class="product-item__btn-item btn-wishlist">
-                        <i class="bi bi-heart"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <x-product-card :product="$product" />
               </div>
-              <!-- Product 2 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Tablet</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Tablet White EliteBook Revolve</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp2.jpg" alt="Tablet" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price">1.299.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 3 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <span class="product-item__badge">-14%</span>
-                  <div class="product-item__category">
-                    <a href="/">Tai nghe</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Purple Solo 2 Wireless</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp3.jpg" alt="Tai nghe" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price-sale">685.000đ</span>
-                      <span class="price-old">800.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                      <button class="product-item__btn-item btn-cart">
-                        <i class="bi bi-cart-plus"></i>
-                      </button>
-                    </div>
-                    <div class="product-item__hover-actions">
-                      <button class="product-item__btn-item btn-compare">
-                        <i class="bi bi-arrow-left-right"></i>
-                      </button>
-                      <button class="product-item__btn-item btn-wishlist">
-                        <i class="bi bi-heart"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 4 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <span class="product-item__badge">-12%</span>
-                  <div class="product-item__category">
-                    <a href="/">Điện thoại</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Smartphone 6S 32GB LTE</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp4.jpg" alt="Smartphone" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price-sale">750.000đ</span>
-                      <span class="price-old">850.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                      <button class="product-item__btn-item btn-cart">
-                        <i class="bi bi-cart-plus"></i>
-                      </button>
-                    </div>
-                    <div class="product-item__hover-actions">
-                      <button class="product-item__btn-item btn-compare">
-                        <i class="bi bi-arrow-left-right"></i>
-                      </button>
-                      <button class="product-item__btn-item btn-wishlist">
-                        <i class="bi bi-heart"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Product 5 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Camera</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Camera C430W 4K Waterproof</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp5.jpg" alt="Camera" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price">899.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 6 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Smartwatch</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Smartwatch 2.0 LTE WiFi</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp6.jpg" alt="Smartwatch" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price">799.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 7 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <span class="product-item__badge">-11%</span>
-                  <div class="product-item__category">
-                    <a href="/">Phụ kiện</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">External SSD USB 3.1 750GB</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp7.jpg" alt="SSD" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price-sale">799.000đ</span>
-                      <span class="price-old">900.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                      <button class="product-item__btn-item btn-cart">
-                        <i class="bi bi-cart-plus"></i>
-                      </button>
-                    </div>
-                    <div class="product-item__hover-actions">
-                      <button class="product-item__btn-item btn-compare">
-                        <i class="bi bi-arrow-left-right"></i>
-                      </button>
-                      <button class="product-item__btn-item btn-wishlist">
-                        <i class="bi bi-heart"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 8 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <span class="product-item__badge">-11%</span>
-                  <div class="product-item__category">
-                    <a href="/">Camera</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Purple NX Mini F1 SMART NX</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/bestseler1.jpg" alt="Camera NX" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price-sale">890.000đ</span>
-                      <span class="price-old">1.000.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                      <button class="product-item__btn-item btn-cart">
-                        <i class="bi bi-cart-plus"></i>
-                      </button>
-                    </div>
-                    <div class="product-item__hover-actions">
-                      <button class="product-item__btn-item btn-compare">
-                        <i class="bi bi-arrow-left-right"></i>
-                      </button>
-                      <button class="product-item__btn-item btn-wishlist">
-                        <i class="bi bi-heart"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- More products... -->
+              @endforeach
             </div>
           </div>
           <!-- End Tab New -->
@@ -497,147 +175,11 @@
           <!-- Tab nổi bật -->
           <div class="tab-pane fade" id="onsale" role="tabpanel" aria-labelledby="onsale-tab">
             <div class="grid-row">
-              <!-- Product 1 -->
+              @foreach($featuredProducts as $product)
               <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <span class="product-item__badge">-13%</span>
-                  <div class="product-item__category">
-                    <a href="/">Máy tính bảng</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Tablet White EliteBook Revolve 810 G2</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp2.jpg" alt="Product" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price-sale">1.999.000đ</span>
-                      <span class="price-old">2.299.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
+                <x-product-card :product="$product" />
               </div>
-              <!-- Product 2 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Tai nghe</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Purple Solo 2 Wireless</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp3.jpg" alt="Product" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <del class="price-old">800.000đ</del>
-                      <ins class="price-sale">685.000đ</ins>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 3 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Điện thoại</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Smartphone 6S 32GB LTE</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp4.jpg" alt="Product" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <del class="price-old">750.000đ</del>
-                      <ins class="price-sale">685.000đ</ins>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 4 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Camera</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Camera C430W 4k Waterproof</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp5.jpg" alt="Product" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <del class="price-old">900.000đ</del>
-                      <ins class="price-sale">685.000đ</ins>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
+              @endforeach
             </div>
           </div>
           <!-- End Tab nổi bật -->
@@ -645,143 +187,11 @@
           <!-- Tab đang giảm giá -->
           <div class="tab-pane fade" id="toprated" role="tabpanel" aria-labelledby="toprated-tab">
             <div class="grid-row">
-              <!-- Product 1 -->
+              @foreach($saleProducts as $product)
               <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Loa</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Wireless Audio System Multiroom 360</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp1.jpg" alt="Product" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price">685.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
+                <x-product-card :product="$product" />
               </div>
-              <!-- Product 2 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Máy tính bảng</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Tablet White EliteBook Revolve 810 G2</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp6.jpg" alt="Product" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <del class="price-old">2.299.000đ</del>
-                      <ins class="price-sale">1.999.000đ</ins>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 3 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Tai nghe</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Purple Solo 2 Wireless</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp7.jpg" alt="Product" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price">685.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Product 4 -->
-              <div class="grid__col-3 product-col">
-                <div class="product-item">
-                  <div class="product-item__category">
-                    <a href="/">Điện thoại</a>
-                  </div>
-                  <h5 class="product-item__title">
-                    <a href="/">Smartphone 6S 32GB LTE</a>
-                  </h5>
-                  <div class="product-item__image">
-                    <a href="/">
-                      <img src="/img/sp4.jpg" alt="Product" class="img-fluid">
-                    </a>
-                  </div>
-                  <div class="product-item__footer">
-                    <div class="product-item__price">
-                      <span class="price">685.000đ</span>
-                    </div>
-                    <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                  </div>
-                </div>
-              </div>
+              @endforeach
             </div>
           </div>
           <!-- End Tab đang giảm giá -->
@@ -791,632 +201,129 @@
     </div>
   </div>
   <!-- Product carousel -->
-   <div class="product__carousel-wrap">
-     <div class="product__carousel">
+  <div class="product__carousel-wrap">
+    <div class="product__carousel">
       <h3>Best Sellers</h3>
       <ul class="nav nav-pills product__carousel-list">
         <li class="nav-item">
-          <a href="/" class="nav-link product__carousel-item-top">Top 10</a>
+          <a href="{{ route('products.index') }}" class="nav-link product__carousel-item-top">Top 10</a>
         </li>
         <li class="nav-item">
-          <a href="/" class="nav-link">Tai nghe</a>
+          <a href="{{ route('products.index') }}" class="nav-link">Tai nghe</a>
         </li>
         <li class="nav-item">
-          <a href="/" class="nav-link">Phụ kiện</a>
+          <a href="{{ route('products.index') }}" class="nav-link">Phụ kiện</a>
         </li>
         <li class="nav-item">
-          <a href="/" class="nav-link">Camera</a>
+          <a href="{{ route('products.index') }}" class="nav-link">Camera</a>
         </li>
       </ul>
-   </div>
-   
-   <div class="container">
-        <div class="product-carousel-wrapper">
-            <!-- Tab Navigation Buttons -->
-            <button class="scroll-btn scroll-btn-left" onclick="changeTab(-1)">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="scroll-btn scroll-btn-right" onclick="changeTab(1)">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            
-            <!-- Tab 1 - Products 1-8 -->
-            <div class="grid-row product-tab active" id="tab-page-1">
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <a href="#">
-                                <img src="{{ asset('img/sp1.jpg') }}" alt="Tablet Air 3 WiFi 64GB Gold" class="img-fluid" loading="lazy">
-                            </a>
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">TABLETS</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Tablet Air 3 WiFi 64GB Gold</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$629,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    </div>
+
+    <div class="container">
+      <div class="product-carousel-wrapper">
+        <!-- Tab Navigation Buttons -->
+        <button class="scroll-btn scroll-btn-left" data-tab-action="prev">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button class="scroll-btn scroll-btn-right" data-tab-action="next">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+
+        @php
+        $tab1 = $bestSellers->take(8);
+        $tab2 = $bestSellers->skip(8)->take(8);
+        @endphp
+
+        <!-- Tab 1 - Products 1-8 -->
+        <div class="grid-row product-tab active" id="tab-page-1">
+          @foreach($tab1 as $product)
+          <div class="grid__col-3 product-col">
+            <div class="product-item">
+              <div class="product-item__image">
+                <a href="{{ route('products.show', $product['slug']) }}">
+                  <img src="{{ $product['thumbnail'] }}" alt="{{ $product['name'] }}" class="img-fluid" loading="lazy">
+                </a>
+              </div>
+              <div class="product-item__content">
+                <div class="product-item__category">
+                  <a href="{{ route('products.index') }}">{{ $product['category'] }}</a>
                 </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <a href="#">
-                                <img src="{{ asset('img/sp2.jpg') }}" alt="Tablet White EliteBook Revolve 810 G2" class="img-fluid" loading="lazy">
-                            </a>
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">LAPTOPS &amp; COMPUTERS</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Tablet White EliteBook Revolve...</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$1 299,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <h5 class="product-item__title">
+                  <a href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
+                </h5>
+                <div class="product-item__footer">
+                  <div class="product-item__price">{{ number_format($product['price_sale']) }}đ</div>
+                  <div class="product-item__btn-list">
+                    <button class="product-item__btn-item btn-cart">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                  <div class="product-item__hover-actions">
+                    <button class="product-item__btn-item btn-compare">
+                      <i class="bi bi-arrow-left-right"></i>
+                    </button>
+                    <button class="product-item__btn-item btn-wishlist">
+                      <i class="bi bi-heart"></i>
+                    </button>
+                  </div>
                 </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp3.jpg') }}" alt="Pendrive USB 3.0 Flash 64 GB" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">ACCESSORIES</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Pendrive USB 3.0 Flash 64 GB</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$110,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp4.jpg') }}" alt="White Solo 2 Wireless" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">HEADPHONES</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">White Solo 2 Wireless</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$110,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp5.jpg') }}" alt="Smartwatch 2.0 LTE Wifi" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">SMARTWATCHES</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Smartwatch 2.0 LTE Wifi</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$110,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp6.jpg') }}" alt="Gear Virtual Reality" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">SMARTWATCHES</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Gear Virtual Reality</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$799,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp7.jpg') }}" alt="External SSD USB 3.1 750 GB" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">GADGETS</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">External SSD USB 3.1 750 GB</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$799,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/bestseler1.jpg') }}" alt="Purple NX Mini F1 SMART NX" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">CAMERAS</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Purple NX Mini F1 aparat SMART NX</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$559.00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              </div>
             </div>
-            <!-- End Tab 1 -->
-                
-            <!-- Tab 2 - Products 9-16 -->
-            <div class="grid-row product-tab" id="tab-page-2">
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/rcm1.png') }}" alt="Recommended Product 1" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">RECOMMENDED</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Recommended Product 1</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$629,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/rcm2.jpg') }}" alt="Recommended Product 2" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">RECOMMENDED</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Recommended Product 2</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$1 299,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/rcm3.jpg') }}" alt="Recommended Product 3" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">RECOMMENDED</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Recommended Product 3</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$110,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/rcm4.png') }}" alt="Recommended Product 4" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">RECOMMENDED</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Recommended Product 4</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$110,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp1.jpg') }}" alt="Tablet Pro 256GB" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">TABLETS</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Tablet Pro 256GB</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$110,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp2.jpg') }}" alt="Gaming Laptop Pro" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">LAPTOPS</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Gaming Laptop Pro</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$799,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp3.jpg') }}" alt="Wireless Keyboard & Mouse" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">ACCESSORIES</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Wireless Keyboard & Mouse</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$799,00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid__col-3 product-col">
-                    <div class="product-item">
-                        <div class="product-item__image">
-                            <img src="{{ asset('img/sp4.jpg') }}" alt="Premium Headphones" loading="lazy">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-item__category">
-                                <a href="#">HEADPHONES</a>
-                            </div>
-                            <h5 class="product-item__title">
-                                <a href="#">Premium Headphones</a>
-                            </h5>
-                            <div class="product-item__footer">
-                                <div class="product-item__price">$559.00</div>
-                                <div class="product-item__btn-list">
-                                    <button class="product-item__btn-item btn-cart">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="product-item__hover-actions">
-                                    <button class="product-item__btn-item btn-compare">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-                                    <button class="product-item__btn-item btn-wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- End Tab 2 -->
-            
-            <!-- Tab Indicators -->
-            <div class="carousel-progress">
-                <div class="tab-indicators">
-                    <span class="tab-dot active" onclick="goToTab(1)"></span>
-                    <span class="tab-dot" onclick="goToTab(2)"></span>
-                </div>
-            </div>
+          </div>
+          @endforeach
         </div>
-   </div>
-   
-   <!-- JavaScript for Tab Navigation -->
-   <script>
-   let currentTab = 1;
-   const totalTabs = 2;
-   
-   // Change Tab Function
-   function changeTab(direction) {
-       const oldTab = currentTab;
-       currentTab += direction;
-       
-       // Loop around
-       if (currentTab > totalTabs) currentTab = 1;
-       if (currentTab < 1) currentTab = totalTabs;
-       
-       showTab(currentTab, direction);
-   }
-   
-   // Go to specific tab
-   function goToTab(tabNumber) {
-       const direction = tabNumber > currentTab ? 1 : -1;
-       currentTab = tabNumber;
-       showTab(currentTab, direction);
-   }
-   
-   // Show Tab with animation
-   function showTab(tabNumber, direction = 1) {
-       const tabs = document.querySelectorAll('.product-tab');
-       
-       // Add slide-out animation to current tab
-       tabs.forEach((tab, index) => {
-           if (tab.classList.contains('active')) {
-               // Slide out in opposite direction
-               if (direction > 0) {
-                   tab.classList.add('slide-out-left');
-               } else {
-                   tab.classList.add('slide-out-right');
-               }
-               
-               // Remove active after animation starts
-               setTimeout(() => {
-                   tab.classList.remove('active', 'slide-out-left', 'slide-out-right');
-               }, 100);
-           }
-       });
-       
-       // Show selected tab with slide-in animation
-       setTimeout(() => {
-           const selectedTab = document.getElementById(`tab-page-${tabNumber}`);
-           if (selectedTab) {
-               selectedTab.classList.add('active');
-           }
-       }, 100);
-       
-       // Update indicators
-       const dots = document.querySelectorAll('.tab-dot');
-       dots.forEach((dot, index) => {
-           if (index + 1 === tabNumber) {
-               dot.classList.add('active');
-           } else {
-               dot.classList.remove('active');
-           }
-       });
-   }
-   </script>
+        <!-- End Tab 1 -->
+
+        <!-- Tab 2 - Products 9-16 -->
+        <div class="grid-row product-tab" id="tab-page-2">
+          @foreach($tab2 as $product)
+          <div class="grid__col-3 product-col">
+            <div class="product-item">
+              <div class="product-item__image">
+                <a href="{{ route('products.show', $product['slug']) }}">
+                  <img src="{{ $product['thumbnail'] }}" alt="{{ $product['name'] }}" class="img-fluid" loading="lazy">
+                </a>
+              </div>
+              <div class="product-item__content">
+                <div class="product-item__category">
+                  <a href="{{ route('products.index') }}">{{ $product['category'] }}</a>
+                </div>
+                <h5 class="product-item__title">
+                  <a href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
+                </h5>
+                <div class="product-item__footer">
+                  <div class="product-item__price">{{ number_format($product['price_sale']) }}đ</div>
+                  <div class="product-item__btn-list">
+                    <button class="product-item__btn-item btn-cart">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                  <div class="product-item__hover-actions">
+                    <button class="product-item__btn-item btn-compare">
+                      <i class="bi bi-arrow-left-right"></i>
+                    </button>
+                    <button class="product-item__btn-item btn-wishlist">
+                      <i class="bi bi-heart"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          @endforeach
+        </div>
+        <!-- End Tab 2 -->
+
+        <!-- Tab Indicators -->
+        <div class="carousel-progress">
+          <div class="tab-indicators">
+            <span class="tab-dot active" data-tab-number="1"></span>
+            <span class="tab-dot" data-tab-number="2"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 @endsection

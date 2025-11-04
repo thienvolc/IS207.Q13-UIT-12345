@@ -7,13 +7,13 @@ use Illuminate\Pagination\LengthAwarePaginator;
 // ==================== TRANG CHỦ & KHÁC ====================
 Route::get('/', function () {
     $allProducts = include resource_path('dummy/products.php');
-    
+
     // Chia sản phẩm theo từng tab
     $newProducts = collect($allProducts)->take(8); // 8 sản phẩm mới
     $featuredProducts = collect($allProducts)->skip(8)->take(8); // 8 sản phẩm nổi bật
     $saleProducts = collect($allProducts)->where('discount', '>', 0)->take(8); // 8 sản phẩm giảm giá
     $bestSellers = collect($allProducts)->take(16); // 16 sản phẩm bán chạy (2 tabs carousel)
-    
+
     return view('pages.home', compact('newProducts', 'featuredProducts', 'saleProducts', 'bestSellers'));
 })->name('home');
 

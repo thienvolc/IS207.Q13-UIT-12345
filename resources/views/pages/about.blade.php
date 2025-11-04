@@ -8,10 +8,10 @@
     <!-- Breadcrumb -->
     <div class="mb-4">
         @include('partials.breadcrumb', [
-            'items' => [
-                ['name' => 'Trang chủ', 'url' => route('home')],
-            ],
-            'current' => 'Giới thiệu'
+        'items' => [
+        ['name' => 'Trang chủ', 'url' => route('home')],
+        ],
+        'current' => 'Giới thiệu'
         ])
     </div>
 
@@ -19,7 +19,7 @@
     <section class="text-center mb-5">
         <h1 class="display-5 fw-bold text-primary mb-3">PinkCapyStore - Phụ kiện công nghệ chính hãng</h1>
         <p class="lead text-muted col-lg-8 mx-auto">
-            Chúng tôi chuyên cung cấp <strong>tai nghe, đồng hồ thông minh và phụ kiện</strong> cho điện thoại, laptop – 
+            Chúng tôi chuyên cung cấp <strong>tai nghe, đồng hồ thông minh và phụ kiện</strong> cho điện thoại, laptop –
             <span class="text-primary">chính hãng 100%</span>, giá tốt, giao nhanh.
         </p>
     </section>
@@ -34,7 +34,7 @@
                         <h3 class="h4 fw-bold mb-0">Tầm nhìn</h3>
                     </div>
                     <p class="text-muted">
-                        Trở thành kênh bán lẻ điện tử trực tuyến <strong>uy tín hàng đầu</strong> tại Việt Nam, 
+                        Trở thành kênh bán lẻ điện tử trực tuyến <strong>uy tín hàng đầu</strong> tại Việt Nam,
                         mang đến sản phẩm công nghệ chất lượng, giá cạnh tranh và trải nghiệm mua sắm hiện đại.
                     </p>
                 </div>

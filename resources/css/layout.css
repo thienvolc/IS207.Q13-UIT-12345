@@ -425,7 +425,9 @@
     font-weight: 700;
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.15s, transform 0.15s;
+    transition:
+        opacity 0.15s,
+        transform 0.15s;
 }
 
 .hero__subtitle {
@@ -435,7 +437,9 @@
     color: #6b7280;
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.15s, transform 0.15s;
+    transition:
+        opacity 0.15s,
+        transform 0.15s;
 }
 
 .hero__meta {
@@ -445,7 +449,9 @@
     margin-bottom: 22px;
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.15s, transform 0.15s;
+    transition:
+        opacity 0.15s,
+        transform 0.15s;
 }
 .hero__from {
     color: #6b7280;
@@ -481,7 +487,10 @@
     border-radius: 12px;
     text-decoration: none;
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06) inset;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        opacity 0.15s;
     opacity: 0;
     transform: translateY(10px);
 }
@@ -527,7 +536,9 @@
     filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.08));
     opacity: 0;
     transform: scale(0.2);
-    transition: opacity 0.1s, transform 0.2s;
+    transition:
+        opacity 0.1s,
+        transform 0.2s;
 }
 
 .hero--anim .hero__title {
@@ -619,7 +630,7 @@
 }
 
 .deal-header-title {
-    font-size: 22px;
+    font-size: 1.8rem;
     font-weight: normal;
     line-height: 28px;
     min-width: 120px;
@@ -641,13 +652,13 @@
 }
 
 .deal-header-coupon span {
-    font-size: 11px;
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--white);
 }
 
 .deal-header-coupon_price {
-    font-size: 20px;
+    font-size: 1.6rem;
     font-weight: 700;
     color: var(--white);
 }
@@ -1114,7 +1125,9 @@
     left: 0;
     opacity: 0;
     transform: translateX(50px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
     pointer-events: none;
 }
 
@@ -1268,14 +1281,14 @@
 }
 
 .product-carousel-wrapper .product-item__price {
-    font-size: 16px;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #333;
 }
 
 .product-carousel-wrapper .product-item__btn-list {
     display: flex;
-    gap: 5px;
+    /* gap: 5px; */
 }
 
 .product-carousel-wrapper .product-item__btn-item {
@@ -1322,6 +1335,7 @@
 
 .product-carousel-wrapper .product-item__btn-item i {
     font-size: 13px;
+    /* vertical-align: middle; */
 }
 
 /* Scroll Navigation Buttons */
@@ -1410,7 +1424,9 @@
     background: #ddd;
     border-radius: 50%;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.3s ease;
+    transition:
+        background 0.3s ease,
+        transform 0.3s ease;
     transform: scale(1);
     flex-shrink: 0; /* Prevent shrinking */
 }

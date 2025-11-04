@@ -8,10 +8,10 @@
     <!-- Breadcrumb -->
     <div class="mb-4">
         @include('partials.breadcrumb', [
-            'items' => [
-                ['name' => 'Sản phẩm', 'url' => route('products.index')],
-            ],
-            'current' => $product['name']
+        'items' => [
+        ['name' => 'Sản phẩm', 'url' => route('products.index')],
+        ],
+        'current' => $product['name']
         ])
     </div>
 
@@ -20,12 +20,12 @@
         <div class="col-lg-5">
             <div class="product-detail-image sticky-top" style="top: 90px;">
                 <div class="product-detail-image__main bg-light rounded-3 p-4 mb-3">
-                    <img src="{{ $product['thumbnail'] }}" 
-                         alt="{{ $product['name'] }}" 
-                         class="w-100 rounded"
-                         style="height: 400px; object-fit: contain;">
+                    <img src="{{ $product['thumbnail'] }}"
+                        alt="{{ $product['name'] }}"
+                        class="w-100 rounded"
+                        style="height: 400px; object-fit: contain;">
                 </div>
-                
+
                 {{-- Gallery thumbnails (nếu có nhiều ảnh) --}}
                 @if(isset($product['images']) && count($product['images']) > 0)
                 <div class="product-detail-gallery d-flex gap-2">
@@ -51,7 +51,7 @@
                         <div class="text-warning fs-5">
                             @for($i = 1; $i <= 5; $i++)
                                 <i class="fa{{ $i <= ($product['rating'] ?? 0) ? 's' : 'r' }} fa-star"></i>
-                            @endfor
+                                @endfor
                         </div>
                         <span class="fw-bold fs-5">{{ $product['rating'] ?? 0 }}</span>
                     </div>
@@ -68,7 +68,7 @@
                         @if($product['price_sale'] < $product['price'])
                             <del class="h5 text-muted mb-0">{{ number_format($product['price']) }}đ</del>
                             <span class="badge bg-danger fs-5">-{{ $product['discount'] }}%</span>
-                        @endif
+                            @endif
                     </div>
                     <p class="text-muted mb-0">
                         <i class="fa-solid fa-tag me-1"></i>
@@ -263,9 +263,9 @@
         </div>
         <div class="row g-3 g-md-4">
             @foreach($related as $item)
-                <div class="col-6 col-md-4 col-lg-3">
-                    @include('components.product-card', ['product' => $item])
-                </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                @include('components.product-card', ['product' => $item])
+            </div>
             @endforeach
         </div>
     </div>
@@ -274,52 +274,52 @@
 
 @push('styles')
 <style>
-/* ---------- Tab Content ---------- */
-.product-description {
-    line-height: 1.8;
-    color: #374151;
-}
-
-.product-specs table td {
-    padding: 1.2rem 1.5rem;
-    vertical-align: middle;
-}
-
-/* ---------- Responsive ---------- */
-@media (max-width: 768px) {
-    .product-detail-gallery__item {
-        width: 64px !important;
-        height: 64px !important;
+    /* ---------- Tab Content ---------- */
+    .product-description {
+        line-height: 1.8;
+        color: #374151;
     }
-    
-    .nav-tabs .nav-link {
-        padding: 1rem 1rem;
+
+    .product-specs table td {
+        padding: 1.2rem 1.5rem;
+        vertical-align: middle;
     }
-}
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 768px) {
+        .product-detail-gallery__item {
+            width: 64px !important;
+            height: 64px !important;
+        }
+
+        .nav-tabs .nav-link {
+            padding: 1rem 1rem;
+        }
+    }
 </style>
 @endpush
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add to cart
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const productId = this.dataset.productId;
-            console.log('Add to cart:', productId);
-            // TODO: Implement add to cart logic
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add to cart
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.dataset.productId;
+                console.log('Add to cart:', productId);
+                // TODO: Implement add to cart logic
+            });
         });
-    });
 
-    // Buy now
-    document.querySelectorAll('.buy-now').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const productId = this.dataset.productId;
-            console.log('Buy now:', productId);
-            // TODO: Implement buy now logic
+        // Buy now
+        document.querySelectorAll('.buy-now').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.dataset.productId;
+                console.log('Buy now:', productId);
+                // TODO: Implement buy now logic
+            });
         });
     });
-});
 </script>
 @endpush
 @endsection
