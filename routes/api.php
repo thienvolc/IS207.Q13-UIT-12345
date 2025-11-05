@@ -12,6 +12,18 @@ Route::prefix('products')->group(function () {
     Route::get('/{slug}', [\App\Http\Controllers\Public\ProductController::class, 'showBySlug']);
 });
 
+// Public Category routes
+Route::prefix('categories')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Public\CategoryController::class, 'index']);
+    Route::get('/{slug}', [\App\Http\Controllers\Public\CategoryController::class, 'show']);
+    Route::get('/{slug}/products', [\App\Http\Controllers\Public\CategoryController::class, 'products']);
+});
+
+// Public Tag routes
+Route::prefix('tags')->group(function () {
+    Route::get('/{tag_id}/products', [\App\Http\Controllers\Public\TagController::class, 'products']);
+});
+
 // Me (user) routes
 Route::middleware($auth)->prefix('me')->group(function () {
     Route::get('carts', [\App\Http\Controllers\Me\CartController::class, 'index']);
@@ -43,5 +55,22 @@ Route::middleware($auth.':admin')->prefix('admin')->group(function () {
         Route::delete('/{id}/metas/{metaId}', [\App\Http\Controllers\Admin\ProductController::class, 'destroyMeta']);
 
         Route::patch('/{id}/inventories', [\App\Http\Controllers\Admin\ProductController::class, 'adjustInventory']);
+    });
+
+    // Admin Categories
+    Route::prefix('categories')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\CategoryController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\Admin\CategoryController::class, 'store']);
+        Route::get('/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'show']);
+        Route::put('/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'update']);
+        Route::delete('/{category_id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroy']);
+    });
+
+    // Admin Tags
+    Route::prefix('tags')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\TagController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\Admin\TagController::class, 'store']);
+        Route::put('/{tag_id}', [\App\Http\Controllers\Admin\TagController::class, 'update']);
+        Route::delete('/{tag_id}', [\App\Http\Controllers\Admin\TagController::class, 'destroy']);
     });
 });
