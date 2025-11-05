@@ -3,108 +3,78 @@
 namespace App\Http\Controllers\Me;
 
 use App\Http\Controllers\AppController;
-use App\Models\Cart;
-use App\Models\Order;
-use App\Models\OrderItem;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\Order\PlaceOrderRequest;
+use App\Http\Requests\Order\GetOrdersRequest;
+use App\Http\Requests\Order\UpdateOrderShippingRequest;
+use App\Services\OrderService;
+use Illuminate\Http\JsonResponse;
 
 class OrderController extends AppController
 {
-    public function place(Request $request)
+    public function __construct(
+        private OrderService $orderService
+    ) {}
+
+    /**
+     * GET /me/orders
+     */
+    public function index(GetOrdersRequest $request): JsonResponse
     {
-        $userId = Auth::id() ?: $request->attributes->get('auth_user_id');
-        if (! $userId) {
-            return $this->error('Unauthorized', '401000', 401);
-        }
+        [$sortField, $sortOrder] = $request->getSort();
 
-        $cart = Cart::where('user_id', $userId)->with('items.product')->first();
-        if (! $cart || $cart->items->isEmpty()) {
-            return $this->error('Cart is empty', '400010', 400);
-        }
+        $orders = $this->orderService->getUserOrders(
+            $request->input('status'),
+            $request->getOffset(),
+            $request->getLimit(),
+            $sortField,
+            $sortOrder
+        );
 
-        $promo = $request->input('promo');
-        $note = $request->input('note');
-
-        DB::beginTransaction();
-        try {
-            $subtotal = 0;
-            $discountTotal = 0;
-
-            foreach ($cart->items as $ci) {
-                $subtotal += $ci->price * $ci->quantity;
-                $discountTotal += $ci->discount * $ci->quantity;
-            }
-
-            $tax = 0; // simplify
-            $shipping = 0; // simplify
-            $total = $subtotal;
-            $grand = $total - $discountTotal + $tax + $shipping;
-
-            $order = Order::create([
-                'user_id' => $userId,
-                'subtotal' => $subtotal,
-                'tax' => $tax,
-                'shipping' => $shipping,
-                'total' => $total,
-                'discount_total' => $discountTotal,
-                'promo' => $promo,
-                'grand_total' => $grand,
-                'status' => 'pending',
-                'note' => $note,
-            ]);
-
-            foreach ($cart->items as $ci) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $ci->product_id,
-                    'quantity' => $ci->quantity,
-                    'price' => $ci->price,
-                    'discount' => $ci->discount,
-                    'note' => $ci->note,
-                ]);
-
-                // reduce stock
-                $product = $ci->product;
-                if ($product) {
-                    $product->quantity = max(0, $product->quantity - $ci->quantity);
-                    $product->save();
-                }
-            }
-
-            // clear cart
-            $cart->items()->delete();
-
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return $this->error('Failed to create order', '500002', 500);
-        }
-
-        return $this->success([
-            'id' => $order->id,
-            'status' => $order->status,
-            'grand_total' => (string) $order->grand_total
-        ], 'Order created');
+        return $this->successResponse($orders);
     }
 
-    public function status(Request $request, $id)
+    /**
+     * POST /me/orders
+     */
+    public function place(PlaceOrderRequest $request): JsonResponse
     {
-        $userId = Auth::id() ?: $request->attributes->get('auth_user_id');
-        if (! $userId) {
-            return $this->error('Unauthorized', '401000', 401);
-        }
+        $order = $this->orderService->placeOrder($request->validated());
+        return $this->createdResponse($order);
+    }
 
-        $order = Order::find($id);
-        if (! $order) {
-            return $this->error('Order not found', '404002', 404);
-        }
+    /**
+     * GET /me/orders/{id}
+     */
+    public function show(int $id): JsonResponse
+    {
+        $order = $this->orderService->getOrderDetails($id);
+        return $this->successResponse($order);
+    }
 
-        if ($order->user_id !== $userId) {
-            return $this->error('Forbidden', '403002', 403);
-        }
+    /**
+     * GET /me/orders/{id}/status
+     */
+    public function status(int $id): JsonResponse
+    {
+        $status = $this->orderService->getOrderStatus($id);
+        return $this->successResponse($status);
+    }
 
-        return $this->success(['id' => $order->id, 'status' => $order->status]);
+    /**
+     * PATCH /me/orders/{id}/shipping
+     */
+    public function updateShipping(UpdateOrderShippingRequest $request, int $id): JsonResponse
+    {
+        $order = $this->orderService->updateShipping($id, $request->validated());
+        return $this->successResponse($order);
+    }
+
+    /**
+     * DELETE /me/orders/{id}/cancel
+     */
+    public function cancel(int $id): JsonResponse
+    {
+        $result = $this->orderService->cancelOrder($id);
+        return $this->successResponse($result);
     }
 }

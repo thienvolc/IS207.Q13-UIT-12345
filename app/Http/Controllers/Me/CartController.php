@@ -3,110 +3,69 @@
 namespace App\Http\Controllers\Me;
 
 use App\Http\Controllers\AppController;
-use App\Models\Cart;
-use App\Models\CartItem;
-use App\Models\Product;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\Cart\AddCartItemRequest;
+use App\Http\Requests\Cart\UpdateCartItemRequest;
+use App\Http\Requests\Cart\CheckoutCartRequest;
+use App\Services\CartService;
+use Illuminate\Http\JsonResponse;
 
 class CartController extends AppController
 {
-    public function index(Request $request)
+    public function __construct(
+        private CartService $cartService
+    ) {}
+
+    /**
+     * GET /me/carts
+     */
+    public function index(): JsonResponse
     {
-        $userId = Auth::id() ?: $request->attributes->get('auth_user_id');
-        if (! $userId) {
-            return $this->error('Unauthorized', '401000', 401);
-        }
-
-        $cart = Cart::firstOrCreate(['user_id' => $userId]);
-        $items = $cart->items()->with('product')->get()->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price' => (string) $item->price,
-                'discount' => (string) $item->discount,
-                'note' => $item->note,
-                'product' => $item->product ? [
-                    'title' => $item->product->title,
-                    'slug' => $item->product->slug,
-                    'thumb' => $item->product->thumb
-                ] : null
-            ];
-        });
-
-        return $this->success([
-            'id' => $cart->id,
-            'total_count' => $items->count(),
-            'items' => $items,
-        ]);
+        $cart = $this->cartService->getOrCreateCart();
+        return $this->successResponse($cart);
     }
 
-    public function addItem(Request $request)
+    /**
+     * POST /me/carts/items
+     */
+    public function addItem(AddCartItemRequest $request): JsonResponse
     {
-        $userId = Auth::id() ?: $request->attributes->get('auth_user_id');
-        if (! $userId) {
-            return $this->error('Unauthorized', '401000', 401);
-        }
+        $item = $this->cartService->addItem($request->validated());
+        return $this->successResponse($item);
+    }
 
-        $productId = $request->input('product_id');
-        $quantity = (int) $request->input('quantity', 1);
+    /**
+     * PATCH /me/carts/items/{cart_item_id}
+     */
+    public function updateItem(UpdateCartItemRequest $request, int $cart_item_id): JsonResponse
+    {
+        $item = $this->cartService->updateItem($cart_item_id, $request->validated());
+        return $this->successResponse($item);
+    }
 
-        if (! $productId || $quantity <= 0) {
-            return $this->error('Invalid product_id or quantity', '400001', 400);
-        }
+    /**
+     * DELETE /me/carts/items/{cart_item_id}
+     */
+    public function deleteItem(int $cart_item_id): JsonResponse
+    {
+        $item = $this->cartService->deleteItem($cart_item_id);
+        return $this->successResponse($item);
+    }
 
-        $product = Product::find($productId);
-        if (! $product) {
-            return $this->error('Product not found', '404001', 404);
-        }
+    /**
+     * DELETE /me/carts/clear
+     */
+    public function clearCart(): JsonResponse
+    {
+        $cart = $this->cartService->clearCart();
+        return $this->successResponse($cart);
+    }
 
-        $cart = Cart::firstOrCreate(['user_id' => $userId]);
-
-        $existingItem = CartItem::where('cart_id', $cart->id)->where('product_id', $productId)->first();
-        $existingQuantity = $existingItem ? $existingItem->quantity : 0;
-        $totalQuantity = $existingQuantity + $quantity;
-
-        if ($product->quantity < $totalQuantity) {
-            return $this->error('Insufficient stock', '400002', 400, [
-                'available' => $product->quantity,
-                'in_cart' => $existingQuantity,
-                'requested' => $quantity,
-                'total_needed' => $totalQuantity
-            ]);
-        }
-
-        DB::beginTransaction();
-        try {
-            if ($existingItem) {
-                $existingItem->quantity = $totalQuantity;
-                $existingItem->price = $product->price;
-                $existingItem->discount = $product->discount;
-                $existingItem->save();
-                $item = $existingItem;
-            } else {
-                $item = CartItem::create([
-                    'cart_id' => $cart->id,
-                    'product_id' => $productId,
-                    'quantity' => $quantity,
-                    'price' => $product->price,
-                    'discount' => $product->discount,
-                ]);
-            }
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return $this->error('Failed to add item', '500001', 500);
-        }
-
-        return $this->success([
-            'id' => $item->id,
-            'cart_id' => $cart->id,
-            'product_id' => $item->product_id,
-            'quantity' => $item->quantity,
-            'price' => (string) $item->price,
-            'discount' => (string) $item->discount,
-        ]);
+    /**
+     * PATCH /me/carts/checkout
+     */
+    public function checkout(CheckoutCartRequest $request): JsonResponse
+    {
+        $result = $this->cartService->checkout($request->validated());
+        return $this->successResponse($result);
     }
 }

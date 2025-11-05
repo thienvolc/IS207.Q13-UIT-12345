@@ -177,6 +177,7 @@ CREATE TABLE carts
     country     VARCHAR(255),
     status      TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 3),
 #   active,checkout_in_progress,checked_out
+#     completed, cancel;
     note        VARCHAR(255),
 
     created_at   DATETIME NOT NULL,

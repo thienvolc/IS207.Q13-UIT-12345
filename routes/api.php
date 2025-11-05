@@ -26,17 +26,33 @@ Route::prefix('tags')->group(function () {
 
 // Me (user) routes
 Route::middleware($auth)->prefix('me')->group(function () {
+    // Cart routes
     Route::get('carts', [\App\Http\Controllers\Me\CartController::class, 'index']);
     Route::post('carts/items', [\App\Http\Controllers\Me\CartController::class, 'addItem']);
+    Route::patch('carts/items/{cart_item_id}', [\App\Http\Controllers\Me\CartController::class, 'updateItem']);
+    Route::delete('carts/items/{cart_item_id}', [\App\Http\Controllers\Me\CartController::class, 'deleteItem']);
+    Route::delete('carts/clear', [\App\Http\Controllers\Me\CartController::class, 'clearCart']);
+    Route::patch('carts/checkout', [\App\Http\Controllers\Me\CartController::class, 'checkout']);
+
+    // Order routes
+    Route::get('orders', [\App\Http\Controllers\Me\OrderController::class, 'index']);
     Route::post('orders', [\App\Http\Controllers\Me\OrderController::class, 'place']);
+    Route::get('orders/{id}', [\App\Http\Controllers\Me\OrderController::class, 'show']);
     Route::get('orders/{id}/status', [\App\Http\Controllers\Me\OrderController::class, 'status']);
+    Route::patch('orders/{id}/shipping', [\App\Http\Controllers\Me\OrderController::class, 'updateShipping']);
+    Route::delete('orders/{id}/cancel', [\App\Http\Controllers\Me\OrderController::class, 'cancel']);
 });
 
 // Admin routes (pass role param)
 Route::middleware($auth.':admin')->prefix('admin')->group(function () {
     // Admin Orders
+    Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index']);
+    Route::get('orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'show']);
     Route::get('orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'status']);
-    Route::put('orders/{id}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'confirm']);
+    Route::patch('orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus']);
+
+    // Admin Transactions
+    Route::get('transactions', [\App\Http\Controllers\Admin\TransactionController::class, 'index']);
 
     // Admin Products
     Route::prefix('products')->group(function () {

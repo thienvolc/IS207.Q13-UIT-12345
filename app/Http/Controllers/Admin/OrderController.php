@@ -3,31 +3,72 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\AppController;
-use App\Models\Order;
-use Illuminate\Http\Request;
+use App\Http\Requests\Order\SearchOrdersAdminRequest;
+use App\Http\Requests\Order\UpdateOrderStatusRequest;
+use App\Services\OrderService;
+use Illuminate\Http\JsonResponse;
 
 class OrderController extends AppController
 {
-    public function status(Request $request, $id)
-    {
-        $order = Order::find($id);
-        if (! $order) {
-            return $this->error('Order not found', '404002', 404);
-        }
+    public function __construct(
+        private OrderService $orderService
+    ) {}
 
-        return $this->success(['id' => $order->id, 'status' => $order->status]);
+    /**
+     * GET /admin/orders
+     */
+    public function index(SearchOrdersAdminRequest $request): JsonResponse
+    {
+        [$sortField, $sortOrder] = $request->getSort();
+
+        $filters = [
+            'query' => $request->input('query'),
+            'status' => $request->input('status'),
+            'user_id' => $request->input('user_id'),
+            'start' => $request->input('start'),
+            'end' => $request->input('end'),
+            'min' => $request->input('min'),
+            'max' => $request->input('max'),
+        ];
+
+        $orders = $this->orderService->searchOrdersAdmin(
+            $filters,
+            $request->getPage(),
+            $request->getSize(),
+            $sortField,
+            $sortOrder
+        );
+
+        return $this->successResponse($orders);
     }
 
-    public function confirm(Request $request, $id)
+    /**
+     * GET /admin/orders/{id}
+     */
+    public function show(int $id): JsonResponse
     {
-        $order = Order::find($id);
-        if (! $order) {
-            return $this->error('Order not found', '404002', 404);
-        }
+        $order = $this->orderService->getOrderDetailsAdmin($id);
+        return $this->successResponse($order);
+    }
 
-        $order->status = 'processing';
-        $order->save();
+    /**
+     * GET /admin/orders/{id}/status
+     */
+    public function status(int $id): JsonResponse
+    {
+        $order = $this->orderService->getOrderDetailsAdmin($id);
+        return $this->successResponse([
+            'order_id' => $order['order_id'],
+            'status' => $order['status'],
+        ]);
+    }
 
-        return $this->success(['id' => $order->id, 'status' => $order->status], 'Order confirmed');
+    /**
+     * PATCH /admin/orders/{id}/status
+     */
+    public function updateStatus(UpdateOrderStatusRequest $request, int $id): JsonResponse
+    {
+        $result = $this->orderService->updateOrderStatus($id, $request->input('status'));
+        return $this->successResponse($result);
     }
 }
