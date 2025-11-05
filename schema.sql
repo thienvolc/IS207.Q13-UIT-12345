@@ -8,13 +8,18 @@
 
 CREATE TABLE users
 (
-    id       INT AUTO_INCREMENT PRIMARY KEY,
+    user_id       INT AUTO_INCREMENT PRIMARY KEY,
     email    VARCHAR(100) NOT NULL UNIQUE,
     phone    VARCHAR(20),
     password VARCHAR(255) NOT NULL,
     salt     VARCHAR(255),
     is_admin BOOLEAN DEFAULT FALSE,
-    status   TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 4)
+    status   TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 4),
+# active,inactive,suspend,banned
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 CREATE TABLE user_profiles
@@ -27,14 +32,18 @@ CREATE TABLE user_profiles
     profile       TEXT,
     registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login    DATETIME
-#     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE roles
 (
-    id     INT AUTO_INCREMENT PRIMARY KEY,
+    role_id     INT AUTO_INCREMENT PRIMARY KEY,
     name   VARCHAR(150) NOT NULL,
-    `desc` TEXT
+    `desc` TEXT,
+
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 CREATE TABLE user_roles
@@ -42,8 +51,6 @@ CREATE TABLE user_roles
     user_id INT,
     role_id INT,
     PRIMARY KEY (user_id, role_id)
-#     FOREIGN KEY (user_id) REFERENCES users (id),
-#     FOREIGN KEY (role_id) REFERENCES roles (id)
 );
 
 -- =========================
@@ -52,7 +59,7 @@ CREATE TABLE user_roles
 
 CREATE TABLE blog_posts
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    blogpost_id         INT AUTO_INCREMENT PRIMARY KEY,
     title      VARCHAR(150) NOT NULL,
     meta_title VARCHAR(150),
     slug       VARCHAR(150),
@@ -60,19 +67,28 @@ CREATE TABLE blog_posts
     summary    TEXT,
     content    TEXT,
     conclusion VARCHAR(255),
-    status     TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 3)
+    status     TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 3),
+#     draft,published,archived
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 CREATE TABLE categories
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    category_id         INT AUTO_INCREMENT PRIMARY KEY,
     parent_id  INT NULL,
     level      INT DEFAULT 1,
     title      VARCHAR(150),
     meta_title VARCHAR(150),
     slug       VARCHAR(150),
-    `desc`     TEXT
-#     FOREIGN KEY (parent_id) REFERENCES categories (id)
+    `desc`     TEXT,
+
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 -- =========================
@@ -81,7 +97,7 @@ CREATE TABLE categories
 
 CREATE TABLE products
 (
-    id           INT AUTO_INCREMENT PRIMARY KEY,
+    product_id           INT AUTO_INCREMENT PRIMARY KEY,
     title        VARCHAR(150),
     meta_title   VARCHAR(150),
     slug         VARCHAR(150),
@@ -94,18 +110,23 @@ CREATE TABLE products
     quantity     INT,
     published_at DATETIME,
     status       TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 5),
+#   active,out_of_stock,inactive,discontinued,archive
     discount     DECIMAL(12, 2),
     starts_at    DATETIME,
-    ends_at      DATETIME
+    ends_at      DATETIME,
+
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 CREATE TABLE product_metas
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    meta_id         INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT,
     `key`      VARCHAR(150),
     content    TEXT
-#     FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
 CREATE TABLE product_categories
@@ -113,17 +134,20 @@ CREATE TABLE product_categories
     product_id  INT,
     category_id INT,
     PRIMARY KEY (product_id, category_id)
-#     FOREIGN KEY (product_id) REFERENCES products (id),
-#     FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 
 CREATE TABLE tags
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    tag_id         INT AUTO_INCREMENT PRIMARY KEY,
     title      VARCHAR(150),
     meta_title VARCHAR(150),
     slug       VARCHAR(150),
-    `desc`     TEXT
+    `desc`     TEXT,
+
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 CREATE TABLE product_tags
@@ -131,8 +155,6 @@ CREATE TABLE product_tags
     product_id INT,
     tag_id     INT,
     PRIMARY KEY (product_id, tag_id)
-#     FOREIGN KEY (product_id) REFERENCES products (id),
-#     FOREIGN KEY (tag_id) REFERENCES tags (id)
 );
 
 -- =========================
@@ -141,7 +163,7 @@ CREATE TABLE product_tags
 
 CREATE TABLE carts
 (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id          INT AUTO_INCREMENT PRIMARY KEY,
     user_id     INT,
     first_name  VARCHAR(150),
     middle_name VARCHAR(150),
@@ -154,13 +176,18 @@ CREATE TABLE carts
     province    VARCHAR(255),
     country     VARCHAR(255),
     status      TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 3),
-    note        VARCHAR(255)
-#     FOREIGN KEY (user_id) REFERENCES users (id)
+#   active,checkout_in_progress,checked_out
+    note        VARCHAR(255),
+
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 CREATE TABLE cart_items
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    cart_item_id         INT AUTO_INCREMENT PRIMARY KEY,
     cart_id    INT,
     product_id INT,
     sku        VARCHAR(150),
@@ -169,13 +196,11 @@ CREATE TABLE cart_items
     quantity   INT,
     discount   DECIMAL(12, 2),
     note       VARCHAR(255)
-#     FOREIGN KEY (cart_id) REFERENCES carts (id),
-#     FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
 CREATE TABLE orders
 (
-    id             INT AUTO_INCREMENT PRIMARY KEY,
+    order_id             INT AUTO_INCREMENT PRIMARY KEY,
     user_id        INT,
     subtotal       DECIMAL(12, 2),
     tax            DECIMAL(12, 2),
@@ -197,13 +222,19 @@ CREATE TABLE orders
     country        VARCHAR(255),
     orders_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
     status         TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 8),
-    note           VARCHAR(255)
-#     FOREIGN KEY (user_id) REFERENCES users (id)
+#   pending_payment,paid,processing,shipped,delivered,refunded,returned,cancelled
+    note           VARCHAR(255),
+
+    version      INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 CREATE TABLE order_items
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    order_item_id         INT AUTO_INCREMENT PRIMARY KEY,
     order_id   INT,
     product_id INT,
     sku        VARCHAR(150),
@@ -212,8 +243,6 @@ CREATE TABLE order_items
     quantity   INT,
     discount   DECIMAL(12, 2),
     note       VARCHAR(255)
-#     FOREIGN KEY (order_id) REFERENCES orders (id),
-#     FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
 -- =========================
@@ -222,15 +251,20 @@ CREATE TABLE order_items
 
 CREATE TABLE transactions
 (
-    id       INT AUTO_INCREMENT PRIMARY KEY,
+    transaction_id       INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
     amount   DECIMAL(12, 2),
     content  TEXT,
     code     VARCHAR(255),
     type     TINYINT UNSIGNED DEFAULT 1 CHECK (type BETWEEN 1 AND 2),
     mode     VARCHAR(150),
-    status   TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 6)
-#     FOREIGN KEY (order_id) REFERENCES orders (id)
+    status   TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 6),
+#   initiated,pending,success,failed,cancelled,expired
+    version      INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    created_by   INT NULL,
+    updated_by   INT NULL
 );
 
 CREATE TABLE configs
@@ -239,7 +273,7 @@ CREATE TABLE configs
     `value` VARCHAR(255),
     type  tinyint,
     `desc`         VARCHAR(255),
-    updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at   DATETIME
 );
 
 
@@ -273,5 +307,3 @@ INSERT INTO products (title, meta_title, slug, thumb, `desc`, summary, type, sku
 INSERT INTO users (email, phone, password, salt, is_admin, status) VALUES
        ('user@example.com',       '0901111222', '5e884898da28047151d0e56f8dc62927', 'r4nD0mS4lT12345', FALSE, 1),
        ('admin@example.com',      '0909999888', '8c6976e5b5410415bde908bd4dee15df', 'Adm1nS4lT67890', TRUE, 1);
-
-

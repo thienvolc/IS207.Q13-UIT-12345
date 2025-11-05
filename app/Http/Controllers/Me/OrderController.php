@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\Me;
+namespace App\Http\Controllers\Me;
 
-use App\Http\Controllers\Api\ApiController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ApiController;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
