@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Me;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\AppController;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class OrderController extends ApiController
+class OrderController extends AppController
 {
     public function place(Request $request)
     {
@@ -108,4 +108,3 @@ class OrderController extends ApiController
         return $this->success(['id' => $order->id, 'status' => $order->status]);
     }
 }
-

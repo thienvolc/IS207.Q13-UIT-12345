@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductMeta;
 use App\Models\Category;
 use App\Models\Tag;
+use App\Models\CartItem;
+use App\Models\OrderItem;
 
 class Product extends Model
 {
@@ -13,6 +15,7 @@ class Product extends Model
     protected $table = 'products';
 
     protected $fillable = [
+        'category_id',
         'title',
         'meta_title',
         'slug',

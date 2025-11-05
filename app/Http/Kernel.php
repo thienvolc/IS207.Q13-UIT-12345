@@ -38,7 +38,7 @@ class Kernel extends HttpKernel
      */
     protected $routeMiddleware = [
         // ...existing code...
-        'api.auth' => \App\Http\Middleware\ApiTokenAuth::class,
+        'api.auth' => \App\Http\Middleware\AuthMiddleware::class,
     ];
 }
 

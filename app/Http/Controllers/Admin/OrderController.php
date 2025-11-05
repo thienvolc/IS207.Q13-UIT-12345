@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\AppController;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
-class OrderController extends ApiController
+class OrderController extends AppController
 {
     public function status(Request $request, $id)
     {
@@ -31,4 +31,3 @@ class OrderController extends ApiController
         return $this->success(['id' => $order->id, 'status' => $order->status], 'Order confirmed');
     }
 }
-

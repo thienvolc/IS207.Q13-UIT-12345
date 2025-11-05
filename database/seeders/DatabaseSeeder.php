@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\ApiToken;
+use App\Models\AuthToken;
 use App\Models\Product;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -31,8 +31,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create API tokens (fixed for demo)
-        ApiToken::firstOrCreate(['token' => 'user-token-1'], ['user_id' => $user->id, 'is_admin' => false]);
-        ApiToken::firstOrCreate(['token' => 'admin-token-2'], ['user_id' => $admin->id, 'is_admin' => true]);
+        AuthToken::firstOrCreate(['token' => 'user-token-1'], ['user_id' => $user->id, 'is_admin' => false]);
+        AuthToken::firstOrCreate(['token' => 'admin-token-2'], ['user_id' => $admin->id, 'is_admin' => true]);
 
         // Sample products
         $products = [

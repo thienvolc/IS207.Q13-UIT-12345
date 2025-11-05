@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Me;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\AppController;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class CartController extends ApiController
+class CartController extends AppController
 {
     public function index(Request $request)
     {
@@ -62,23 +62,29 @@ class CartController extends ApiController
             return $this->error('Product not found', '404001', 404);
         }
 
-        // simple stock check
-        if ($product->quantity < $quantity) {
-            return $this->error('Insufficient stock', '400002', 400);
-        }
-
         $cart = Cart::firstOrCreate(['user_id' => $userId]);
 
-        // add or increment item
-        $item = CartItem::where('cart_id', $cart->id)->where('product_id', $productId)->first();
+        $existingItem = CartItem::where('cart_id', $cart->id)->where('product_id', $productId)->first();
+        $existingQuantity = $existingItem ? $existingItem->quantity : 0;
+        $totalQuantity = $existingQuantity + $quantity;
+
+        if ($product->quantity < $totalQuantity) {
+            return $this->error('Insufficient stock', '400002', 400, [
+                'available' => $product->quantity,
+                'in_cart' => $existingQuantity,
+                'requested' => $quantity,
+                'total_needed' => $totalQuantity
+            ]);
+        }
 
         DB::beginTransaction();
         try {
-            if ($item) {
-                $item->quantity += $quantity;
-                $item->price = $product->price;
-                $item->discount = $product->discount;
-                $item->save();
+            if ($existingItem) {
+                $existingItem->quantity = $totalQuantity;
+                $existingItem->price = $product->price;
+                $existingItem->discount = $product->discount;
+                $existingItem->save();
+                $item = $existingItem;
             } else {
                 $item = CartItem::create([
                     'cart_id' => $cart->id,
@@ -101,8 +107,6 @@ class CartController extends ApiController
             'quantity' => $item->quantity,
             'price' => (string) $item->price,
             'discount' => (string) $item->discount,
-            'note' => $item->note,
         ]);
     }
 }
-
