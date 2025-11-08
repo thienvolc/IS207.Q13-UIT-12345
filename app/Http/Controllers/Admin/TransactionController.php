@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Dtos\Transaction\SearchTransactionsDto;
 use App\Http\Controllers\AppController;
 use App\Http\Requests\Transaction\SearchTransactionsRequest;
 use App\Services\TransactionService;
@@ -13,28 +14,23 @@ class TransactionController extends AppController
         private TransactionService $transactionService
     ) {}
 
-    /**
-     * GET /admin/transactions
-     */
     public function index(SearchTransactionsRequest $request): JsonResponse
     {
         [$sortField, $sortOrder] = $request->getSort();
 
-        $filters = [
-            'user_id' => $request->input('user_id'),
+        $dto = SearchTransactionsDto::fromArray([
+            'userId' => $request->input('user_id'),
+            'orderId' => $request->input('order_id'),
             'status' => $request->input('status'),
-            'order_id' => $request->input('order_id'),
             'type' => $request->input('type'),
-        ];
+            'page' => $request->getPage(),
+            'size' => $request->getSize(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
 
-        $transactions = $this->transactionService->searchTransactions(
-            $filters,
-            $request->getPage(),
-            $request->getSize(),
-            $sortField,
-            $sortOrder
-        );
+        $transactions = $this->transactionService->searchTransactions($dto);
 
-        return $this->successResponse($transactions);
+        return $this->success($transactions);
     }
 }

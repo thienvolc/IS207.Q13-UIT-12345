@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Me;
 
+use App\Dtos\Cart\AddCartItemDto;
+use App\Dtos\Cart\CheckoutCartDto;
+use App\Dtos\Cart\UpdateCartItemDto;
 use App\Http\Controllers\AppController;
 use App\Http\Requests\Cart\AddCartItemRequest;
 use App\Http\Requests\Cart\UpdateCartItemRequest;
@@ -21,7 +24,7 @@ class CartController extends AppController
     public function index(): JsonResponse
     {
         $cart = $this->cartService->getOrCreateCart();
-        return $this->successResponse($cart);
+        return $this->success($cart);
     }
 
     /**
@@ -29,8 +32,9 @@ class CartController extends AppController
      */
     public function addItem(AddCartItemRequest $request): JsonResponse
     {
-        $item = $this->cartService->addItem($request->validated());
-        return $this->successResponse($item);
+        $dto = AddCartItemDto::fromArray($request->validated());
+        $item = $this->cartService->addItem($dto);
+        return $this->success($item);
     }
 
     /**
@@ -38,8 +42,9 @@ class CartController extends AppController
      */
     public function updateItem(UpdateCartItemRequest $request, int $cart_item_id): JsonResponse
     {
-        $item = $this->cartService->updateItem($cart_item_id, $request->validated());
-        return $this->successResponse($item);
+        $dto = UpdateCartItemDto::fromArray($request->validated(), $cart_item_id);
+        $item = $this->cartService->updateItem($dto);
+        return $this->success($item);
     }
 
     /**
@@ -48,7 +53,7 @@ class CartController extends AppController
     public function deleteItem(int $cart_item_id): JsonResponse
     {
         $item = $this->cartService->deleteItem($cart_item_id);
-        return $this->successResponse($item);
+        return $this->success($item);
     }
 
     /**
@@ -57,7 +62,7 @@ class CartController extends AppController
     public function clearCart(): JsonResponse
     {
         $cart = $this->cartService->clearCart();
-        return $this->successResponse($cart);
+        return $this->success($cart);
     }
 
     /**
@@ -65,7 +70,8 @@ class CartController extends AppController
      */
     public function checkout(CheckoutCartRequest $request): JsonResponse
     {
-        $result = $this->cartService->checkout($request->validated());
-        return $this->successResponse($result);
+        $dto = CheckoutCartDto::fromArray($request->validated());
+        $result = $this->cartService->checkout($dto);
+        return $this->success($result);
     }
 }

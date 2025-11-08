@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -34,7 +34,11 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (BusinessException $e) {
-            return $e->render();
+            return ResponseFactory::error(
+                $e->getResponseCode(),
+                null,
+                $e->getExtraMeta()
+            );
         });
 
         $this->renderable(function (ValidationException $e) {

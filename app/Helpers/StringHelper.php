@@ -9,6 +9,7 @@ class StringHelper
         foreach ($args as $key => $value) {
             $template = str_replace('{' . $key . '}', $value, $template);
         }
+
         return $template;
     }
 
@@ -17,8 +18,8 @@ class StringHelper
         $text = self::removeVietnameseTones($text);
         $text = strtolower($text);
         $text = preg_replace('/[^a-z0-9]+/', '-', $text);
-        $text = trim($text, '-');
-        return $text;
+
+        return trim($text, '-');
     }
 
     private static function removeVietnameseTones(string $str): string

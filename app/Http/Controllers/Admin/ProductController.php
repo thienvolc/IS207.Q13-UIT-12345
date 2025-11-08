@@ -2,6 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Dtos\Product\AdjustInventoryDto;
+use App\Dtos\Product\CreateMetaDto;
+use App\Dtos\Product\CreateProductDto;
+use App\Dtos\Product\SearchProductsAdminDto;
+use App\Dtos\Product\UpdateCategoriesDto;
+use App\Dtos\Product\UpdateMetaDto;
+use App\Dtos\Product\UpdateProductDto;
+use App\Dtos\Product\UpdateStatusDto;
+use App\Dtos\Product\UpdateTagsDto;
 use App\Http\Controllers\AppController;
 use App\Http\Requests\Product\AdminSearchProductRequest;
 use App\Http\Requests\Product\CreateProductRequest;
@@ -23,140 +32,138 @@ class ProductController extends AppController
         private ProductManageService $manageService
     ) {}
 
-    /**
-     * GET /admin/products
-     */
     public function index(AdminSearchProductRequest $request): JsonResponse
     {
         $filters = $request->only(['query', 'category', 'price_min', 'price_max']);
         [$sortField, $sortOrder] = $request->getSort();
 
-        $result = $this->readService->searchForAdmin(
-            $filters,
-            $request->getPage(),
-            $request->getSize(),
-            $sortField,
-            $sortOrder
-        );
+        $dto = SearchProductsAdminDto::fromArray([
+            ...$filters,
+            'page' => $request->getPage(),
+            'size' => $request->getSize(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->readService->searchForAdmin($dto);
 
         return $this->success($result);
     }
 
-    /**
-     * POST /admin/products
-     */
     public function store(CreateProductRequest $request): JsonResponse
     {
-        $product = $this->manageService->createProduct($request->validated());
+        $dto = CreateProductDto::fromArray($request->validated());
 
-        return $this->createdResponse($product);
+        $product = $this->manageService->createProduct($dto);
+
+        return $this->created($product);
     }
 
-    /**
-     * GET /admin/products/{id}
-     */
-    public function show(int $id): JsonResponse
+    public function show(int $product_id): JsonResponse
     {
-        $product = $this->readService->getByIdForAdmin($id);
+        $product = $this->readService->getByIdForAdmin($product_id);
 
         return $this->success($product);
     }
 
-    /**
-     * PUT /admin/products/{id}
-     */
-    public function update(UpdateProductRequest $request, int $id): JsonResponse
+    public function update(UpdateProductRequest $request, int $product_id): JsonResponse
     {
-        $product = $this->manageService->updateProduct($id, $request->validated());
+        $dto = UpdateProductDto::fromArray([
+            'productId' => $product_id,
+            ...$request->validated()
+        ]);
+
+        $product = $this->manageService->updateProduct($dto);
 
         return $this->success($product);
     }
 
-    /**
-     * DELETE /admin/products/{id}
-     */
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $product_id): JsonResponse
     {
-        $product = $this->manageService->deleteProduct($id);
+        $product = $this->manageService->deleteProduct($product_id);
 
         return $this->success($product);
     }
 
-    /**
-     * PUT /admin/products/{id}/categories
-     */
-    public function updateCategories(UpdateProductCategoriesRequest $request, int $id): JsonResponse
+    public function updateCategories(UpdateProductCategoriesRequest $request, int $product_id): JsonResponse
     {
-        $product = $this->manageService->updateCategories($id, $request->input('category_ids'));
+        $dto = UpdateCategoriesDto::fromArray([
+            'productId' => $product_id,
+            'categoryIds' => $request->input('category_ids')
+        ]);
+
+        $product = $this->manageService->updateCategories($dto);
 
         return $this->success($product);
     }
 
-    /**
-     * PATCH /admin/products/{id}/tags
-     */
-    public function updateTags(UpdateProductTagsRequest $request, int $id): JsonResponse
+    public function updateTags(UpdateProductTagsRequest $request, int $product_id): JsonResponse
     {
-        $product = $this->manageService->updateTags($id, $request->input('tag_ids'));
+        $dto = UpdateTagsDto::fromArray([
+            'productId' => $product_id,
+            'tagIds' => $request->input('tag_ids')
+        ]);
+
+        $product = $this->manageService->updateTags($dto);
 
         return $this->success($product);
     }
 
-    /**
-     * PATCH /admin/products/{id}/status
-     */
-    public function updateStatus(UpdateProductStatusRequest $request, int $id): JsonResponse
+    public function updateStatus(UpdateProductStatusRequest $request, int $product_id): JsonResponse
     {
-        $product = $this->manageService->updateStatus($id, $request->input('status'));
+        $dto = UpdateStatusDto::fromArray([
+            'productId' => $product_id,
+            'status' => $request->input('status')
+        ]);
+
+        $product = $this->manageService->updateStatus($dto);
 
         return $this->success($product);
     }
 
-    /**
-     * PATCH /admin/products/{id}/inventory/adjust
-     */
-    public function adjustInventory(AdjustInventoryRequest $request, int $id): JsonResponse
+    public function adjustInventory(AdjustInventoryRequest $request, int $product_id): JsonResponse
     {
-        $product = $this->manageService->adjustInventory(
-            $id,
-            $request->input('amount'),
-            $request->input('operationType'),
-            $request->input('reason')
-        );
+        $dto = AdjustInventoryDto::fromArray([
+            'productId' => $product_id,
+            'amount' => $request->input('amount'),
+            'operationType' => $request->input('operationType'),
+            'reason' => $request->input('reason')
+        ]);
+
+        $product = $this->manageService->adjustInventory($dto);
 
         return $this->success($product);
     }
 
-    /**
-     * POST /admin/products/{id}/meta
-     */
-    public function storeMeta(CreateProductMetaRequest $request, int $id): JsonResponse
+    public function storeMeta(CreateProductMetaRequest $request, int $product_id): JsonResponse
     {
-        $meta = $this->manageService->createMeta(
-            $id,
-            $request->input('key'),
-            $request->input('content')
-        );
+        $dto = CreateMetaDto::fromArray([
+            'productId' => $product_id,
+            'key' => $request->input('key'),
+            'content' => $request->input('content')
+        ]);
+
+        $meta = $this->manageService->createMeta($dto);
 
         return $this->success($meta);
     }
 
-    /**
-     * PUT /admin/products/{id}/meta/{metaId}
-     */
-    public function updateMeta(UpdateProductMetaRequest $request, int $id, int $metaId): JsonResponse
+    public function updateMeta(UpdateProductMetaRequest $request, int $product_id, int $meta_id): JsonResponse
     {
-        $meta = $this->manageService->updateMeta($id, $metaId, $request->validated());
+        $dto = UpdateMetaDto::fromArray([
+            'productId' => $product_id,
+            'metaId' => $meta_id,
+            ...$request->validated()
+        ]);
+
+        $meta = $this->manageService->updateMeta($dto);
 
         return $this->success($meta);
     }
 
-    /**
-     * DELETE /admin/products/{id}/meta/{metaId}
-     */
-    public function destroyMeta(int $id, int $metaId): JsonResponse
+    public function destroyMeta(int $product_id, int $meta_id): JsonResponse
     {
-        $meta = $this->manageService->deleteMeta($id, $metaId);
+        $meta = $this->manageService->deleteMeta($product_id, $meta_id);
 
         return $this->success($meta);
     }

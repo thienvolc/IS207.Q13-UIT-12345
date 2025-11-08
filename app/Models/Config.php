@@ -4,6 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Config Model
+ *
+ * @property string $key Primary key - configuration key
+ * @property string|null $value Configuration value
+ * @property int $type Value type (string/int/bool/json)
+ * @property string|null $desc Configuration description
+ * @property \Illuminate\Support\Carbon|null $updated_at Last update timestamp
+ */
 class Config extends Model
 {
     protected $primaryKey = 'key';

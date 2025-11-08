@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Dtos\Product\GetRelatedProductsDto;
+use App\Dtos\Product\SearchProductsPublicDto;
 use App\Http\Controllers\AppController;
 use App\Http\Requests\Product\SearchProductRequest;
 use App\Services\ProductReadService;
@@ -13,38 +15,31 @@ class ProductController extends AppController
         private ProductReadService $readService
     ) {}
 
-    /**
-     * GET /products
-     */
     public function search(SearchProductRequest $request): JsonResponse
     {
         $filters = $request->only(['query', 'category', 'price_min', 'price_max']);
         [$sortField, $sortOrder] = $request->getSort();
 
-        $result = $this->readService->searchForPublic(
-            $filters,
-            $request->getOffset(),
-            $request->getLimit(),
-            $sortField,
-            $sortOrder
-        );
+        $dto = SearchProductsPublicDto::fromArray([
+            ...$filters,
+            'offset' => $request->getOffset(),
+            'limit' => $request->getLimit(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->readService->searchForPublic($dto);
 
         return $this->success($result);
     }
 
-    /**
-     * GET /products/{id}
-     */
-    public function show(int $id): JsonResponse
+    public function show(int $product_id): JsonResponse
     {
-        $product = $this->readService->getByIdForPublic($id);
+        $product = $this->readService->getByIdForPublic($product_id);
 
         return $this->success($product);
     }
 
-    /**
-     * GET /products/{slug}
-     */
     public function showBySlug(string $slug): JsonResponse
     {
         $product = $this->readService->getBySlugForPublic($slug);
@@ -52,18 +47,19 @@ class ProductController extends AppController
         return $this->success($product);
     }
 
-    /**
-     * GET /products/{id}/related
-     */
-    public function related(int $id, SearchProductRequest $request): JsonResponse
+    public function related(int $product_id, SearchProductRequest $request): JsonResponse
     {
-        $result = $this->readService->getRelatedProductsById(
-            $id,
-            $request->getOffset(),
-            $request->getLimit(),
-            $request->getSort()[0],
-            $request->getSort()[1]
-        );
+        [$sortField, $sortOrder] = $request->getSort();
+
+        $dto = GetRelatedProductsDto::fromArray([
+            'productId' => $product_id,
+            'offset' => $request->getOffset(),
+            'limit' => $request->getLimit(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->readService->getRelatedProductsById($dto);
 
         return $this->success($result);
     }

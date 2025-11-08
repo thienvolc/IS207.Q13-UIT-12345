@@ -4,6 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * UserProfile Model
+ *
+ * @property int $user_id Primary key and foreign key to users
+ * @property string|null $first_name User first name
+ * @property string|null $middle_name User middle name
+ * @property string|null $last_name User last name
+ * @property string|null $avatar Avatar image path
+ * @property string|null $profile Profile description
+ * @property \Illuminate\Support\Carbon|null $registered_at Registration timestamp
+ * @property \Illuminate\Support\Carbon|null $last_login Last login timestamp
+ *
+ * @property-read \App\Models\User|null $user Associated user
+ * @method static updateOrCreate(int[] $array, array $data)
+ * @method static create(array $data)
+ */
 class UserProfile extends Model
 {
     protected $primaryKey = 'user_id';

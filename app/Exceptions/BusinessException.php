@@ -22,6 +22,8 @@ class BusinessException extends Exception
         $this->extraMeta = $extraMeta;
 
         $message = StringHelper::applyTemplate($responseCode['message'], $args);
+        $this->responseCode['message'] = $message;
+
         parent::__construct($message, 0, null);
     }
 
@@ -43,23 +45,5 @@ class BusinessException extends Exception
     public function getStatusCode(): int
     {
         return $this->responseCode['statusCode'];
-    }
-
-    public function render()
-    {
-        if (!empty($this->args)) {
-            return ResponseFactory::withArgs(
-                $this->responseCode,
-                $this->args,
-                null,
-                $this->extraMeta
-            );
-        }
-
-        return ResponseFactory::error(
-            $this->responseCode,
-            null,
-            $this->extraMeta
-        );
     }
 }

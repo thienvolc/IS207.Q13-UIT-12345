@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Me;
 
+use App\Dtos\Order\GetUserOrdersDto;
+use App\Dtos\Order\PlaceOrderDto;
+use App\Dtos\Order\UpdateOrderShippingDto;
 use App\Http\Controllers\AppController;
 use App\Http\Requests\Order\PlaceOrderRequest;
 use App\Http\Requests\Order\GetOrdersRequest;
@@ -22,15 +25,17 @@ class OrderController extends AppController
     {
         [$sortField, $sortOrder] = $request->getSort();
 
-        $orders = $this->orderService->getUserOrders(
-            $request->input('status'),
-            $request->getOffset(),
-            $request->getLimit(),
-            $sortField,
-            $sortOrder
-        );
+        $dto = GetUserOrdersDto::fromArray([
+            'status' => $request->input('status'),
+            'offset' => $request->getOffset(),
+            'limit' => $request->getLimit(),
+            'sort_field' => $sortField,
+            'sort_order' => $sortOrder,
+        ]);
 
-        return $this->successResponse($orders);
+        $orders = $this->orderService->getUserOrders($dto);
+
+        return $this->success($orders);
     }
 
     /**
@@ -38,43 +43,45 @@ class OrderController extends AppController
      */
     public function place(PlaceOrderRequest $request): JsonResponse
     {
-        $order = $this->orderService->placeOrder($request->validated());
-        return $this->createdResponse($order);
+        $dto = PlaceOrderDto::fromArray($request->validated());
+        $order = $this->orderService->placeOrder($dto);
+        return $this->created($order);
     }
 
     /**
-     * GET /me/orders/{id}
+     * GET /me/orders/{order_id}
      */
-    public function show(int $id): JsonResponse
+    public function show(int $order_id): JsonResponse
     {
-        $order = $this->orderService->getOrderDetails($id);
-        return $this->successResponse($order);
+        $order = $this->orderService->getOrderDetails($order_id);
+        return $this->success($order);
     }
 
     /**
-     * GET /me/orders/{id}/status
+     * GET /me/orders/{order_id}/status
      */
-    public function status(int $id): JsonResponse
+    public function status(int $order_id): JsonResponse
     {
-        $status = $this->orderService->getOrderStatus($id);
-        return $this->successResponse($status);
+        $status = $this->orderService->getOrderStatus($order_id);
+        return $this->success($status);
     }
 
     /**
-     * PATCH /me/orders/{id}/shipping
+     * PATCH /me/orders/{order_id}/shipping
      */
-    public function updateShipping(UpdateOrderShippingRequest $request, int $id): JsonResponse
+    public function updateShipping(UpdateOrderShippingRequest $request, int $order_id): JsonResponse
     {
-        $order = $this->orderService->updateShipping($id, $request->validated());
-        return $this->successResponse($order);
+        $dto = UpdateOrderShippingDto::fromArray($request->validated(), $order_id);
+        $order = $this->orderService->updateShipping($dto);
+        return $this->success($order);
     }
 
     /**
-     * DELETE /me/orders/{id}/cancel
+     * DELETE /me/orders/{order_id}/cancel
      */
-    public function cancel(int $id): JsonResponse
+    public function cancel(int $order_id): JsonResponse
     {
-        $result = $this->orderService->cancelOrder($id);
-        return $this->successResponse($result);
+        $result = $this->orderService->cancelOrder($order_id);
+        return $this->success($result);
     }
 }

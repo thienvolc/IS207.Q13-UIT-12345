@@ -4,6 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * CartItem Model
+ *
+ * @property int $cart_item_id Primary key
+ * @property int $cart_id Foreign key to carts
+ * @property int $product_id Foreign key to products
+ * @property string|null $sku Product SKU snapshot
+ * @property bool $is_active Item active flag
+ * @property float $price Price snapshot at time of adding
+ * @property int $quantity Item quantity
+ * @property float $discount Discount snapshot
+ * @property string|null $note Item note
+ *
+ * @property-read \App\Models\Cart $cart Associated cart
+ * @property-read \App\Models\Product $product Associated product
+ */
 class CartItem extends Model
 {
     protected $primaryKey = 'cart_item_id';

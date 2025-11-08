@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Dtos\Category\GetProductsByCategoryDto;
+use App\Dtos\Category\SearchCategoriesPublicDto;
 use App\Http\Controllers\AppController;
 use App\Http\Requests\Category\SearchCategoryRequest;
 use App\Http\Requests\Product\SearchProductRequest;
@@ -14,28 +16,24 @@ class CategoryController extends AppController
         private CategoryService $categoryService
     ) {}
 
-    /**
-     * GET /categories
-     */
     public function index(SearchCategoryRequest $request): JsonResponse
     {
         [$sortField, $sortOrder] = $request->getSort();
 
-        $result = $this->categoryService->searchCategoriesPublic(
-            $request->input('query'),
-            $request->input('level'),
-            $request->getOffset(),
-            $request->getLimit(),
-            $sortField,
-            $sortOrder
-        );
+        $dto = SearchCategoriesPublicDto::fromArray([
+            'query' => $request->input('query'),
+            'level' => $request->input('level'),
+            'offset' => $request->getOffset(),
+            'limit' => $request->getLimit(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->categoryService->searchCategoriesPublic($dto);
 
         return $this->success($result);
     }
 
-    /**
-     * GET /categories/{slug}
-     */
     public function show(string $slug): JsonResponse
     {
         $category = $this->categoryService->getCategoryBySlug($slug);
@@ -43,20 +41,19 @@ class CategoryController extends AppController
         return $this->success($category);
     }
 
-    /**
-     * GET /categories/{slug}/products
-     */
     public function products(SearchProductRequest $request, string $slug): JsonResponse
     {
         [$sortField, $sortOrder] = $request->getSort();
 
-        $result = $this->categoryService->getProductsByCategorySlug(
-            $slug,
-            $request->getOffset(),
-            $request->getLimit(),
-            $sortField,
-            $sortOrder
-        );
+        $dto = GetProductsByCategoryDto::fromArray([
+            'slug' => $slug,
+            'offset' => $request->getOffset(),
+            'limit' => $request->getLimit(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->categoryService->getProductsByCategorySlug($dto);
 
         return $this->success($result);
     }

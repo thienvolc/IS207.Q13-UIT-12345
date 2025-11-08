@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id();
+            $table->id('product_id');
             $table->unsignedBigInteger('category_id')->nullable();
             $table->string('title');
             $table->string('slug')->unique();
@@ -29,15 +29,15 @@ return new class extends Migration
         });
 
         Schema::create('carts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->id('cart_id');
+            $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
             $table->timestamps();
         });
 
         Schema::create('cart_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('cart_id')->constrained('carts')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->id('cart_item_id');
+            $table->foreignId('cart_id')->constrained('carts', 'cart_id')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products', 'product_id')->onDelete('cascade');
             $table->integer('quantity')->default(1);
             $table->decimal('price', 14, 2);
             $table->decimal('discount', 10, 2)->default(0);
@@ -46,8 +46,8 @@ return new class extends Migration
         });
 
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->id('order_id');
+            $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
             $table->decimal('subtotal', 14, 2)->default(0);
             $table->decimal('tax', 14, 2)->default(0);
             $table->decimal('shipping', 14, 2)->default(0);
@@ -61,21 +61,13 @@ return new class extends Migration
         });
 
         Schema::create('order_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->id('order_item_id');
+            $table->foreignId('order_id')->constrained('orders', 'order_id')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products', 'product_id')->onDelete('cascade');
             $table->integer('quantity')->default(1);
             $table->decimal('price', 14, 2);
             $table->decimal('discount', 10, 2)->default(0);
             $table->text('note')->nullable();
-            $table->timestamps();
-        });
-
-        Schema::create('api_tokens', function (Blueprint $table) {
-            $table->id();
-            $table->string('token', 64)->unique();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->boolean('is_admin')->default(false);
             $table->timestamps();
         });
     }
@@ -85,7 +77,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('api_tokens');
         Schema::dropIfExists('order_items');
         Schema::dropIfExists('orders');
         Schema::dropIfExists('cart_items');

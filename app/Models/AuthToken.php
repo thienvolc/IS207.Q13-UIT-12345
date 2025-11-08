@@ -2,15 +2,54 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class AuthToken extends Model
+class AuthToken
 {
-    protected $table = 'api_tokens';
-    protected $fillable = ['token', 'user_id', 'is_admin'];
+    public string $token;
+    public int $userId;
+    public bool $isAdmin;
 
-    public function user()
+    public function __construct(string $token, int $userId, bool $isAdmin)
     {
-        return $this->belongsTo(User::class);
+        $this->token = $token;
+        $this->userId = $userId;
+        $this->isAdmin = $isAdmin;
+    }
+
+    /**
+     * Parse token string to extract user ID and admin flag
+     * Expected format: "admin-123" or "user-456"
+     */
+    public static function fromTokenString(string $tokenString): ?self
+    {
+        $parts = explode('-', $tokenString);
+
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+        [$prefix, $userId] = $parts;
+
+        if (!is_numeric($userId)) {
+            return null;
+        }
+
+        if ($prefix === 'admin') {
+            return new self($tokenString, (int)$userId, true);
+        } elseif ($prefix === 'user') {
+            return new self($tokenString, (int)$userId, false);
+        }
+
+        return null;
+    }
+
+    /**
+     * Generate token string from user data
+     */
+    public static function generate(int $userId, bool $isAdmin): self
+    {
+        $prefix = $isAdmin ? 'admin' : 'user';
+        $token = "{$prefix}-{$userId}";
+
+        return new self($token, $userId, $isAdmin);
     }
 }

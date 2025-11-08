@@ -9,6 +9,44 @@ use App\Models\Tag;
 use App\Models\CartItem;
 use App\Models\OrderItem;
 
+/**
+ * Product Model
+ *
+ * @property int $product_id Primary key
+ * @property int|null $category_id Main category foreign key
+ * @property string $title Product title
+ * @property string|null $meta_title SEO meta title
+ * @property string $slug URL-friendly slug
+ * @property string|null $thumb Thumbnail image path
+ * @property string|null $desc Product description
+ * @property string|null $summary Short summary
+ * @property string|null $type Product type
+ * @property string|null $sku Stock keeping unit
+ * @property float $price Product price
+ * @property int $quantity Available quantity
+ * @property \Illuminate\Support\Carbon|null $published_at Publication date
+ * @property int $status Product status (draft/published/archived)
+ * @property float $discount Discount amount
+ * @property \Illuminate\Support\Carbon|null $starts_at Discount start date
+ * @property \Illuminate\Support\Carbon|null $ends_at Discount end date
+ * @property int|null $created_by User who created this product
+ * @property int|null $updated_by User who updated this product
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductMeta> $metas Product metadata
+ * @property-read int|null $metas_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $categories Product categories
+ * @property-read int|null $categories_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Tag> $tags Product tags
+ * @property-read int|null $tags_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, CartItem> $cartItems Cart items containing this product
+ * @property-read int|null $cart_items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $orderItems Order items containing this product
+ * @property-read int|null $order_items_count
+ * @method static where(string $string, int $productId)
+ * @method static create(array $data)
+ */
 class Product extends Model
 {
     protected $primaryKey = 'product_id';

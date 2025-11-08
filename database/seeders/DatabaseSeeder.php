@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\AuthToken;
 use App\Models\Product;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -14,7 +13,7 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // Create user (id 1)
+        // Create user (id 1) - Token will be: user-1
         $user = User::firstOrCreate([
             'email' => 'user@example.com'
         ], [
@@ -22,7 +21,7 @@ class DatabaseSeeder extends Seeder
             'password' => 'password'
         ]);
 
-        // Create admin (id 2)
+        // Create admin (id 2) - Token will be: admin-2
         $admin = User::firstOrCreate([
             'email' => 'admin@example.com'
         ], [
@@ -30,9 +29,9 @@ class DatabaseSeeder extends Seeder
             'password' => 'password'
         ]);
 
-        // Create API tokens (fixed for demo)
-        AuthToken::firstOrCreate(['token' => 'user-token-1'], ['user_id' => $user->id, 'is_admin' => false]);
-        AuthToken::firstOrCreate(['token' => 'admin-token-2'], ['user_id' => $admin->id, 'is_admin' => true]);
+        // Note: Tokens are NOT stored in database!
+        // After login, tokens are generated as: "user-{user_id}" or "admin-{user_id}"
+        // Example: "user-1" for user@example.com, "admin-2" for admin@example.com
 
         // Sample products
         $products = [

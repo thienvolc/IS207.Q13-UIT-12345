@@ -35,15 +35,4 @@ class ResponseFactory
             'data' => $data
         ];
     }
-
-    public static function withArgs(array $responseCode, array $args, $data = null, array $extraMeta = []): JsonResponse
-    {
-        $message = StringHelper::applyTemplate($responseCode['message'], $args);
-        $modifiedCode = array_merge($responseCode, ['message' => $message]);
-
-        return response()->json(
-            self::buildEnvelope($modifiedCode, $data, $extraMeta),
-            $modifiedCode['statusCode']
-        );
-    }
 }

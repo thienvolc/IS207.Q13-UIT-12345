@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Dtos\Category\CreateCategoryDto;
+use App\Dtos\Category\SearchCategoriesAdminDto;
+use App\Dtos\Category\UpdateCategoryDto;
 use App\Http\Controllers\AppController;
 use App\Http\Requests\Category\CreateCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
@@ -15,27 +18,23 @@ class CategoryController extends AppController
         private CategoryService $categoryService
     ) {}
 
-    /**
-     * GET /admin/categories
-     */
     public function index(SearchCategoryRequest $request): JsonResponse
     {
         [$sortField, $sortOrder] = $request->getSort();
 
-        $result = $this->categoryService->searchCategoriesAdmin(
-            $request->input('level'),
-            $request->getPage(),
-            $request->getSize(),
-            $sortField,
-            $sortOrder
-        );
+        $dto = SearchCategoriesAdminDto::fromArray([
+            'level' => $request->input('level'),
+            'page' => $request->getPage(),
+            'size' => $request->getSize(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->categoryService->searchCategoriesAdmin($dto);
 
         return $this->success($result);
     }
 
-    /**
-     * GET /admin/categories/{category_id}
-     */
     public function show(int $category_id): JsonResponse
     {
         $category = $this->categoryService->getCategoryById($category_id);
@@ -43,29 +42,27 @@ class CategoryController extends AppController
         return $this->success($category);
     }
 
-    /**
-     * POST /admin/categories
-     */
     public function store(CreateCategoryRequest $request): JsonResponse
     {
-        $category = $this->categoryService->createCategory($request->validated());
+        $dto = CreateCategoryDto::fromArray($request->validated());
 
-        return $this->createdResponse($category);
+        $category = $this->categoryService->createCategory($dto);
+
+        return $this->created($category);
     }
 
-    /**
-     * PUT /admin/categories/{category_id}
-     */
     public function update(UpdateCategoryRequest $request, int $category_id): JsonResponse
     {
-        $category = $this->categoryService->updateCategory($category_id, $request->validated());
+        $dto = UpdateCategoryDto::fromArray([
+            'categoryId' => $category_id,
+            ...$request->validated()
+        ]);
+
+        $category = $this->categoryService->updateCategory($dto);
 
         return $this->success($category);
     }
 
-    /**
-     * DELETE /admin/categories/{category_id}
-     */
     public function destroy(int $category_id): JsonResponse
     {
         $category = $this->categoryService->deleteCategory($category_id);
@@ -73,4 +70,3 @@ class CategoryController extends AppController
         return $this->success($category);
     }
 }
-

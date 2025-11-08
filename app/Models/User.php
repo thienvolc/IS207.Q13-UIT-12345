@@ -9,6 +9,35 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\UserProfile;
 use App\Models\Role;
 
+/**
+ * User Model
+ *
+ * @property int $user_id Primary key
+ * @property string $email User email address
+ * @property string|null $phone User phone number
+ * @property string $password Hashed password
+ * @property string|null $salt Password salt
+ * @property bool $is_admin Admin flag
+ * @property int $status User status (active/inactive/banned)
+ * @property \Illuminate\Support\Carbon|null $registered_at Registration timestamp
+ * @property \Illuminate\Support\Carbon|null $last_login Last login timestamp
+ * @property int|null $created_by User who created this record
+ * @property int|null $updated_by User who updated this record
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read UserProfile|null $profile User profile information
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Role> $roles User roles
+ * @property-read int|null $roles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Cart> $carts User carts
+ * @property-read int|null $carts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders User orders
+ * @property-read int|null $orders_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @method static create(array $data)
+ * @method static where(string $string, string $email)
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -27,6 +56,8 @@ class User extends Authenticatable
         'salt',
         'is_admin',
         'status',
+        'registered_at',
+        'last_login',
         'created_by',
         'updated_by',
     ];

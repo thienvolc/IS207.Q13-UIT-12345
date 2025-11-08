@@ -2,27 +2,75 @@
 
 namespace App\Services;
 
-use App\Models\Transaction;
 use App\Constants\ResponseCode;
-use App\Http\Resources\TransactionResource;
+use App\Constants\TransactionStatus;
+use App\Dtos\Transaction\CreateTransactionDto;
+use App\Dtos\Transaction\SearchTransactionsDto;
+use App\Dtos\Transaction\UpdateTransactionStatusDto;
 use App\Exceptions\BusinessException;
+use App\Http\Resources\TransactionResource;
+use App\Models\Transaction;
+use App\Utils\PaginationUtil;
 use Illuminate\Support\Facades\DB;
 
 class TransactionService
 {
-    /**
-     * Search transactions for admin
-     */
-    public function searchTransactions(
-        array $filters,
-        int $page = 1,
-        int $size = 10,
-        string $sortField = 'created_at',
-        string $sortOrder = 'desc'
-    ): array {
-        $query = Transaction::query()->with(['order', 'order.user']);
+    public function searchTransactions(SearchTransactionsDto $dto): array
+    {
+        $query = $this->buildTransactionQuery();
+        $this->applyFilters($query, $dto->getFilters());
+        $totalCount = $query->count();
 
-        // Apply filters
+        $transactions = $query->orderBy($dto->sortField, $dto->sortOrder)
+            ->offset(($dto->page - 1) * $dto->size)
+            ->limit($dto->size)
+            ->get();
+
+        return PaginationUtil::fromPageSize(
+            TransactionResource::collection($transactions),
+            $dto->page,
+            $dto->size,
+            $totalCount
+        );
+    }
+
+    public function getTransactionById(int $transactionId): array
+    {
+        $transaction = $this->findTransactionById($transactionId);
+        return TransactionResource::transform($transaction);
+    }
+
+    public function createTransaction(CreateTransactionDto $dto): array
+    {
+        $transaction = DB::transaction(function () use ($dto) {
+            $data = $this->prepareCreateData($dto);
+            $transaction = Transaction::create($data);
+            $transaction->load(['order', 'order.user']);
+            return $transaction;
+        });
+
+        return TransactionResource::transform($transaction);
+    }
+
+    public function updateTransactionStatus(UpdateTransactionStatusDto $dto): array
+    {
+        $transaction = DB::transaction(function () use ($dto) {
+            $transaction = $this->findTransactionById($dto->transactionId);
+            $this->updateStatus($transaction, $dto->status);
+            $transaction->load(['order', 'order.user']);
+            return $transaction;
+        });
+
+        return TransactionResource::transform($transaction);
+    }
+
+    private function buildTransactionQuery()
+    {
+        return Transaction::query()->with(['order', 'order.user']);
+    }
+
+    private function applyFilters($query, array $filters): void
+    {
         if (!empty($filters['user_id'])) {
             $query->whereHas('order', function($q) use ($filters) {
                 $q->where('user_id', $filters['user_id']);
@@ -40,28 +88,9 @@ class TransactionService
         if (!empty($filters['type'])) {
             $query->where('type', $filters['type']);
         }
-
-        $totalCount = $query->count();
-        $totalPage = (int)ceil($totalCount / $size);
-
-        $transactions = $query->orderBy($sortField, $sortOrder)
-            ->offset(($page - 1) * $size)
-            ->limit($size)
-            ->get();
-
-        return [
-            'data' => TransactionResource::collection($transactions),
-            'current_page' => $page,
-            'total_page' => $totalPage,
-            'total_count' => $totalCount,
-            'has_more' => $page < $totalPage,
-        ];
     }
 
-    /**
-     * Get transaction by ID
-     */
-    public function getTransactionById(int $transactionId): array
+    private function findTransactionById(int $transactionId): Transaction
     {
         $transaction = Transaction::with(['order', 'order.user'])->find($transactionId);
 
@@ -69,48 +98,18 @@ class TransactionService
             throw new BusinessException(ResponseCode::NOT_FOUND);
         }
 
-        return TransactionResource::transform($transaction);
+        return $transaction;
     }
 
-    /**
-     * Create transaction for order
-     */
-    public function createTransaction(int $orderId, array $data): array
+    private function prepareCreateData(CreateTransactionDto $dto): array
     {
-        return DB::transaction(function () use ($orderId, $data) {
-            $transaction = Transaction::create([
-                'order_id' => $orderId,
-                'amount' => $data['amount'],
-                'content' => $data['content'] ?? null,
-                'code' => $data['code'] ?? null,
-                'type' => $data['type'],
-                'mode' => $data['mode'] ?? null,
-                'status' => $data['status'] ?? \App\Constants\TransactionStatus::INITIATED,
-            ]);
-
-            $transaction->load(['order', 'order.user']);
-
-            return TransactionResource::transform($transaction);
-        });
+        $data = $dto->toArray();
+        $data['status'] = $dto->status ?? TransactionStatus::INITIATED;
+        return $data;
     }
 
-    /**
-     * Update transaction status
-     */
-    public function updateTransactionStatus(int $transactionId, int $status): array
+    private function updateStatus(Transaction $transaction, int $status): void
     {
-        return DB::transaction(function () use ($transactionId, $status) {
-            $transaction = Transaction::find($transactionId);
-
-            if (!$transaction) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
-
-            $transaction->update(['status' => $status]);
-            $transaction->load(['order', 'order.user']);
-
-            return TransactionResource::transform($transaction);
-        });
+        $transaction->update(['status' => $status]);
     }
 }
-

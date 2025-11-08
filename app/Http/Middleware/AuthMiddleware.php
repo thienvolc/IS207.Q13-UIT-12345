@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
-use App\Models\User;
-use App\Constants\ResponseCode;
 use App\Constants\UserStatus;
-use App\Utils\ResponseFactory;
+use App\Exceptions\BusinessException;
+use App\Constants\ResponseCode;
+use App\Models\User;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,60 +14,74 @@ class AuthMiddleware
 {
     public function handle(Request $request, Closure $next, ?string $role = null): mixed
     {
-        $header = $request->header('Authorization');
-        if (!$header) {
-            return ResponseFactory::error(ResponseCode::UNAUTHORIZED);
-        }
+        $token = $this->getBearerToken($request);
+        [$tokenRole, $userId] = $this->parseToken($token);
 
-        if (!str_starts_with($header, 'Bearer ')) {
-            $customCode = array_merge(
-                ResponseCode::UNAUTHORIZED,
-                ['message' => 'Invalid Authorization format. Use: Bearer <token>']
-            );
-            return ResponseFactory::error($customCode);
-        }
-
-        $token = trim(substr($header, 7));
-
-        if (!preg_match('/^(admin|user)-(\d+)$/', $token, $matches)) {
-            $customCode = array_merge(
-                ResponseCode::UNAUTHORIZED,
-                ['message' => 'Invalid token format. Use: admin-{id} or user-{id}']
-            );
-            return ResponseFactory::error($customCode);
-        }
-
-        $tokenRole = $matches[1];
-        $userId = (int)$matches[2];
-
-        $user = User::find($userId);
-        if (!$user) {
-            $customCode = array_merge(
-                ResponseCode::UNAUTHORIZED,
-                ['message' => 'User not found']
-            );
-            return ResponseFactory::error($customCode);
-        }
-
-        if ($user->status !== UserStatus::ACTIVE) {
-            $customCode = array_merge(
-                ResponseCode::UNAUTHORIZED,
-                ['message' => 'User is inactive']
-            );
-            return ResponseFactory::error($customCode);
-        }
-
-        $isAdmin = ($tokenRole === 'admin');
-
-        if ($role === 'admin' && !$isAdmin) {
-            return ResponseFactory::error(ResponseCode::FORBIDDEN);
-        }
+        $user = $this->findUser($userId);
+        $this->assertUserIsActive($user);
+        $this->assertRoleAllowed($role, $tokenRole);
 
         Auth::loginUsingId($userId);
         $request->attributes->set('auth_user_id', $userId);
-        $request->attributes->set('is_admin', $isAdmin);
+        $request->attributes->set('is_admin', $tokenRole === 'admin');
         $request->attributes->set('user', $user);
 
         return $next($request);
+    }
+
+    private function getBearerToken(Request $request): string
+    {
+        $header = $request->header('Authorization');
+
+        if (empty($header)) {
+            throw new BusinessException(ResponseCode::UNAUTHORIZED);
+        }
+
+        $prefix = 'Bearer ';
+        if (!str_starts_with($header, $prefix)) {
+            throw new BusinessException(ResponseCode::INVALID_AUTHORIZATION_FORMAT);
+        }
+
+        return trim(substr($header, strlen($prefix)));
+    }
+
+    private function parseToken(string $token): array
+    {
+        $matches = [];
+        if (!preg_match('/^(admin|user)-(\d+)$/', $token, $matches)) {
+            throw new BusinessException(ResponseCode::INVALID_TOKEN_FORMAT);
+        }
+
+        // $matches[2] = [<role>, <id>]
+        return [$matches[1], (int)$matches[2]];
+    }
+
+    private function findUser(int $userId): User
+    {
+        $user = User::find($userId);
+
+        if (!$user) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
+        }
+
+        return $user;
+    }
+
+    private function assertUserIsActive(User $user): void
+    {
+        if ($user->status !== UserStatus::ACTIVE) {
+            throw new BusinessException(ResponseCode::USER_INACTIVE);
+        }
+    }
+
+    private function assertRoleAllowed(?string $requiredRole, string $tokenRole): void
+    {
+        if ($requiredRole === null) {
+            return;
+        }
+
+        if ($requiredRole === 'admin' && $tokenRole !== 'admin') {
+            throw new BusinessException(ResponseCode::FORBIDDEN);
+        }
     }
 }
