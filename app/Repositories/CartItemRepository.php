@@ -37,25 +37,15 @@ class CartItemRepository
         return CartItem::create($data);
     }
 
-    public function update(CartItem $cartItem, array $data): bool
-    {
-        return $cartItem->update($data);
-    }
-
-    public function delete(CartItem $cartItem): bool
-    {
-        return $cartItem->delete();
-    }
-
     public function deleteByCartId(int $cartId): int
     {
         return CartItem::where('cart_id', $cartId)->delete();
     }
 
-    public function deleteNonSelected(int $cartId, array $selectedItemIds): int
+    public function deleteByCartAndProductIds(int $cart_id, array $productIds): void
     {
-        return CartItem::where('cart_id', $cartId)
-            ->whereNotIn('cart_item_id', $selectedItemIds)
+        CartItem::where('cart_id', $cart_id)
+            ->whereIn('product_id', $productIds)
             ->delete();
     }
 }

@@ -25,6 +25,14 @@ class CartRepository
         return $cart;
     }
 
+    public function createCheckoutCart(int $userId): Cart
+    {
+        return Cart::create([
+            'user_id' => $userId,
+            'status' => CartStatus::CHECKED_OUT,
+        ]);
+    }
+
     public function findActiveCart(int $userId): ?Cart
     {
         return Cart::where('user_id', $userId)
@@ -48,15 +56,5 @@ class CartRepository
             ->where('status', CartStatus::CHECKED_OUT)
             ->with('items.product')
             ->first();
-    }
-
-    public function create(array $data): Cart
-    {
-        return Cart::create($data);
-    }
-
-    public function update(Cart $cart, array $data): bool
-    {
-        return $cart->update($data);
     }
 }

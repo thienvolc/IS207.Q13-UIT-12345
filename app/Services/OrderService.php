@@ -23,26 +23,34 @@ use App\Repositories\OrderItemRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Utils\PaginationUtil;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class OrderService
+readonly class OrderService
 {
     public function __construct(
-        private OrderRepository $orderRepository,
+        private OrderRepository     $orderRepository,
         private OrderItemRepository $orderItemRepository,
-        private CartRepository $cartRepository,
-        private CartItemRepository $cartItemRepository,
-        private ProductRepository $productRepository
-    ) {
+        private CartRepository      $cartRepository,
+        private CartItemRepository  $cartItemRepository,
+        private ProductRepository   $productRepository
+    )
+    {
     }
 
     public function getUserOrders(GetUserOrdersDto $dto): array
     {
         $userId = $this->getAuthUserId();
-        
+
         $totalCount = $this->orderRepository->countUserOrders($userId, $dto->status);
-        $orders = $this->orderRepository->getUserOrders($userId, $dto->status, $dto->sortField, $dto->sortOrder, $dto->offset, $dto->limit);
+        $orders = $this->orderRepository->getUserOrders(
+            $userId,
+            $dto->status,
+            $dto->sortField,
+            $dto->sortOrder,
+            $dto->offset,
+            $dto->limit);
 
         return PaginationUtil::fromOffsetLimit(
             ShortOrderResource::collection($orders),
@@ -60,9 +68,7 @@ class OrderService
             $cart = $this->cartRepository->findCheckedOutCart($userId, $dto->cartId);
 
             if (!$cart) {
-                throw new BusinessException(ResponseCode::NOT_FOUND, [], [
-                    'message' => 'Cart not found or not checked out'
-                ]);
+                throw new BusinessException(ResponseCode::NOT_FOUND);
             }
 
             $this->assertCartNotEmpty($cart);
@@ -74,8 +80,10 @@ class OrderService
             $this->createOrderItems($order, $cart, $products);
             $this->completeCart($cart);
 
+            $this->deleteSelectedItemsInActiveCart($userId, $products);
             return ShortOrderResource::transform($order);
         });
+
     }
 
     public function getOrderDetails(int $orderId): array
@@ -116,7 +124,7 @@ class OrderService
                 throw new BusinessException(ResponseCode::NOT_FOUND);
             }
 
-            $this->assertCanUpdateShipping($order);
+// TODO     $this->assertCanUpdateShipping($order);
 
             $this->orderRepository->update($order, $dto->toArray());
             $order->load('items');
@@ -136,7 +144,7 @@ class OrderService
                 throw new BusinessException(ResponseCode::NOT_FOUND);
             }
 
-            $this->assertNotAlreadyCancelled($order);
+// TODO     $this->assertNotAlreadyCancelled($order);
             $this->assertCanCancelOrder($order);
 
             $this->orderItemRepository->restoreProductQuantities($order);
@@ -155,7 +163,12 @@ class OrderService
         $offset = ($dto->page - 1) * $dto->size;
 
         $totalCount = $this->orderRepository->countWithFilters($filters);
-        $orders = $this->orderRepository->searchWithFilters($filters, $dto->sortField, $dto->sortOrder, $offset, $dto->size);
+        $orders = $this->orderRepository->searchWithFilters(
+            $filters,
+            $dto->sortField,
+            $dto->sortOrder,
+            $offset,
+            $dto->size);
 
         return PaginationUtil::fromPageSize(
             OrderResource::collection($orders),
@@ -236,6 +249,7 @@ class OrderService
         $products = $this->productRepository->findByIdsWithLock($productIds);
 
         foreach ($cart->items as $item) {
+            /** @var Product $product */
             $product = $products->get($item->product_id);
 
             if (!$product) {
@@ -360,17 +374,38 @@ class OrderService
 
     private function completeCart(Cart $cart): void
     {
-        $this->cartRepository->update($cart, ['status' => CartStatus::COMPLETED]);
+        $cart->update(['status' => CartStatus::COMPLETED]);
         $this->cartItemRepository->deleteByCartId($cart->cart_id);
     }
 
     private function assertCanCancelOrder(Order $order): void
     {
-        if (!in_array($order->status, [OrderStatus::PENDING_PAYMENT, OrderStatus::PAID, OrderStatus::PROCESSING])) {
+        if (!$this->isCancelableStatus($order->status)) {
             throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
                 'message' => 'Cannot cancel this order. Order status does not allow cancellation.',
                 'current_status' => $order->status,
             ]);
         }
     }
+
+    private function isCancelableStatus(string $status): bool
+    {
+        $cancelableStatuses = [
+            OrderStatus::PENDING_PAYMENT,
+            OrderStatus::PAID,
+            OrderStatus::PROCESSING,
+        ];
+
+        return in_array($status, $cancelableStatuses);
+    }
+
+    private function deleteSelectedItemsInActiveCart(int $userId, Collection $products): void
+    {
+        $cart = $this->cartRepository->findActiveCart($userId);
+        $productIds = $products->map(function (Product $product) {
+            return $product->product_id;
+        })->toArray();
+        $this->cartItemRepository->deleteByCartAndProductIds($cart->cart_id, $productIds);
+    }
+
 }

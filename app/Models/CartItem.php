@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property-read \App\Models\Cart $cart Associated cart
  * @property-read \App\Models\Product $product Associated product
+ * @method static where(string $string, int $cartId)
  */
 class CartItem extends Model
 {

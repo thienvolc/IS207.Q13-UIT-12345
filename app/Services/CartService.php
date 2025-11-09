@@ -19,21 +19,21 @@ use App\Repositories\CartItemRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use \Illuminate\Database\Eloquent\Collection;
 
-class CartService
+readonly class CartService
 {
     public function __construct(
         private CartRepository     $cartRepository,
         private CartItemRepository $cartItemRepository,
         private ProductRepository  $productRepository
-    )
-    {
-    }
+    ) {}
 
     public function getOrCreateCart(): array
     {
         $userId = $this->getAuthUserId();
         $cart = $this->cartRepository->findOrCreateActiveCart($userId);
+
         return CartResource::transform($cart);
     }
 
@@ -47,25 +47,25 @@ class CartService
 
             $this->assertProductIsAvailable($product);
 
-            $cartItem = $this->cartItemRepository
-                ->findByCartAndProduct($cart->cart_id, $addCartItemDto->productId);
-            $newQuantity = $cartItem
-                ? ($cartItem->quantity + $addCartItemDto->quantity)
-                : $addCartItemDto->quantity;
+            $existingCartItem = $this->cartItemRepository->findByCartAndProduct(
+                $cart->cart_id, $addCartItemDto->productId);
 
-            $this->assertSufficientStock($product, $newQuantity, $cartItem);
+            $inCartQuantity = $existingCartItem ? $existingCartItem->quantity : 0;
+            $newQuantity = $addCartItemDto->quantity + $inCartQuantity;
 
-            if ($cartItem) {
-                $this->updateExistingCartItem(
-                    $cartItem, $product, $newQuantity, $addCartItemDto->note);
+            $this->assertSufficientStock($product, $newQuantity, $inCartQuantity);
+
+            if ($existingCartItem) {
+                $this->updateExistingCartItem($existingCartItem,
+                    $product, $newQuantity, $addCartItemDto->note);
             } else {
-                $cartItem = $this->createNewCartItem($cart, $product, $addCartItemDto);
+                $existingCartItem = $this->createNewCartItem($cart, $product, $addCartItemDto);
             }
 
             return [
-                'item_id' => $cartItem->cart_item_id,
-                'product_id' => $cartItem->product_id,
-                'quantity' => $cartItem->quantity,
+                'item_id' => $existingCartItem->cart_item_id,
+                'product_id' => $existingCartItem->product_id,
+                'quantity' => $existingCartItem->quantity,
             ];
         });
     }
@@ -78,9 +78,7 @@ class CartService
             $cartItem = $this->cartItemRepository->findUserCartItem($userId, $dto->cartItemId);
 
             if (!$cartItem) {
-                throw new BusinessException(ResponseCode::NOT_FOUND, [], [
-                    'message' => 'Cart item not found'
-                ]);
+                throw new BusinessException(ResponseCode::NOT_FOUND);
             }
 
             $product = $this->productRepository->findAndLock($cartItem->product_id);
@@ -102,13 +100,11 @@ class CartService
             $cartItem = $this->cartItemRepository->findUserCartItem($userId, $cartItemId);
 
             if (!$cartItem) {
-                throw new BusinessException(ResponseCode::NOT_FOUND, [], [
-                    'message' => 'Cart item not found'
-                ]);
+                throw new BusinessException(ResponseCode::NOT_FOUND);
             }
 
             $deletedItem = $this->replicateCartItemWithProduct($cartItem);
-            $this->cartItemRepository->delete($cartItem);
+            $cartItem->delete();
 
             return CartItemResource::transform($deletedItem);
         });
@@ -137,21 +133,15 @@ class CartService
         $userId = $this->getAuthUserId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $cart = $this->cartRepository->findAndLockActiveCart($userId);
-
-            if (!$cart) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
-
-            $cartItems = $this->cartItemRepository->findAndLockByIds($cart->cart_id, $dto->items);
-
-            $this->assertAllItemsInCart($dto->items, $cartItems);
+            $cartItems = $this->findAndLockItemsForActiveCart($userId, $dto->items);
             $this->validateAllProductsAvailable($cartItems);
 
-//            $this->cartItemRepository->deleteNonSelected($cart->cart_id, $dto->items);
-            $this->updateCartWithShippingInfo($cart, $dto);
+            $checkoutCart = $this->cartRepository->createCheckoutCart($userId);
+            $checkoutCartItems = $this->replicateCartItemsForCart($cartItems, $checkoutCart->cart_id);
 
-            return $this->buildCheckoutResponse($cart, $cartItems);
+            $this->updateCartWithShippingInfo($checkoutCart, $dto);
+
+            return $this->buildCheckoutResponse($checkoutCart, $checkoutCartItems);
         });
     }
 
@@ -163,9 +153,7 @@ class CartService
     private function assertProductIsAvailable(?Product $product): void
     {
         if (!$product) {
-            throw new BusinessException(ResponseCode::NOT_FOUND, [], [
-                'message' => 'Product not found'
-            ]);
+            throw new BusinessException(ResponseCode::NOT_FOUND);
         }
 
         if ($product->status !== ProductStatus::ACTIVE) {
@@ -187,23 +175,30 @@ class CartService
     }
 
     private function assertSufficientStock(
-        Product $product, int $totalQuantity, ?CartItem $existingItem): void
+        Product $product,
+        int     $totalQuantity,
+        int     $inCartQuantity
+    ): void
     {
         if ($product->quantity < $totalQuantity) {
             throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
                 'message' => 'Not enough product in stock',
                 'available' => $product->quantity,
-                'in_cart' => $existingItem ? $existingItem->quantity : 0,
-                'requested' => $totalQuantity - ($existingItem ? $existingItem->quantity : 0),
+                'in_cart' => $inCartQuantity,
+                'requested' => $totalQuantity - $inCartQuantity,
                 'total_needed' => $totalQuantity,
             ]);
         }
     }
 
     private function updateExistingCartItem(
-        CartItem $cartItem, Product $product, int $quantity, ?string $note): void
+        CartItem $cartItem,
+        Product  $product,
+        int      $quantity,
+        ?string  $note
+    ): void
     {
-        $this->cartItemRepository->update($cartItem, [
+        $cartItem->update([
             'quantity' => $quantity,
             'price' => $product->price,
             'discount' => $product->discount ?? 0,
@@ -227,9 +222,12 @@ class CartService
     }
 
     private function updateCartItemWithCurrentPrice(
-        CartItem $cartItem, Product $product, int $quantity): void
+        CartItem $cartItem,
+        Product  $product,
+        int      $quantity
+    ): void
     {
-        $this->cartItemRepository->update($cartItem, [
+        $cartItem->update([
             'quantity' => $quantity,
             'price' => $product->price,
             'discount' => $product->discount ?? 0,
@@ -244,13 +242,25 @@ class CartService
         return $deletedItem;
     }
 
-    private function assertAllItemsInCart(array $requestedItems, $cartItems): void
+    private function findAndLockItemsForActiveCart(int $userId, array $itemIds): Collection
     {
-        if ($cartItems->count() !== count($requestedItems)) {
-            throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
-                'message' => 'Some items are not in your cart'
-            ]);
+        $cart = $this->cartRepository->findAndLockActiveCart($userId);
+        if (!$cart) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
         }
+
+        return $this->cartItemRepository->findAndLockByIds($cart->cart_id, $itemIds);
+    }
+
+    private function replicateCartItemsForCart(Collection $cartItems, int $cart_id): Collection
+    {
+        return $cartItems->map(function (CartItem $item) use ($cart_id) {
+            $clone = $item->replicate();
+            $clone->cart_id = $cart_id;
+            $clone->save();
+
+            return $clone;
+        });
     }
 
     private function validateAllProductsAvailable($cartItems): void
@@ -282,7 +292,7 @@ class CartService
     {
         $shippingData = $dto->getShippingData();
         $shippingData['status'] = CartStatus::CHECKED_OUT;
-        $this->cartRepository->update($cart, $shippingData);
+        $cart->update($shippingData);
     }
 
     private function buildCheckoutResponse(Cart $cart, $cartItems): array

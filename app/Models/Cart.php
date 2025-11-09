@@ -29,6 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\User $user Cart owner
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CartItem> $items Cart items
  * @property-read int|null $items_count
+ * @method static where(string $string, int $userId)
+ * @method static create(array $array)
  */
 class Cart extends Model
 {
