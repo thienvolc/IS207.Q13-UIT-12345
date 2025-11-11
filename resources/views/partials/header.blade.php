@@ -68,20 +68,22 @@
         <a class="header-cart-item"><i class="bi bi-handbag-fill"></i></a>
         <span class="header-cart-badge">2</span>
       </div>
-      <div class="header-auth"><a href="/login">Đăng nhập</a> <span class="separate"></span> <a href="/register">Đăng ký</a></div>
+      <!-- <div class="header-auth"><a href="/login">Đăng nhập</a> <span class="separate"></span> <a href="/register">Đăng ký</a></div> -->
       <!-- Tài khoản -->
-      <!-- <div class="nav-item dropdown header-user">
-          <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{{ asset('img/LOGO_Admin.png') }}" alt="avatar" class="header-user-avt"> Admin
-          </a>
-          <ul class="dropdown-menu header-user-menu" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="/">Tài khoản của tôi</a></li>
-            <li><a class="dropdown-item" href="/">Đơn mua</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
-          </ul>
-        </div> -->
+      <div class="nav-item dropdown header-user">
+        <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="{{ asset('img/LOGO_Admin.png') }}" alt="avatar" class="header-user-avt"> Admin
+        </a>
+        <ul class="dropdown-menu header-user-menu" aria-labelledby="userDropdown">
+          <li><a class="dropdown-item" href="/">Tài khoản của tôi</a></li>
+          <li><a class="dropdown-item" href="/">Đơn mua</a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+        </ul>
+      </div>
     </div>
   </div>
   <!-- Header bottom -->
