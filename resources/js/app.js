@@ -6,3 +6,4 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./base.js";
 import "./header.js";
 import "./home.js";
+import "./cart.js";

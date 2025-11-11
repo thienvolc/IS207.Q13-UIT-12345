@@ -7,7 +7,33 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 // ==================== TRANG CHỦ & KHÁC ====================
 Route::get('/', function () {
-    // Lấy dữ liệu từ Aiven Cloud Database
+    // ============================================
+    // ✅ DATA THẬT - Lấy từ Aiven Cloud Database
+    // ============================================
+
+    // Hero Slider - 3 sản phẩm nổi bật
+    $heroProducts = DB::table('products')
+        ->where('status', 1)
+        ->orderBy('created_at', 'desc')
+        ->limit(3)
+        ->get()
+        ->map(function ($product) {
+            return [
+                'id' => $product->product_id,
+                'name' => $product->title,
+                'slug' => $product->slug,
+                'thumbnail' => $product->thumb,
+                'price' => $product->price,
+                'price_sale' => $product->price,
+            ];
+        });
+
+    // Category Banners - 4 categories từ DB
+    $categoryBanners = DB::table('categories')
+        ->limit(4)
+        ->get(['category_id', 'title', 'slug']);
+
+    // Products cho tabs và carousel
     $products = DB::table('products')
         ->where('status', 1)
         ->orderBy('created_at', 'desc')
@@ -31,10 +57,25 @@ Route::get('/', function () {
     // Chia sản phẩm theo từng tab
     $newProducts = $products->take(8); // 8 sản phẩm mới
     $featuredProducts = $products->skip(8)->take(8); // 8 sản phẩm nổi bật
-    $saleProducts = $products->where('discount', '>', 0)->take(8); // 8 sản phẩm giảm giá
+
+    // ============================================
+    // 🔒 HARDCODE TẠM - Tab Giảm Giá (Chờ discount data)
+    // ============================================
+    // Lý do: Database không có discount (all NULL)
+    // TODO: Khi có discount data, thay bằng:
+    //   $saleProducts = $products->where('discount', '>', 0)->take(8);
+    // Date: 2025-11-11
+    // ============================================
+    $saleProducts = $products->skip(16)->take(8)->map(function ($p) {
+        // FAKE discount for demo
+        $p['discount'] = rand(10, 30);
+        $p['price_sale'] = $p['price'] * (1 - $p['discount'] / 100);
+        return $p;
+    });
+
     $bestSellers = $products->take(16); // 16 sản phẩm bán chạy (2 tabs carousel)
 
-    return view('pages.home', compact('newProducts', 'featuredProducts', 'saleProducts', 'bestSellers'));
+    return view('pages.home', compact('heroProducts', 'categoryBanners', 'newProducts', 'featuredProducts', 'saleProducts', 'bestSellers'));
 })->name('home');
 
 Route::get('/gioi-thieu', fn() => view('pages.about'))->name('about');
@@ -49,10 +90,37 @@ Route::get('/san-pham', function () {
     $perPage = 12;
     $currentPage = LengthAwarePaginator::resolveCurrentPage();
 
-    // Lấy dữ liệu từ database với phân trang
-    $query = DB::table('products')
-        ->where('status', 1)
-        ->orderBy('created_at', 'desc');
+    // ============================================
+    // ✅ SEARCH & FILTER - Từ query parameters
+    // ============================================
+    $query = DB::table('products')->where('status', 1);
+
+    // Search by name
+    if ($search = request('q')) {
+        $query->where('title', 'like', "%{$search}%");
+    }
+
+    // Filter by category
+    if ($category = request('category')) {
+        $query->where('slug', 'like', "{$category}%");
+    }
+
+    // Filter by price range
+    if ($priceMin = request('price_min')) {
+        $query->where('price', '>=', $priceMin);
+    }
+    if ($priceMax = request('price_max')) {
+        $query->where('price', '<=', $priceMax);
+    }
+
+    // Sort
+    $sort = request('sort', 'newest');
+    match ($sort) {
+        'price_asc' => $query->orderBy('price', 'asc'),
+        'price_desc' => $query->orderBy('price', 'desc'),
+        'name' => $query->orderBy('title', 'asc'),
+        default => $query->orderBy('created_at', 'desc'),
+    };
 
     $total = $query->count();
     $items = $query
@@ -81,11 +149,18 @@ Route::get('/san-pham', function () {
         ['path' => url('/san-pham')]
     );
 
+    // Preserve query string in pagination
+    $products->appends(request()->query());
+
     return view('pages.products.index', compact('products'));
 })->name('products.index');
 
 // Chi tiết sản phẩm
 Route::get('/san-pham/{slug}', function ($slug) {
+    // ============================================
+    // ✅ DATA THẬT - Product từ Aiven Cloud
+    // ============================================
+
     // Lấy sản phẩm theo slug
     $productData = DB::table('products')
         ->where('slug', $slug)
@@ -95,6 +170,13 @@ Route::get('/san-pham/{slug}', function ($slug) {
     if (!$productData) {
         abort(404);
     }
+
+    // Lấy product metas
+    $metas = DB::table('product_metas')
+        ->where('product_id', $productData->product_id)
+        ->get()
+        ->pluck('content', 'key')
+        ->toArray();
 
     $product = [
         'id' => $productData->product_id,
@@ -108,6 +190,34 @@ Route::get('/san-pham/{slug}', function ($slug) {
         'quantity' => $productData->quantity,
         'description' => $productData->desc,
         'summary' => $productData->summary,
+
+        // ============================================
+        // 🔒 HARDCODE TẠM - Fake data chờ field thật
+        // ============================================
+        // TODO: Tính từ bảng reviews khi có
+        'rating' => 4.5,
+        'reviews_count' => rand(10, 100),
+        'sold' => rand(50, 500),
+
+        // TODO: Parse từ description hoặc tạo field mới
+        'highlights' => [
+            'Chất lượng cao, hiệu suất tốt',
+            'Thiết kế đẹp, hiện đại',
+            'Bảo hành chính hãng',
+        ],
+
+        // ============================================
+        // ✅ SPECS THẬT - Map từ product_metas
+        // ============================================
+        // Map keys phù hợp với loại sản phẩm (Loa/Tai nghe)
+        'specs' => [
+            'Thương hiệu' => $metas['brand'] ?? 'N/A',
+            'Công suất' => $metas['rms_watt'] ?? null,
+            'Thời lượng pin' => $metas['battery_life_h'] ?? null,
+            'Chống nước' => $metas['waterproof_ip'] ?? null,
+            'Bluetooth' => $metas['bluetooth_version'] ?? null,
+            'Bảo hành' => $metas['warranty_months'] ?? null,
+        ],
     ];
 
     // Sản phẩm liên quan (cùng loại)

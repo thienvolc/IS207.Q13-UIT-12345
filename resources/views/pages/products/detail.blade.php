@@ -93,6 +93,26 @@
 
                 <!-- Actions -->
                 <div class="product-detail-actions mb-4">
+                    {{-- ============================================ --}}
+                    {{-- ✅ QUANTITY SELECTOR - Chọn số lượng --}}
+                    {{-- ============================================ --}}
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <label class="fw-bold fs-5">Số lượng:</label>
+                        <div class="input-group" style="width: 150px;">
+                            <button class="btn btn-outline-secondary" type="button" id="decrease-qty">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+                            <input type="number" class="form-control text-center" id="product-quantity" value="1" min="1" max="{{ $product['quantity'] }}">
+                            <button class="btn btn-outline-secondary" type="button" id="increase-qty">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                        <span class="text-muted">
+                            <i class="fa-solid fa-box"></i>
+                            Còn <strong>{{ $product['quantity'] }}</strong> sản phẩm
+                        </span>
+                    </div>
+
                     <div class="d-flex gap-3 mb-3">
                         <button class="btn btn-primary btn-lg flex-grow-1 px-4 py-3 fs-5 add-to-cart" data-product-id="{{ $product['id'] }}">
                             <i class="fa-solid fa-cart-plus me-2 fs-5"></i>
@@ -185,58 +205,58 @@
             <!-- Thông số kỹ thuật -->
             <div class="tab-pane fade" id="specs" role="tabpanel">
                 <div class="product-specs bg-white rounded">
+                    {{-- ============================================ --}}
+                    {{-- ✅ SPECS THẬT - Từ product_metas (Aiven Cloud) --}}
+                    {{-- ============================================ --}}
                     <table class="table table-striped table-hover mb-0 fs-5">
                         <tbody>
-                            @if(isset($product['screen']))
+                            @if(isset($product['specs']))
+                            @foreach($product['specs'] as $label => $value)
+                            @if($value && $value !== 'N/A')
                             <tr>
                                 <td class="fw-bold" style="width: 30%;">
-                                    <i class="fa-solid fa-display me-2 text-primary fs-4"></i>Màn hình
+                                    @switch($label)
+                                    @case('Thương hiệu')
+                                    <i class="fa-solid fa-tag me-2 text-primary fs-4"></i>
+                                    @break
+                                    @case('Công suất')
+                                    <i class="fa-solid fa-bolt me-2 text-warning fs-4"></i>
+                                    @break
+                                    @case('Thời lượng pin')
+                                    <i class="fa-solid fa-battery-full me-2 text-success fs-4"></i>
+                                    @break
+                                    @case('Chống nước')
+                                    <i class="fa-solid fa-droplet me-2 text-info fs-4"></i>
+                                    @break
+                                    @case('Bluetooth')
+                                    <i class="fa-brands fa-bluetooth me-2 text-primary fs-4"></i>
+                                    @break
+                                    @case('Bảo hành')
+                                    <i class="fa-solid fa-shield-halved me-2 text-danger fs-4"></i>
+                                    @break
+                                    @default
+                                    <i class="fa-solid fa-circle-info me-2 text-secondary fs-4"></i>
+                                    @endswitch
+                                    {{ $label }}
                                 </td>
-                                <td>{{ $product['screen'] }}</td>
+                                <td>{{ $value }}</td>
                             </tr>
                             @endif
-                            @if(isset($product['cpu']))
+                            @endforeach
+                            @else
                             <tr>
-                                <td class="fw-bold">
-                                    <i class="fa-solid fa-microchip me-2 text-danger fs-4"></i>CPU
+                                <td colspan="2" class="text-center text-muted py-4">
+                                    Chưa có thông số kỹ thuật chi tiết.
                                 </td>
-                                <td>{{ $product['cpu'] }}</td>
-                            </tr>
-                            @endif
-                            @if(isset($product['ram']))
-                            <tr>
-                                <td class="fw-bold">
-                                    <i class="fa-solid fa-memory me-2 text-success fs-4"></i>RAM
-                                </td>
-                                <td>{{ $product['ram'] }}</td>
-                            </tr>
-                            @endif
-                            @if(isset($product['storage']))
-                            <tr>
-                                <td class="fw-bold">
-                                    <i class="fa-solid fa-hard-drive me-2 text-info fs-4"></i>Bộ nhớ trong
-                                </td>
-                                <td>{{ $product['storage'] }}</td>
-                            </tr>
-                            @endif
-                            @if(isset($product['battery']))
-                            <tr>
-                                <td class="fw-bold">
-                                    <i class="fa-solid fa-battery-full me-2 text-warning fs-4"></i>Pin
-                                </td>
-                                <td>{{ $product['battery'] }}</td>
-                            </tr>
-                            @endif
-                            @if(isset($product['os']))
-                            <tr>
-                                <td class="fw-bold">
-                                    <i class="fa-brands fa-android me-2 text-success fs-4"></i>Hệ điều hành
-                                </td>
-                                <td>{{ $product['os'] }}</td>
                             </tr>
                             @endif
                         </tbody>
                     </table>
+
+                    {{-- 🔒 HARDCODE TẠM: Specs cũ (Screen, CPU, RAM...) cho điện thoại --}}
+                    {{-- TODO: Tạo meta keys phù hợp khi bán điện thoại/laptop --}}
+                    {{-- Hiện tại DB có: brand, rms_watt, battery_life_h, waterproof_ip, bluetooth_version, warranty_months --}}
+                    {{-- Phù hợp với: Loa, Tai nghe --}}
                 </div>
             </div>
 
@@ -302,21 +322,79 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Add to cart
+        // ============================================
+        // ✅ QUANTITY SELECTOR - Tăng/Giảm số lượng
+        // ============================================
+        const qtyInput = document.getElementById('product-quantity');
+        const decreaseBtn = document.getElementById('decrease-qty');
+        const increaseBtn = document.getElementById('increase-qty');
+        const maxQty = parseInt(qtyInput.max);
+
+        decreaseBtn?.addEventListener('click', function() {
+            let currentVal = parseInt(qtyInput.value);
+            if (currentVal > 1) {
+                qtyInput.value = currentVal - 1;
+            }
+        });
+
+        increaseBtn?.addEventListener('click', function() {
+            let currentVal = parseInt(qtyInput.value);
+            if (currentVal < maxQty) {
+                qtyInput.value = currentVal + 1;
+            }
+        });
+
+        qtyInput?.addEventListener('change', function() {
+            let val = parseInt(this.value);
+            if (val < 1) this.value = 1;
+            if (val > maxQty) this.value = maxQty;
+        });
+
+        // ============================================
+        // 🔒 ADD TO CART - TODO: Call API
+        // ============================================
+        // TODO: Implement API call to /api/me/carts/items
+        // Yêu cầu: User phải login, có token
+        // ============================================
         document.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', function() {
                 const productId = this.dataset.productId;
-                console.log('Add to cart:', productId);
-                // TODO: Implement add to cart logic
+                const quantity = parseInt(qtyInput?.value || 1);
+
+                console.log('Add to cart:', {
+                    product_id: productId,
+                    quantity: quantity
+                });
+
+                // TODO: Check if user logged in
+                // TODO: Call API: POST /api/me/carts/items
+                // TODO: Show success notification
+                // TODO: Update cart count in header
+
+                // Temporary notification
+                alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!\n\nTODO: Implement API call`);
             });
         });
 
-        // Buy now
+        // ============================================
+        // 🔒 BUY NOW - TODO: Redirect to checkout
+        // ============================================
+        // TODO: Add to cart + redirect to checkout page
+        // ============================================
         document.querySelectorAll('.buy-now').forEach(btn => {
             btn.addEventListener('click', function() {
                 const productId = this.dataset.productId;
-                console.log('Buy now:', productId);
-                // TODO: Implement buy now logic
+                const quantity = parseInt(qtyInput?.value || 1);
+
+                console.log('Buy now:', {
+                    product_id: productId,
+                    quantity: quantity
+                });
+
+                // TODO: Add to cart via API
+                // TODO: Redirect to /checkout or /cart
+
+                alert(`Mua ngay ${quantity} sản phẩm!\n\nTODO: Implement checkout flow`);
             });
         });
     });
