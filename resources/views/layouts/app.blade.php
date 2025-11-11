@@ -26,5 +26,6 @@
     @yield('content')
   </main>
   @include('partials.footer')
+  @include('partials.chatbot')
 </body>
 </html>
