@@ -1,0 +1,115 @@
+/* ================================================
+   RESPONSIVE & MOBILE STYLES
+   Mobile Bar, Search, Offcanvas
+   ================================================ */
+
+/* ============================================ */
+/* MOBILE BAR */
+/* ============================================ */
+.mbar {
+    background: var(--primary, #ffd200);
+    height: 52px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    width: 100%;
+}
+
+.mbar__btn,
+.mbar__icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: #111827;
+    font-size: 20px;
+}
+
+.mbar__brand {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    height: 40px;
+}
+
+.mbar__brand-img {
+    height: 100%;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+}
+
+.mbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.mbar__badge {
+    position: absolute;
+    top: -4px;
+    right: -2px;
+    min-width: 18px;
+    height: 18px;
+    background: #111827;
+    color: #fff;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    padding: 0 4px;
+}
+
+/* ============================================ */
+/* MOBILE SEARCH */
+/* ============================================ */
+.msearch {
+    background: #fff;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.msearch__input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    padding: 0 14px;
+    outline: none;
+}
+
+.msearch__btn {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--primary, #ffd200);
+}
+
+/* ============================================ */
+/* OFFCANVAS MENU */
+/* ============================================ */
+.off-link {
+    display: block;
+    padding: 8px 6px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.off-link:hover {
+    color: var(--primary, #ff4f67);
+}
