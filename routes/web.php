@@ -4,11 +4,12 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Controllers\Auth\AuthController;
 
 // ==================== TRANG CHỦ & KHÁC ====================
 Route::get('/', function () {
     // ============================================
-    // ✅ DATA THẬT - Lấy từ Aiven Cloud Database
+    //  DATA THẬT - Lấy từ Aiven Cloud Database
     // ============================================
 
     // Hero Slider - 3 sản phẩm nổi bật
@@ -59,7 +60,7 @@ Route::get('/', function () {
     $featuredProducts = $products->skip(8)->take(8); // 8 sản phẩm nổi bật
 
     // ============================================
-    // 🔒 HARDCODE TẠM - Tab Giảm Giá (Chờ discount data)
+    //  HARDCODE TẠM - Tab Giảm Giá (Chờ discount data)
     // ============================================
     // Lý do: Database không có discount (all NULL)
     // TODO: Khi có discount data, thay bằng:
@@ -91,7 +92,7 @@ Route::get('/san-pham', function () {
     $currentPage = LengthAwarePaginator::resolveCurrentPage();
 
     // ============================================
-    // ✅ SEARCH & FILTER - Từ query parameters
+    //  SEARCH & FILTER - Từ query parameters
     // ============================================
     $query = DB::table('products')->where('status', 1);
 
@@ -158,7 +159,7 @@ Route::get('/san-pham', function () {
 // Chi tiết sản phẩm
 Route::get('/san-pham/{slug}', function ($slug) {
     // ============================================
-    // ✅ DATA THẬT - Product từ Aiven Cloud
+    //  DATA THẬT - Product từ Aiven Cloud
     // ============================================
 
     // Lấy sản phẩm theo slug
@@ -192,7 +193,7 @@ Route::get('/san-pham/{slug}', function ($slug) {
         'summary' => $productData->summary,
 
         // ============================================
-        // 🔒 HARDCODE TẠM - Fake data chờ field thật
+        //  HARDCODE TẠM - Fake data chờ field thật
         // ============================================
         // TODO: Tính từ bảng reviews khi có
         'rating' => 4.5,
@@ -207,7 +208,7 @@ Route::get('/san-pham/{slug}', function ($slug) {
         ],
 
         // ============================================
-        // ✅ SPECS THẬT - Map từ product_metas
+        //  SPECS THẬT - Map từ product_metas
         // ============================================
         // Map keys phù hợp với loại sản phẩm (Loa/Tai nghe)
         'specs' => [
@@ -243,3 +244,17 @@ Route::get('/san-pham/{slug}', function ($slug) {
 
     return view('pages.products.detail', compact('product', 'related'));
 })->name('products.show');
+
+// ==================== ĐĂNG NHẬP & ĐĂNG KÝ ====================
+
+// Trang đăng nhập
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+// Trang quên mật khẩu
+Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+
+// Trang đăng ký
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);

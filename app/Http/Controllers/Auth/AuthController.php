@@ -16,6 +16,27 @@ use Illuminate\Http\JsonResponse;
 
 class AuthController extends AppController
 {
+    /**
+     * GET /forgot-password
+     */
+    public function showForgotPasswordForm()
+    {
+        return view('auth.forgot-password');
+    }
+    /**
+     * GET /register
+     */
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+    /**
+     * GET /login
+     */
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
     public function __construct(
         private AuthService $authService
     ) {}
