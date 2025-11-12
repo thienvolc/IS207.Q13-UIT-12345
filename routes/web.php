@@ -8,10 +8,6 @@ use App\Http\Controllers\Auth\AuthController;
 
 // ==================== TRANG CHỦ & KHÁC ====================
 Route::get('/', function () {
-    // ============================================
-    //  DATA THẬT - Lấy từ Aiven Cloud Database
-    // ============================================
-
     // Hero Slider - 3 sản phẩm nổi bật
     $heroProducts = DB::table('products')
         ->where('status', 1)
@@ -55,26 +51,17 @@ Route::get('/', function () {
             ];
         });
 
-    // Chia sản phẩm theo từng tab
     $newProducts = $products->take(8); // 8 sản phẩm mới
     $featuredProducts = $products->skip(8)->take(8); // 8 sản phẩm nổi bật
 
-    // ============================================
-    //  HARDCODE TẠM - Tab Giảm Giá (Chờ discount data)
-    // ============================================
-    // Lý do: Database không có discount (all NULL)
-    // TODO: Khi có discount data, thay bằng:
-    //   $saleProducts = $products->where('discount', '>', 0)->take(8);
-    // Date: 2025-11-11
-    // ============================================
+    // Tab Giảm Giá (chờ discount data)
     $saleProducts = $products->skip(16)->take(8)->map(function ($p) {
-        // FAKE discount for demo
         $p['discount'] = rand(10, 30);
         $p['price_sale'] = $p['price'] * (1 - $p['discount'] / 100);
         return $p;
     });
 
-    $bestSellers = $products->take(16); // 16 sản phẩm bán chạy (2 tabs carousel)
+    $bestSellers = $products->take(16); // 16 sản phẩm bán chạy
 
     return view('pages.home', compact('heroProducts', 'categoryBanners', 'newProducts', 'featuredProducts', 'saleProducts', 'bestSellers'));
 })->name('home');
@@ -85,36 +72,22 @@ Route::get('/tin-tuc', fn() => view('pages.blog.index'))->name('blog.index');
 Route::get('/khuyen-mai', fn() => view('pages.super-deal'))->name('super-deal');
 
 // ==================== SẢN PHẨM ====================
-
-// Danh sách sản phẩm
 Route::get('/san-pham', function () {
     $perPage = 12;
     $currentPage = LengthAwarePaginator::resolveCurrentPage();
-
-    // ============================================
-    //  SEARCH & FILTER - Từ query parameters
-    // ============================================
     $query = DB::table('products')->where('status', 1);
-
-    // Search by name
     if ($search = request('q')) {
         $query->where('title', 'like', "%{$search}%");
     }
-
-    // Filter by category
     if ($category = request('category')) {
         $query->where('slug', 'like', "{$category}%");
     }
-
-    // Filter by price range
     if ($priceMin = request('price_min')) {
         $query->where('price', '>=', $priceMin);
     }
     if ($priceMax = request('price_max')) {
         $query->where('price', '<=', $priceMax);
     }
-
-    // Sort
     $sort = request('sort', 'newest');
     match ($sort) {
         'price_asc' => $query->orderBy('price', 'asc'),
@@ -122,7 +95,6 @@ Route::get('/san-pham', function () {
         'name' => $query->orderBy('title', 'asc'),
         default => $query->orderBy('created_at', 'desc'),
     };
-
     $total = $query->count();
     $items = $query
         ->skip(($currentPage - 1) * $perPage)
@@ -141,7 +113,6 @@ Route::get('/san-pham', function () {
                 'quantity' => $product->quantity,
             ];
         })->toArray();
-
     $products = new LengthAwarePaginator(
         $items,
         $total,
@@ -149,36 +120,23 @@ Route::get('/san-pham', function () {
         $currentPage,
         ['path' => url('/san-pham')]
     );
-
-    // Preserve query string in pagination
     $products->appends(request()->query());
-
     return view('pages.products.index', compact('products'));
 })->name('products.index');
 
-// Chi tiết sản phẩm
 Route::get('/san-pham/{slug}', function ($slug) {
-    // ============================================
-    //  DATA THẬT - Product từ Aiven Cloud
-    // ============================================
-
-    // Lấy sản phẩm theo slug
     $productData = DB::table('products')
         ->where('slug', $slug)
         ->where('status', 1)
         ->first();
-
     if (!$productData) {
         abort(404);
     }
-
-    // Lấy product metas
     $metas = DB::table('product_metas')
         ->where('product_id', $productData->product_id)
         ->get()
         ->pluck('content', 'key')
         ->toArray();
-
     $product = [
         'id' => $productData->product_id,
         'name' => $productData->title,
@@ -191,26 +149,14 @@ Route::get('/san-pham/{slug}', function ($slug) {
         'quantity' => $productData->quantity,
         'description' => $productData->desc,
         'summary' => $productData->summary,
-
-        // ============================================
-        //  HARDCODE TẠM - Fake data chờ field thật
-        // ============================================
-        // TODO: Tính từ bảng reviews khi có
         'rating' => 4.5,
         'reviews_count' => rand(10, 100),
         'sold' => rand(50, 500),
-
-        // TODO: Parse từ description hoặc tạo field mới
         'highlights' => [
             'Chất lượng cao, hiệu suất tốt',
             'Thiết kế đẹp, hiện đại',
             'Bảo hành chính hãng',
         ],
-
-        // ============================================
-        //  SPECS THẬT - Map từ product_metas
-        // ============================================
-        // Map keys phù hợp với loại sản phẩm (Loa/Tai nghe)
         'specs' => [
             'Thương hiệu' => $metas['brand'] ?? 'N/A',
             'Công suất' => $metas['rms_watt'] ?? null,
@@ -220,8 +166,6 @@ Route::get('/san-pham/{slug}', function ($slug) {
             'Bảo hành' => $metas['warranty_months'] ?? null,
         ],
     ];
-
-    // Sản phẩm liên quan (cùng loại)
     $related = DB::table('products')
         ->where('type', $productData->type)
         ->where('product_id', '!=', $productData->product_id)
@@ -241,20 +185,25 @@ Route::get('/san-pham/{slug}', function ($slug) {
                 'category' => $p->type,
             ];
         });
-
     return view('pages.products.detail', compact('product', 'related'));
 })->name('products.show');
 
 // ==================== ĐĂNG NHẬP & ĐĂNG KÝ ====================
-
-// Trang đăng nhập
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-
-// Trang quên mật khẩu
 Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
-
-// Trang đăng ký
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
+
+// ==================== GIỎ HÀNG ====================
+Route::get('/cart', function () {
+    $cartItems = [];
+    $total = 0;
+    return view('pages.cart', compact('cartItems', 'total'));
+})->name('cart.page');
+
+// ==================== THANH TOÁN ====================
+Route::get('/checkout', function () {
+    return view('pages.checkout');
+})->name('order.checkout');

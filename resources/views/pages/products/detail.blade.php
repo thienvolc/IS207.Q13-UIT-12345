@@ -98,11 +98,11 @@
                     {{-- ============================================ --}}
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <label class="fw-bold fs-5">Số lượng:</label>
-                        <div class="input-group" style="width: 150px;">
+                        <div class="input-group" style="width: 120px;">
                             <button class="btn btn-outline-secondary" type="button" id="decrease-qty">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
-                            <input type="number" class="form-control text-center" id="product-quantity" value="1" min="1" max="{{ $product['quantity'] }}">
+                            <input type="number" class="form-control text-center" id="product-quantity" value="1" min="1" max="{{ $product['quantity'] }}" style="appearance: textfield;">
                             <button class="btn btn-outline-secondary" type="button" id="increase-qty">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
@@ -281,9 +281,9 @@
                 Xem tất cả <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
-        <div class="row g-3 g-md-4">
+        <div class="grid-row">
             @foreach($related as $item)
-            <div class="col-6 col-md-4 col-lg-3">
+            <div class="grid__col-2-4 product-col">
                 @include('components.product-card', ['product' => $item])
             </div>
             @endforeach
@@ -292,112 +292,25 @@
     @endif
 </div>
 
-@push('styles')
 <style>
-    /* ---------- Tab Content ---------- */
-    .product-description {
-        line-height: 1.8;
-        color: #374151;
+    /* Ẩn nút tăng giảm mặc định của input number trên mọi trình duyệt */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
 
-    .product-specs table td {
-        padding: 1.2rem 1.5rem;
-        vertical-align: middle;
-    }
-
-    /* ---------- Responsive ---------- */
-    @media (max-width: 768px) {
-        .product-detail-gallery__item {
-            width: 64px !important;
-            height: 64px !important;
-        }
-
-        .nav-tabs .nav-link {
-            padding: 1rem 1rem;
-        }
+    input[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
     }
 </style>
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/pages/detail.css') }}">
 @endpush
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // ============================================
-        // ✅ QUANTITY SELECTOR - Tăng/Giảm số lượng
-        // ============================================
-        const qtyInput = document.getElementById('product-quantity');
-        const decreaseBtn = document.getElementById('decrease-qty');
-        const increaseBtn = document.getElementById('increase-qty');
-        const maxQty = parseInt(qtyInput.max);
-
-        decreaseBtn?.addEventListener('click', function() {
-            let currentVal = parseInt(qtyInput.value);
-            if (currentVal > 1) {
-                qtyInput.value = currentVal - 1;
-            }
-        });
-
-        increaseBtn?.addEventListener('click', function() {
-            let currentVal = parseInt(qtyInput.value);
-            if (currentVal < maxQty) {
-                qtyInput.value = currentVal + 1;
-            }
-        });
-
-        qtyInput?.addEventListener('change', function() {
-            let val = parseInt(this.value);
-            if (val < 1) this.value = 1;
-            if (val > maxQty) this.value = maxQty;
-        });
-
-        // ============================================
-        // 🔒 ADD TO CART - TODO: Call API
-        // ============================================
-        // TODO: Implement API call to /api/me/carts/items
-        // Yêu cầu: User phải login, có token
-        // ============================================
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const productId = this.dataset.productId;
-                const quantity = parseInt(qtyInput?.value || 1);
-
-                console.log('Add to cart:', {
-                    product_id: productId,
-                    quantity: quantity
-                });
-
-                // TODO: Check if user logged in
-                // TODO: Call API: POST /api/me/carts/items
-                // TODO: Show success notification
-                // TODO: Update cart count in header
-
-                // Temporary notification
-                alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!\n\nTODO: Implement API call`);
-            });
-        });
-
-        // ============================================
-        // 🔒 BUY NOW - TODO: Redirect to checkout
-        // ============================================
-        // TODO: Add to cart + redirect to checkout page
-        // ============================================
-        document.querySelectorAll('.buy-now').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const productId = this.dataset.productId;
-                const quantity = parseInt(qtyInput?.value || 1);
-
-                console.log('Buy now:', {
-                    product_id: productId,
-                    quantity: quantity
-                });
-
-                // TODO: Add to cart via API
-                // TODO: Redirect to /checkout or /cart
-
-                alert(`Mua ngay ${quantity} sản phẩm!\n\nTODO: Implement checkout flow`);
-            });
-        });
-    });
-</script>
+@vite('resources/js/detail.js')
 @endpush
 @endsection

@@ -65,8 +65,10 @@
     </div>
     <div class="header-options">
       <div class="header-cart">
-        <a class="header-cart-item"><i class="bi bi-handbag-fill"></i></a>
-        <span class="header-cart-badge">2</span>
+        <a href="/cart" class="header-cart-item">
+          <span class="header-cart-text">Giỏ hàng</span>
+          <i class="bi bi-handbag-fill"></i>
+        </a>
       </div>
       <div class="header-auth"><a href="/login">Đăng nhập</a> <span class="separate"></span> <a href="/register">Đăng ký</a></div>
       <!-- Tài khoản -->
