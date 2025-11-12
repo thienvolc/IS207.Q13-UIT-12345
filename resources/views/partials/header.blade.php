@@ -68,9 +68,9 @@
         <a class="header-cart-item"><i class="bi bi-handbag-fill"></i></a>
         <span class="header-cart-badge">2</span>
       </div>
-      <!-- <div class="header-auth"><a href="/login">Đăng nhập</a> <span class="separate"></span> <a href="/register">Đăng ký</a></div> -->
+      <div class="header-auth"><a href="/login">Đăng nhập</a> <span class="separate"></span> <a href="/register">Đăng ký</a></div>
       <!-- Tài khoản -->
-      <div class="nav-item dropdown header-user">
+      <!-- <div class="nav-item dropdown header-user">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
           data-bs-toggle="dropdown" aria-expanded="false">
           <img src="{{ asset('img/LOGO_Admin.png') }}" alt="avatar" class="header-user-avt"> Admin
@@ -83,7 +83,7 @@
           </li>
           <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
         </ul>
-      </div>
+      </div> -->
     </div>
   </div>
   <!-- Header bottom -->
@@ -111,7 +111,7 @@
       <a href="/san-pham" class="under-nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">Sản phẩm</a>
       <a href="/khuyen-mai" class="under-nav-item {{ request()->routeIs('super-deal') ? 'active' : '' }}">Khuyến mãi</a>
       <a href="/gioi-thieu" class="under-nav-item {{ request()->routeIs('about') ? 'active' : '' }}">Giới thiệu</a>
-      <a href="/blog" class="under-nav-item {{ request()->routeIs('blog.*') ? 'active' : '' }}">Blog</a>
+      <a href="{{ route('blog.index') }}" class="under-nav-item {{ request()->routeIs('blog.*') ? 'active' : '' }}">Tin tức</a>
       <a href="/lien-he" class="under-nav-item {{ request()->routeIs('contact') ? 'active' : '' }}">Liên hệ</a>
     </div>
 

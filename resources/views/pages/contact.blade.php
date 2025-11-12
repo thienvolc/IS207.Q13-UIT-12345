@@ -67,8 +67,8 @@
                 </div>
                 <h3 class="contact-card__title">Giờ làm việc</h3>
                 <p class="contact-card__text">
-                    T2 - T7: 8:00 - 21:00<br>
-                    Chủ nhật: 9:00 - 18:00
+                    T2 - T6: 8:00 - 20:00<br>
+                    T7 - Chủ nhật: 9:00 - 21:00
                 </p>
             </div>
         </div>

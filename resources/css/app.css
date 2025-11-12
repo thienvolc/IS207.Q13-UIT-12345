@@ -11,6 +11,9 @@
 @import "./components/responsive.css";
 @import "./components/breadcrumb.css";
 
-/* Page Styles */
-@import "./pages/home-sections.css";
-@import "./pages/contact.css";
+/* Pages */
+@import "pages/home-sections.css";
+@import "pages/contact.css";
+@import "pages/about.css";
+@import "pages/products.css";
+@import "pages/blog.css";

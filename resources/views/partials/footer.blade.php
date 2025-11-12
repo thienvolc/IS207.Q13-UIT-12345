@@ -1,6 +1,6 @@
 <!-- Newsletter Bar -->
 <div class="newsletter-bar">
-    <div class="container">
+    <div class="grid">
         <div class="newsletter-bar__inner">
             <div class="newsletter-bar__icon">
                 <i class="bi bi-envelope"></i>
@@ -19,7 +19,7 @@
 
 <!-- Footer Main -->
 <footer class="footer">
-    <div class="container">
+    <div class="grid">
         <div class="row">
             <!-- Column 1: Logo & Info -->
             <div class="col-lg-3 col-md-6 mb-4">
@@ -106,7 +106,7 @@
 
     <!-- Footer Bottom -->
     <div class="footer-bottom">
-        <div class="container">
+        <div class="grid">
             <div class="footer-bottom__inner">
                 <p class="copyright">© 2025 <strong>PinkCapy</strong>. Dự án IS207 - UIT.</p>
                 <div class="payment-methods">

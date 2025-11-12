@@ -17,25 +17,7 @@
     <div class="products-header-wrapper mb-4">
         <h1 class="title-lg fw-bold mb-3">Tất cả sản phẩm</h1>
 
-        {{-- ============================================ --}}
-        {{-- ✅ SEARCH & FILTER - Hoạt động với query params --}}
-        {{-- ============================================ --}}
-
-        <!-- Search Box -->
-        <form method="GET" action="{{ route('products.index') }}" class="mb-3">
-            <div class="input-group input-group-lg">
-                <input type="text"
-                    class="form-control"
-                    name="q"
-                    placeholder="Tìm kiếm sản phẩm..."
-                    value="{{ request('q') }}">
-                <button class="btn btn-primary" type="submit">
-                    <i class="fa-solid fa-search me-2"></i>Tìm kiếm
-                </button>
-            </div>
-        </form>
-
-        <!-- Horizontal Filter Bar -->
+        <!-- Filter Bar -->
         <div class="filter-bar card border-0 shadow-sm">
             <div class="card-body p-3">
                 <form method="GET" action="{{ route('products.index') }}" id="filter-form">
@@ -45,29 +27,45 @@
                             <i class="fa-solid fa-filter me-2"></i>Bộ lọc:
                         </div>
 
-                        <!-- Preserve search query -->
-                        @if(request('q'))
-                        <input type="hidden" name="q" value="{{ request('q') }}">
-                        @endif
+                        <!-- Category Filter -->
+                        <div class="filter-bar__group d-flex align-items-center gap-2">
+                            <span class="fw-bold text-muted">Danh mục:</span>
+                            <select class="form-select form-select-sm" name="category" onchange="this.form.submit()" style="width: auto; min-width: 150px;">
+                                <option value="">Tất cả</option>
+                                <option value="tai-nghe" {{ request('category') == 'tai-nghe' ? 'selected' : '' }}>Tai nghe</option>
+                                <option value="dong-ho" {{ request('category') == 'dong-ho' ? 'selected' : '' }}>Đồng hồ thông minh</option>
+                                <option value="phu-kien" {{ request('category') == 'phu-kien' ? 'selected' : '' }}>Phụ kiện</option>
+                            </select>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="vr d-none d-md-block"></div>
 
                         <!-- Price Filter -->
                         <div class="filter-bar__group d-flex align-items-center gap-2">
                             <span class="fw-bold text-muted">Giá:</span>
-                            <button type="submit" name="price_max" value="10000000"
-                                class="btn btn-outline-secondary btn-sm {{ request('price_max') == '10000000' ? 'active' : '' }}">
-                                Dưới 10tr
+                            <button type="button"
+                                onclick="document.getElementById('price_min_input').value=''; document.getElementById('price_max_input').value='1000000'; this.form.submit();"
+                                class="btn btn-outline-secondary btn-sm {{ request('price_max') == '1000000' && !request('price_min') ? 'active' : '' }}">
+                                Dưới 1tr
                             </button>
-                            <button type="submit"
-                                onclick="this.form.price_min.value='10000000'; this.form.price_max.value='20000000';"
-                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '10000000' ? 'active' : '' }}">
-                                10-20tr
+                            <button type="button"
+                                onclick="document.getElementById('price_min_input').value='1000000'; document.getElementById('price_max_input').value='3000000'; this.form.submit();"
+                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '1000000' && request('price_max') == '3000000' ? 'active' : '' }}">
+                                1-3tr
                             </button>
-                            <button type="submit" name="price_min" value="20000000"
-                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '20000000' ? 'active' : '' }}">
-                                Trên 20tr
+                            <button type="button"
+                                onclick="document.getElementById('price_min_input').value='3000000'; document.getElementById('price_max_input').value='5000000'; this.form.submit();"
+                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '3000000' && request('price_max') == '5000000' ? 'active' : '' }}">
+                                3-5tr
                             </button>
-                            <input type="hidden" name="price_min" value="{{ request('price_min') }}">
-                            <input type="hidden" name="price_max" value="{{ request('price_max') }}">
+                            <button type="button"
+                                onclick="document.getElementById('price_min_input').value='5000000'; document.getElementById('price_max_input').value=''; this.form.submit();"
+                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '5000000' && !request('price_max') ? 'active' : '' }}">
+                                Trên 5tr
+                            </button>
+                            <input type="hidden" id="price_min_input" name="price_min" value="{{ request('price_min') }}">
+                            <input type="hidden" id="price_max_input" name="price_max" value="{{ request('price_max') }}">
                         </div>
 
                         <!-- Divider -->
@@ -91,7 +89,7 @@
                         </div>
 
                         <!-- Clear Filter -->
-                        @if(request()->hasAny(['q', 'category', 'price_min', 'price_max', 'sort']))
+                        @if(request()->hasAny(['category', 'price_min', 'price_max', 'sort']))
                         <div>
                             <a href="{{ route('products.index') }}" class="btn btn-link btn-sm text-danger text-decoration-none">
                                 <i class="fa-solid fa-rotate-left me-1"></i>Xóa bộ lọc
