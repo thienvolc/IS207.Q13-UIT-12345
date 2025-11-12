@@ -45,7 +45,7 @@ class ProductRepository
             ->first();
     }
 
-    public function findByIdsWithLock(array $productIds): Collection
+    public function findByIdsWithLock(array $productIds): \Illuminate\Support\Collection
     {
         return Product::whereIn('product_id', $productIds)
             ->lockForUpdate()

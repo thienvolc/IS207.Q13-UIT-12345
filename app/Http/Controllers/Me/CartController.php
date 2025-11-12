@@ -11,11 +11,12 @@ use App\Http\Requests\Cart\UpdateCartItemRequest;
 use App\Http\Requests\Cart\CheckoutCartRequest;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends AppController
 {
     public function __construct(
-        private CartService $cartService
+        private readonly CartService $cartService
     ) {}
 
     /**
@@ -61,7 +62,7 @@ class CartController extends AppController
      */
     public function clearCart(): JsonResponse
     {
-        $cart = $this->cartService->clearCart();
+        $cart = $this->cartService->clear();
         return $this->success($cart);
     }
 

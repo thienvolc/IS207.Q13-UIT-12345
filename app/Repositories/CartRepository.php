@@ -7,7 +7,7 @@ use App\Models\Cart;
 
 class CartRepository
 {
-    public function findOrCreateActiveCart(int $userId): Cart
+    public function findOrCreateActive(int $userId): Cart
     {
         $cart = Cart::where('user_id', $userId)
             ->where('status', CartStatus::ACTIVE)
@@ -33,14 +33,14 @@ class CartRepository
         ]);
     }
 
-    public function findActiveCart(int $userId): ?Cart
+    public function findActive(int $userId): ?Cart
     {
         return Cart::where('user_id', $userId)
             ->where('status', CartStatus::ACTIVE)
             ->first();
     }
 
-    public function findAndLockActiveCart(int $userId): ?Cart
+    public function findAndLockActive(int $userId): ?Cart
     {
         return Cart::where('user_id', $userId)
             ->where('status', CartStatus::ACTIVE)

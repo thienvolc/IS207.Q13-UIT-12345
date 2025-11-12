@@ -15,7 +15,7 @@ class CartItemRepository
             ->first();
     }
 
-    public function findUserCartItem(int $userId, int $cartItemId): ?CartItem
+    public function findInUserCart(int $userId, int $cartItemId): ?CartItem
     {
         return CartItem::whereHas('cart', function ($query) use ($userId) {
             $query->where('user_id', $userId)
@@ -35,6 +35,11 @@ class CartItemRepository
     public function create(array $data): CartItem
     {
         return CartItem::create($data);
+    }
+
+    public function insert(array $data): bool
+    {
+        return CartItem::insert($data);
     }
 
     public function deleteByCartId(int $cartId): int

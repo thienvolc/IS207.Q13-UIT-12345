@@ -20,70 +20,49 @@ use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use \Illuminate\Database\Eloquent\Collection;
+use Throwable as ThrowableAlias;
 
-readonly class CartService
+class CartService
 {
     public function __construct(
-        private CartRepository     $cartRepository,
-        private CartItemRepository $cartItemRepository,
-        private ProductRepository  $productRepository
+        private readonly CartRepository     $cartRepository,
+        private readonly CartItemRepository $cartItemRepository,
+        private readonly ProductRepository  $productRepository
     ) {}
 
     public function getOrCreateCart(): array
     {
-        $userId = $this->getAuthUserId();
-        $cart = $this->cartRepository->findOrCreateActiveCart($userId);
+        $userId = $this->getCurrentUserId();
+        $cart = $this->cartRepository->findOrCreateActive($userId);
 
         return CartResource::transform($cart);
     }
 
-    public function addItem(AddCartItemDto $addCartItemDto): array
+    public function addItem(AddCartItemDto $dto): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
-        return DB::transaction(function () use ($userId, $addCartItemDto) {
-            $cart = $this->cartRepository->findOrCreateActiveCart($userId);
-            $product = $this->productRepository->findAndLock($addCartItemDto->productId);
-
-            $this->assertProductIsAvailable($product);
-
-            $existingCartItem = $this->cartItemRepository->findByCartAndProduct(
-                $cart->cart_id, $addCartItemDto->productId);
-
-            $inCartQuantity = $existingCartItem ? $existingCartItem->quantity : 0;
-            $newQuantity = $addCartItemDto->quantity + $inCartQuantity;
-
-            $this->assertSufficientStock($product, $newQuantity, $inCartQuantity);
-
-            if ($existingCartItem) {
-                $this->updateExistingCartItem($existingCartItem,
-                    $product, $newQuantity, $addCartItemDto->note);
-            } else {
-                $existingCartItem = $this->createNewCartItem($cart, $product, $addCartItemDto);
-            }
+        return DB::transaction(function () use ($userId, $dto) {
+            $cart = $this->cartRepository->findOrCreateActive($userId);
+            $product = $this->findAndLockAndValidateProduct($dto->productId);
+            $cartItem = $this->updateOrCreateCartItem($cart, $product, $dto);
 
             return [
-                'item_id' => $existingCartItem->cart_item_id,
-                'product_id' => $existingCartItem->product_id,
-                'quantity' => $existingCartItem->quantity,
+                'item_id' => $cartItem->cart_item_id,
+                'product_id' => $cartItem->product_id,
+                'quantity' => $cartItem->quantity,
             ];
         });
     }
 
     public function updateItem(UpdateCartItemDto $dto): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $cartItem = $this->cartItemRepository->findUserCartItem($userId, $dto->cartItemId);
+            $cartItem = $this->findInUserCartOrFail($userId, $dto->cartItemId);
+            $product = $this->findAndLockAndValidateProduct($cartItem->product_id);
 
-            if (!$cartItem) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
-
-            $product = $this->productRepository->findAndLock($cartItem->product_id);
-
-            $this->assertProductIsAvailable($product);
             $this->assertStockAvailable($product, $dto->quantity);
 
             $this->updateCartItemWithCurrentPrice($cartItem, $product, $dto->quantity);
@@ -94,35 +73,26 @@ readonly class CartService
 
     public function deleteItem(int $cartItemId): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $cartItemId) {
-            $cartItem = $this->cartItemRepository->findUserCartItem($userId, $cartItemId);
+            $cartItem = $this->findInUserCartOrFail($userId, $cartItemId);
+            $replicateItem = $this->replicateCartItemAndLoadProduct($cartItem);
 
-            if (!$cartItem) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
-
-            $deletedItem = $this->replicateCartItemWithProduct($cartItem);
             $cartItem->delete();
 
-            return CartItemResource::transform($deletedItem);
+            return CartItemResource::transform($replicateItem);
         });
     }
 
-    public function clearCart(): array
+    public function clear(): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId) {
-            $cart = $this->cartRepository->findActiveCart($userId);
-
-            if (!$cart) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
+            $cart = $this->findActiveCartWithItemsOrFail($userId);
 
             $this->cartItemRepository->deleteByCartId($cart->cart_id);
-            $cart->load('items');
 
             return CartResource::transform($cart);
         });
@@ -130,14 +100,16 @@ readonly class CartService
 
     public function checkout(CheckoutCartDto $dto): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $cartItems = $this->findAndLockItemsForActiveCart($userId, $dto->items);
+            $cart = $this->findAndLockActiveCartOrFail($userId);
+            $cartItems = $this->findAndLockCartItems($cart, $dto->items);
+
             $this->validateAllProductsAvailable($cartItems);
 
             $checkoutCart = $this->cartRepository->createCheckoutCart($userId);
-            $checkoutCartItems = $this->replicateCartItemsForCart($cartItems, $checkoutCart->cart_id);
+            $checkoutCartItems = $this->copyItemsFromCart($cartItems, $checkoutCart->cart_id);
 
             $this->updateCartWithShippingInfo($checkoutCart, $dto);
 
@@ -145,9 +117,17 @@ readonly class CartService
         });
     }
 
-    private function getAuthUserId(): int
+    private function getCurrentUserId(): int
     {
         return Auth::id();
+    }
+
+    private function findAndLockAndValidateProduct(int $productId): Product
+    {
+        $product = $this->productRepository->findAndLock($productId);
+        $this->assertProductIsAvailable($product);
+
+        return $product;
     }
 
     private function assertProductIsAvailable(?Product $product): void
@@ -174,11 +154,21 @@ readonly class CartService
         }
     }
 
-    private function assertSufficientStock(
-        Product $product,
-        int     $totalQuantity,
-        int     $inCartQuantity
-    ): void
+    private function updateOrCreateCartItem(Cart $cart, Product $product, AddCartItemDto $dto): CartItem
+    {
+        $existingItem = $this->cartItemRepository->findByCartAndProduct($cart->cart_id, $dto->productId);
+
+        $inCartQuantity = $existingItem->quantity ?? 0;
+        $newQuantity = $dto->quantity + $inCartQuantity;
+
+        $this->assertSufficientStock($product, $newQuantity, $inCartQuantity);
+
+        return $existingItem
+            ? $this->updateCartItem($existingItem, $product, $newQuantity, $dto->note)
+            : $this->createCartItem($cart, $product, $dto);
+    }
+
+    private function assertSufficientStock(Product $product, int $totalQuantity, int $inCartQuantity): void
     {
         if ($product->quantity < $totalQuantity) {
             throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
@@ -191,12 +181,12 @@ readonly class CartService
         }
     }
 
-    private function updateExistingCartItem(
+    private function updateCartItem(
         CartItem $cartItem,
         Product  $product,
         int      $quantity,
         ?string  $note
-    ): void
+    ): CartItem
     {
         $cartItem->update([
             'quantity' => $quantity,
@@ -204,9 +194,11 @@ readonly class CartService
             'discount' => $product->discount ?? 0,
             'note' => $note ?? $cartItem->note,
         ]);
+
+        return $cartItem;
     }
 
-    private function createNewCartItem(Cart $cart, Product $product, AddCartItemDto $dto): CartItem
+    private function createCartItem(Cart $cart, Product $product, AddCartItemDto $dto): CartItem
     {
         $cartItem = $this->cartItemRepository->create([
             'cart_id' => $cart->cart_id,
@@ -218,6 +210,17 @@ readonly class CartService
         ]);
 
         $cartItem->load('product');
+        return $cartItem;
+    }
+
+    private function findInUserCartOrFail(int $userId, int $cartItemId)
+    {
+        $cartItem = $this->cartItemRepository->findInUserCart($userId, $cartItemId);
+
+        if (!$cartItem) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
+        }
+
         return $cartItem;
     }
 
@@ -235,32 +238,54 @@ readonly class CartService
         $cartItem->load('product');
     }
 
-    private function replicateCartItemWithProduct(CartItem $cartItem): CartItem
+    private function replicateCartItemAndLoadProduct(CartItem $cartItem): CartItem
     {
-        $deletedItem = $cartItem->replicate();
-        $deletedItem->load('product');
-        return $deletedItem;
+        $replicate = $cartItem->replicate();
+        $replicate->load('product');
+        return $replicate;
     }
 
-    private function findAndLockItemsForActiveCart(int $userId, array $itemIds): Collection
+    private function findActiveCartWithItemsOrFail(int $userId)
     {
-        $cart = $this->cartRepository->findAndLockActiveCart($userId);
+        $cart = $this->cartRepository->findActive($userId);
+
         if (!$cart) {
             throw new BusinessException(ResponseCode::NOT_FOUND);
         }
 
+        $cart->load('items');
+
+        return $cart;
+    }
+
+    private function findAndLockActiveCartOrFail(int $userId): Cart
+    {
+        $cart = $this->cartRepository->findAndLockActive($userId);
+
+        if (!$cart) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
+        }
+
+        return $cart;
+    }
+
+    private function findAndLockCartItems($cart, array $itemIds): Collection
+    {
         return $this->cartItemRepository->findAndLockByIds($cart->cart_id, $itemIds);
     }
 
-    private function replicateCartItemsForCart(Collection $cartItems, int $cart_id): Collection
+    private function copyItemsFromCart(Collection $cartItems, $cartId): Collection
     {
-        return $cartItems->map(function (CartItem $item) use ($cart_id) {
-            $clone = $item->replicate();
-            $clone->cart_id = $cart_id;
-            $clone->save();
+        $cartItems = $cartItems->map(function (CartItem $item) use ($cartId) {
+            $replicate = $item->replicate();
+            $replicate->cart_id = $cartId;
 
-            return $clone;
+            return $replicate;
         });
+
+        $this->cartItemRepository->insert($cartItems->toArray());
+
+        return $cartItems;
     }
 
     private function validateAllProductsAvailable($cartItems): void

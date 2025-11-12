@@ -401,7 +401,7 @@ readonly class OrderService
 
     private function deleteSelectedItemsInActiveCart(int $userId, Collection $products): void
     {
-        $cart = $this->cartRepository->findActiveCart($userId);
+        $cart = $this->cartRepository->findActive($userId);
         $productIds = $products->map(function (Product $product) {
             return $product->product_id;
         })->toArray();
