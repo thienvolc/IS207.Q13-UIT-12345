@@ -14,6 +14,7 @@ use App\Models\Product;
 use App\Repositories\ProductRepository;
 use App\Utils\PaginationUtil;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class ProductReadService
 {
@@ -132,11 +133,19 @@ class ProductReadService
 
     private function extractCategoryIds(Product $product): array
     {
-        return $product->categories()->pluck('category_id')->toArray();
+//        return $product->categories()->pluck('pivot.category_id')->toArray();
+        return DB::table('product_categories')
+            ->where('product_id', $product->product_id)
+            ->pluck('category_id')
+            ->toArray();
     }
 
     private function extractTagIds(Product $product): array
     {
-        return $product->tags()->pluck('tag_id')->toArray();
+//        return $product->tags()->pluck('pivot.tag_id')->toArray();
+        return DB::table('product_tags')
+            ->where('product_id', $product->product_id)
+            ->pluck('tag_id')
+            ->toArray();
     }
 }

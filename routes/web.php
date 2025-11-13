@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Auth\AuthController;
+use \App\Http\Controllers\Public;
 
 // ==================== TRANG CHỦ & KHÁC ====================
 Route::get('/', function () {
@@ -187,6 +188,8 @@ Route::get('/san-pham/{slug}', function ($slug) {
         });
     return view('pages.products.detail', compact('product', 'related'));
 })->name('products.show');
+
+Route::get('/products/{slug}', [Public\ProductController::class, 'showBySlugView']);
 
 // ==================== ĐĂNG NHẬP & ĐĂNG KÝ ====================
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

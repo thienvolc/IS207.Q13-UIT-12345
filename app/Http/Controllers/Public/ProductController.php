@@ -6,6 +6,7 @@ use App\Dtos\Product\GetRelatedProductsDto;
 use App\Dtos\Product\SearchProductsPublicDto;
 use App\Http\Controllers\AppController;
 use App\Http\Requests\Product\SearchProductRequest;
+use App\Http\Resources\ProductPublicResource;
 use App\Services\ProductReadService;
 use Illuminate\Http\JsonResponse;
 
@@ -38,6 +39,28 @@ class ProductController extends AppController
         $product = $this->readService->getByIdForPublic($product_id);
 
         return $this->success($product);
+    }
+
+    public function showBySlugView(string $slug)
+    {
+        /** @var ProductPublicResource $product */
+        $product = $this->readService->getBySlugForPublic($slug);
+
+        $productId = $product['product_id'];
+        [$sortField, $sortOrder] = ['created_at', 'desc'];
+
+//        $dto = GetRelatedProductsDto::fromArray([
+//            'productId' => $productId,
+//            'offset' => 0,
+//            'limit' => 4,
+//            'sortField' => $sortField,
+//            'sortOrder' => $sortOrder,
+//        ]);
+//
+//        $related = $this->readService->getRelatedProductsById($dto);
+        $related = null;
+
+        return view('pages.products.detail2', compact('product', 'related'));
     }
 
     public function showBySlug(string $slug): JsonResponse
