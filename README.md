@@ -37,7 +37,7 @@
 | 3      | 23520230      | Nguyễn Lê Bảo Đăng        |[](https://github.com/)     |23520230@gm.uit.edu.vn   |
 | 4      | 23520997      | Phạm Minh Ngân        |[](https://github.com/)     |23520997@gm.uit.edu.vn   |
 | 5      | 23521481      | Nguyễn Hải Thiện        |[adamwhite625](https://github.com/adamwhite625)     |23521481@gm.uit.edu.vn   |
-| 6      | 23520217      | Nguyễn Dương Đại        |[Daji-36](https://github.com/Daji-36)     |23520217@gm.uit.edu.vn   |
+| 6      | 23520217      | Nguyễn Dương Đại        |[ndd-uit](https://github.com/ndd-uit)     |23520217@gm.uit.edu.vn   |
 | 7      | 23521489      | Võ Lưu Chí Thiện     |[thienvolc](https://github.com/thienvolc)                 |23521489@gm.uit.edu.vn   |
 
 
