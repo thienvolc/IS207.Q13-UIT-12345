@@ -1,0 +1,37 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+
+# LangChain Components
+langchain-core
+langchain-community
+langchain-chroma
+langchain-google-genai  # Google Gemini API Integration
+langchain-ollama  # Ollama Embeddings Support
+
+# Utilities
+chardet  # Thư viện phát hiện encoding
+
+# Note: Ollama embeddings chạy local, không cần torch/transformers nữa
+# Gemini API không cần HuggingFace models
+
+# --- HƯỚNG DẪN CÀI ĐẶT ---
+# 1. Cài dependencies: pip install -r requirements.txt
+# 2. Cài Ollama: https://ollama.ai
+# 3. Chạy Ollama: ollama serve
+# 4. Tải model: ollama pull mxbai-embed-large
+# 5. Lấy Google API Key: https://aistudio.google.com/app/apikey
+# 6. Thêm vào .env: GOOGLE_API_KEY=...
+# 7. Chạy server: uvicorn main:app --reload
+
+
+#cách chạy
+# cách 1: # Bước 1: Kích hoạt venv
+#.\.venv\Scripts\Activate.ps1
+
+# Bước 2: Chạy server (lúc này Python tự động dùng venv)
+#uvicorn main:app --reload --port 8001
+
+#cách 2
+# Chạy trực tiếp mà không cần activate
+#.\.venv\Scripts\python.exe -m uvicorn main:app --reload --port 8001
