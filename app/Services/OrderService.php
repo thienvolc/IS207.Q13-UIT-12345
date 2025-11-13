@@ -15,6 +15,7 @@ use App\Exceptions\BusinessException;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\ShortOrderResource;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\Product;
 use App\Repositories\CartItemRepository;
@@ -27,24 +28,28 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-readonly class OrderService
+class OrderService
 {
+
+
+
     public function __construct(
-        private OrderRepository     $orderRepository,
-        private OrderItemRepository $orderItemRepository,
-        private CartRepository      $cartRepository,
-        private CartItemRepository  $cartItemRepository,
-        private ProductRepository   $productRepository
-    )
-    {
-    }
+        private readonly OrderRepository     $orderRepository,
+        private readonly OrderItemRepository $orderItemRepository,
+        private readonly CartRepository      $cartRepository,
+        private readonly CartItemRepository  $cartItemRepository,
+        private readonly ProductRepository   $productRepository,
+        private readonly float               $DEFAULT_TAX_RATE = 0.1,
+        private readonly int                 $DEFAULT_SHIPPING_FEE = 30000,
+        private readonly float               $DEFAULT_PROMO_DISCOUNT_RATE = 0.05
+    ) {}
 
     public function getUserOrders(GetUserOrdersDto $dto): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
         $totalCount = $this->orderRepository->countUserOrders($userId, $dto->status);
-        $orders = $this->orderRepository->getUserOrders(
+        $orders = $this->orderRepository->findUserOrders(
             $userId,
             $dto->status,
             $dto->sortField,
@@ -62,33 +67,26 @@ readonly class OrderService
 
     public function placeOrder(PlaceOrderDto $dto): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $cart = $this->cartRepository->findCheckedOutCart($userId, $dto->cartId);
-
-            if (!$cart) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
-
+            $cart = $this->findCheckedOutCartWithItemsOrFail($userId, $dto->cartId);
             $this->assertCartNotEmpty($cart);
 
-            $products = $this->lockAndValidateProducts($cart);
-            $calculations = $this->calculateOrderTotals($cart, $dto->promo);
-
-            $order = $this->createOrder($userId, $cart, $calculations, $dto->promo);
-            $this->createOrderItems($order, $cart, $products);
+            $order = $this->createOrder($userId, $cart, $dto->promo);
+            $this->createOrderItems($order, $cart);
             $this->completeCart($cart);
+            $this->removeOrderedItemsInUserCart($cart);
 
-            $this->deleteSelectedItemsInActiveCart($userId, $products);
+            // TODO: Init payment process here
+
             return ShortOrderResource::transform($order);
         });
-
     }
 
     public function getOrderDetails(int $orderId): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
         $order = $this->orderRepository->findUserOrder($userId, $orderId);
 
         if (!$order) {
@@ -100,7 +98,7 @@ readonly class OrderService
 
     public function getOrderStatus(int $orderId): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
         $order = $this->orderRepository->findUserOrderWithoutRelations($userId, $orderId);
 
         if (!$order) {
@@ -115,7 +113,7 @@ readonly class OrderService
 
     public function updateShipping(UpdateOrderShippingDto $dto): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $dto) {
             $order = $this->orderRepository->findUserOrderWithoutRelations($userId, $dto->orderId);
@@ -135,7 +133,7 @@ readonly class OrderService
 
     public function cancelOrder(int $orderId): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $orderId) {
             $order = $this->orderRepository->findAndLockUserOrder($userId, $orderId);
@@ -229,9 +227,20 @@ readonly class OrderService
         });
     }
 
-    private function getAuthUserId(): int
+    private function getCurrentUserId(): int
     {
         return Auth::id();
+    }
+
+    private function findCheckedOutCartWithItemsOrFail(int $userId, int $cartId)
+    {
+        $cart = $this->cartRepository->findCheckedOutWithItemsByUserIdAndCartId($userId, $cartId);
+
+        if (!$cart) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
+        }
+
+        return $cart;
     }
 
     private function assertCartNotEmpty(Cart $cart): void
@@ -243,7 +252,7 @@ readonly class OrderService
         }
     }
 
-    private function lockAndValidateProducts(Cart $cart)
+    private function lockAndValidateProductsInCart(Cart $cart)
     {
         $productIds = $cart->items->pluck('product_id')->toArray();
         $products = $this->productRepository->findByIdsWithLock($productIds);
@@ -252,19 +261,13 @@ readonly class OrderService
             /** @var Product $product */
             $product = $products->get($item->product_id);
 
-            if (!$product) {
-                throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
-                    'message' => "Product {$item->product_id} is not available"
-                ]);
-            }
-
-            $this->validateProductAvailability($product, $item->quantity);
+            $this->validateProductAvailable($product, $item->quantity);
         }
 
         return $products;
     }
 
-    private function validateProductAvailability(Product $product, int $requestedQuantity): void
+    private function validateProductAvailable(Product $product, int $requestedQuantity): void
     {
         if ($product->status !== ProductStatus::ACTIVE) {
             throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
@@ -281,48 +284,14 @@ readonly class OrderService
         }
     }
 
-    private function calculateOrderTotals(Cart $cart, ?string $promo): array
-    {
-        $subtotal = $cart->items->sum(function ($item) {
-            return $item->price * $item->quantity;
-        });
-
-        $discountTotal = $cart->items->sum(function ($item) {
-            return $item->discount * $item->quantity;
-        });
-
-        $netAmount = $subtotal - $discountTotal;
-        $tax = $netAmount * 0.1;
-        $shipping = 30000;
-
-        $promoDiscount = 0;
-        if (!empty($promo)) {
-            $promoDiscount = $netAmount * 0.05;
-        }
-
-        $grandTotal = $netAmount - $promoDiscount + $tax + $shipping;
-
-        if ($grandTotal < 0) {
-            $grandTotal = 0;
-        }
-
-        return [
-            'subtotal' => $subtotal,
-            'discount_total' => $discountTotal,
-            'tax' => $tax,
-            'shipping' => $shipping,
-            'promo_discount' => $promoDiscount,
-            'grand_total' => $grandTotal,
-        ];
-    }
-
     private function createOrder(
         int     $userId,
         Cart    $cart,
-        array   $calculations,
         ?string $promo
     ): Order
     {
+        $calculations = $this->calculateOrderTotals($cart, $promo);
+
         return $this->orderRepository->create([
             'user_id' => $userId,
             'subtotal' => $calculations['subtotal'],
@@ -349,8 +318,44 @@ readonly class OrderService
         ]);
     }
 
-    private function createOrderItems(Order $order, Cart $cart, $products): void
+    private function calculateOrderTotals(Cart $cart, ?string $promo): array
     {
+        $subtotal = $cart->items->sum(function ($item) {
+            return $item->price * $item->quantity;
+        });
+        $discountTotal = $cart->items->sum(function ($item) {
+            return $item->discount * $item->quantity;
+        });
+
+        $netAmount = $subtotal - $discountTotal;
+        $tax = $netAmount * $this->DEFAULT_TAX_RATE;
+        $shipping = $this->DEFAULT_SHIPPING_FEE;
+
+        $promoDiscount = 0;
+        if (!empty($promo)) {
+            $promoDiscount = $netAmount * $this->DEFAULT_PROMO_DISCOUNT_RATE;
+        }
+
+        $grandTotal = $netAmount - $promoDiscount + $tax + $shipping;
+
+        if ($grandTotal < 0) {
+            $grandTotal = 0;
+        }
+
+        return [
+            'subtotal' => $subtotal,
+            'discount_total' => $discountTotal,
+            'tax' => $tax,
+            'shipping' => $shipping,
+            'promo_discount' => $promoDiscount,
+            'grand_total' => $grandTotal,
+        ];
+    }
+
+    private function createOrderItems(Order $order, Cart $cart): void
+    {
+        $products = $this->lockAndValidateProductsInCart($cart);
+
         foreach ($cart->items as $cartItem) {
             $this->orderItemRepository->create([
                 'order_id' => $order->order_id,
@@ -378,6 +383,17 @@ readonly class OrderService
         $this->cartItemRepository->deleteByCartId($cart->cart_id);
     }
 
+    private function removeOrderedItemsInUserCart(Cart $checkedOutCart): void
+    {
+        $userId = $checkedOutCart->user_id;
+        $productIds = $checkedOutCart->items->map(function (CartItem $item) {
+            return $item->product_id;
+        })->toArray();
+
+        $activeCart = $this->cartRepository->findActiveByUserId($userId);
+        $this->cartItemRepository->deleteByCartIdAndProductIds($activeCart->cart_id, $productIds);
+    }
+
     private function assertCanCancelOrder(Order $order): void
     {
         if (!$this->isCancelableStatus($order->status)) {
@@ -398,14 +414,4 @@ readonly class OrderService
 
         return in_array($status, $cancelableStatuses);
     }
-
-    private function deleteSelectedItemsInActiveCart(int $userId, Collection $products): void
-    {
-        $cart = $this->cartRepository->findActive($userId);
-        $productIds = $products->map(function (Product $product) {
-            return $product->product_id;
-        })->toArray();
-        $this->cartItemRepository->deleteByCartAndProductIds($cart->cart_id, $productIds);
-    }
-
 }

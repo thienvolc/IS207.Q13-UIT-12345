@@ -7,25 +7,25 @@ use App\Models\Cart;
 
 class CartRepository
 {
-    public function findOrCreateActive(int $userId): Cart
+    public function findOrCreateActiveByUserId(int $userId): Cart
     {
         $cart = Cart::where('user_id', $userId)
             ->where('status', CartStatus::ACTIVE)
             ->with(['items.product'])
             ->first();
 
-        if (!$cart) {
-            $cart = Cart::create([
-                'user_id' => $userId,
-                'status' => CartStatus::ACTIVE,
-            ]);
-            $cart->load(['items.product']);
-        }
-
-        return $cart;
+        return $cart ?? $this->createActive($userId);
     }
 
-    public function createCheckoutCart(int $userId): Cart
+    public function createActive(int $userId): Cart
+    {
+        return Cart::create([
+            'user_id' => $userId,
+            'status' => CartStatus::ACTIVE,
+        ]);
+    }
+
+    public function createCheckedOut(int $userId): Cart
     {
         return Cart::create([
             'user_id' => $userId,
@@ -33,14 +33,14 @@ class CartRepository
         ]);
     }
 
-    public function findActive(int $userId): ?Cart
+    public function findActiveByUserId(int $userId): ?Cart
     {
         return Cart::where('user_id', $userId)
             ->where('status', CartStatus::ACTIVE)
             ->first();
     }
 
-    public function findAndLockActive(int $userId): ?Cart
+    public function findAndLockActiveByUserId(int $userId): ?Cart
     {
         return Cart::where('user_id', $userId)
             ->where('status', CartStatus::ACTIVE)
@@ -49,7 +49,7 @@ class CartRepository
             ->first();
     }
 
-    public function findCheckedOutCart(int $userId, int $cartId): ?Cart
+    public function findCheckedOutWithItemsByUserIdAndCartId(int $userId, int $cartId): ?Cart
     {
         return Cart::where('cart_id', $cartId)
             ->where('user_id', $userId)

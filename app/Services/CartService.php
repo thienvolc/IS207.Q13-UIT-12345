@@ -20,7 +20,6 @@ use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use \Illuminate\Database\Eloquent\Collection;
-use Throwable as ThrowableAlias;
 
 class CartService
 {
@@ -33,7 +32,7 @@ class CartService
     public function getOrCreateCart(): array
     {
         $userId = $this->getCurrentUserId();
-        $cart = $this->cartRepository->findOrCreateActive($userId);
+        $cart = $this->cartRepository->findOrCreateActiveByUserId($userId);
 
         return CartResource::transform($cart);
     }
@@ -43,7 +42,7 @@ class CartService
         $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $cart = $this->cartRepository->findOrCreateActive($userId);
+            $cart = $this->cartRepository->findOrCreateActiveByUserId($userId);
             $product = $this->findAndLockAndValidateProduct($dto->productId);
             $cartItem = $this->updateOrCreateCartItem($cart, $product, $dto);
 
@@ -90,7 +89,7 @@ class CartService
         $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId) {
-            $cart = $this->findActiveCartWithItemsOrFail($userId);
+            $cart = $this->findActiveCartWithItemsByUserIdOrFail($userId);
 
             $this->cartItemRepository->deleteByCartId($cart->cart_id);
 
@@ -108,8 +107,8 @@ class CartService
 
             $this->validateAllProductsAvailable($cartItems);
 
-            $checkoutCart = $this->cartRepository->createCheckoutCart($userId);
-            $checkoutCartItems = $this->copyItemsFromCart($cartItems, $checkoutCart->cart_id);
+            $checkoutCart = $this->cartRepository->createCheckedOut($userId);
+            $checkoutCartItems = $this->copyAndSaveItemsFromCart($cartItems, $checkoutCart->cart_id);
 
             $this->updateCartWithShippingInfo($checkoutCart, $dto);
 
@@ -156,7 +155,7 @@ class CartService
 
     private function updateOrCreateCartItem(Cart $cart, Product $product, AddCartItemDto $dto): CartItem
     {
-        $existingItem = $this->cartItemRepository->findByCartAndProduct($cart->cart_id, $dto->productId);
+        $existingItem = $this->cartItemRepository->findByCartIdAndProductId($cart->cart_id, $dto->productId);
 
         $inCartQuantity = $existingItem->quantity ?? 0;
         $newQuantity = $dto->quantity + $inCartQuantity;
@@ -245,9 +244,9 @@ class CartService
         return $replicate;
     }
 
-    private function findActiveCartWithItemsOrFail(int $userId)
+    private function findActiveCartWithItemsByUserIdOrFail(int $userId)
     {
-        $cart = $this->cartRepository->findActive($userId);
+        $cart = $this->cartRepository->findActiveByUserId($userId);
 
         if (!$cart) {
             throw new BusinessException(ResponseCode::NOT_FOUND);
@@ -260,7 +259,7 @@ class CartService
 
     private function findAndLockActiveCartOrFail(int $userId): Cart
     {
-        $cart = $this->cartRepository->findAndLockActive($userId);
+        $cart = $this->cartRepository->findAndLockActiveByUserId($userId);
 
         if (!$cart) {
             throw new BusinessException(ResponseCode::NOT_FOUND);
@@ -274,7 +273,7 @@ class CartService
         return $this->cartItemRepository->findAndLockByIds($cart->cart_id, $itemIds);
     }
 
-    private function copyItemsFromCart(Collection $cartItems, $cartId): Collection
+    private function copyAndSaveItemsFromCart(Collection $cartItems, $cartId): Collection
     {
         $cartItems = $cartItems->map(function (CartItem $item) use ($cartId) {
             $replicate = $item->replicate();

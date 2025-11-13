@@ -56,7 +56,7 @@ class OrderRepository
         return $order->update($data);
     }
 
-    public function getUserOrders(
+    public function findUserOrders(
         int    $userId,
         ?int   $status,
         string $sortField,

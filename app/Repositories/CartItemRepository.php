@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class CartItemRepository
 {
-    public function findByCartAndProduct(int $cartId, int $productId): ?CartItem
+    public function findByCartIdAndProductId(int $cartId, int $productId): ?CartItem
     {
         return CartItem::where('cart_id', $cartId)
             ->where('product_id', $productId)
@@ -47,7 +47,7 @@ class CartItemRepository
         return CartItem::where('cart_id', $cartId)->delete();
     }
 
-    public function deleteByCartAndProductIds(int $cart_id, array $productIds): void
+    public function deleteByCartIdAndProductIds(int $cart_id, array $productIds): void
     {
         CartItem::where('cart_id', $cart_id)
             ->whereIn('product_id', $productIds)
