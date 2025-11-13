@@ -7,17 +7,17 @@ use Illuminate\Database\Eloquent\Collection;
 
 class OrderRepository
 {
-    public function findById(int $orderId): ?Order
+    public function findWithItemsById(int $orderId): ?Order
     {
         return Order::with('items')->find($orderId);
     }
 
-    public function findByIdWithoutRelations(int $orderId): ?Order
+    public function findById(int $orderId): ?Order
     {
         return Order::find($orderId);
     }
 
-    public function findUserOrder(int $userId, int $orderId): ?Order
+    public function findUserOrderWithItems(int $userId, int $orderId): ?Order
     {
         return Order::where('order_id', $orderId)
             ->where('user_id', $userId)
@@ -25,7 +25,7 @@ class OrderRepository
             ->first();
     }
 
-    public function findUserOrderWithoutRelations(int $userId, int $orderId): ?Order
+    public function findUserOrder(int $userId, int $orderId): ?Order
     {
         return Order::where('order_id', $orderId)
             ->where('user_id', $userId)
@@ -49,11 +49,6 @@ class OrderRepository
     public function create(array $data): Order
     {
         return Order::create($data);
-    }
-
-    public function update(Order $order, array $data): bool
-    {
-        return $order->update($data);
     }
 
     public function findUserOrders(

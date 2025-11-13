@@ -73,6 +73,7 @@ Route::middleware($auth . ':admin')->prefix('admin')->group(function () {
     Route::get('orders/{order_id}', [Admin\OrderController::class, 'show']);
     Route::get('orders/{order_id}/status', [Admin\OrderController::class, 'status']);
     Route::patch('orders/{order_id}/status', [Admin\OrderController::class, 'updateStatus']);
+    Route::delete('orders/{order_id}/cancel', [Admin\OrderController::class, 'cancel']);
 
     // Transactions
     Route::get('transactions', [Admin\TransactionController::class, 'index']);

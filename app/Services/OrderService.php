@@ -30,9 +30,6 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
-
-
-
     public function __construct(
         private readonly OrderRepository     $orderRepository,
         private readonly OrderItemRepository $orderItemRepository,
@@ -87,7 +84,7 @@ class OrderService
     public function getOrderDetails(int $orderId): array
     {
         $userId = $this->getCurrentUserId();
-        $order = $this->orderRepository->findUserOrder($userId, $orderId);
+        $order = $this->orderRepository->findUserOrderWithItems($userId, $orderId);
 
         if (!$order) {
             throw new BusinessException(ResponseCode::NOT_FOUND);
@@ -99,11 +96,7 @@ class OrderService
     public function getOrderStatus(int $orderId): array
     {
         $userId = $this->getCurrentUserId();
-        $order = $this->orderRepository->findUserOrderWithoutRelations($userId, $orderId);
-
-        if (!$order) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
+        $order = $this->findUserOrderOrFail($userId, $orderId);
 
         return [
             'order_id' => $order->order_id,
@@ -116,15 +109,11 @@ class OrderService
         $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $order = $this->orderRepository->findUserOrderWithoutRelations($userId, $dto->orderId);
+            $order = $this->findUserOrderOrFail($userId, $dto->orderId);
 
-            if (!$order) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
+            $this->assertCanUpdateShipping($order);
 
-// TODO     $this->assertCanUpdateShipping($order);
-
-            $this->orderRepository->update($order, $dto->toArray());
+            $order->update($dto->toArray());
             $order->load('items');
 
             return OrderResource::transform($order);
@@ -136,17 +125,14 @@ class OrderService
         $userId = $this->getCurrentUserId();
 
         return DB::transaction(function () use ($userId, $orderId) {
-            $order = $this->orderRepository->findAndLockUserOrder($userId, $orderId);
+            $order = $this->findAndLockUserOrderOrFail($userId, $orderId);
 
-            if (!$order) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
-
-// TODO     $this->assertNotAlreadyCancelled($order);
             $this->assertCanCancelOrder($order);
 
             $this->orderItemRepository->restoreProductQuantities($order);
-            $this->orderRepository->update($order, ['status' => OrderStatus::CANCELLED]);
+            $order->update(['status' => OrderStatus::CANCELLED]);
+
+            // TODO: Process refund if payment was made
 
             return [
                 'order_id' => $order->order_id,
@@ -178,11 +164,7 @@ class OrderService
 
     public function getOrderDetailsAdmin(int $orderId): array
     {
-        $order = $this->orderRepository->findById($orderId);
-
-        if (!$order) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
+        $order = $this->findOrderWithItemsByIdOrFail($orderId);
 
         return OrderResource::transform($order);
     }
@@ -190,13 +172,8 @@ class OrderService
     public function updateOrderStatus(UpdateOrderStatusDto $dto): array
     {
         return DB::transaction(function () use ($dto) {
-            $order = $this->orderRepository->findByIdWithoutRelations($dto->orderId);
-
-            if (!$order) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
-
-            $this->orderRepository->update($order, ['status' => $dto->status]);
+            $order = $this->findOrderByIdOrFail($dto->orderId);
+            $order->update(['status' => $dto->status]);
 
             return [
                 'order_id' => $order->order_id,
@@ -208,17 +185,14 @@ class OrderService
     public function cancelOrderAdmin(int $orderId): array
     {
         return DB::transaction(function () use ($orderId) {
-            $order = $this->orderRepository->findById($orderId);
-
-            if (!$order) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
+            $order = $this->findOrderWithItemsByIdOrFail($orderId);
 
             if ($order->status !== OrderStatus::CANCELLED) {
                 $this->orderItemRepository->restoreProductQuantities($order);
             }
+            $order->update(['status' => OrderStatus::CANCELLED]);
 
-            $this->orderRepository->update($order, ['status' => OrderStatus::CANCELLED]);
+            // TODO: Process refund if payment was made
 
             return [
                 'order_id' => $order->order_id,
@@ -232,7 +206,7 @@ class OrderService
         return Auth::id();
     }
 
-    private function findCheckedOutCartWithItemsOrFail(int $userId, int $cartId)
+    private function findCheckedOutCartWithItemsOrFail(int $userId, int $cartId): Cart
     {
         $cart = $this->cartRepository->findCheckedOutWithItemsByUserIdAndCartId($userId, $cartId);
 
@@ -252,7 +226,7 @@ class OrderService
         }
     }
 
-    private function lockAndValidateProductsInCart(Cart $cart)
+    private function lockAndValidateProductsInCart(Cart $cart): \Illuminate\Support\Collection
     {
         $productIds = $cart->items->pluck('product_id')->toArray();
         $products = $this->productRepository->findByIdsWithLock($productIds);
@@ -366,6 +340,7 @@ class OrderService
                 'note' => $cartItem->note,
             ]);
 
+            /** @var Product  $product */
             $product = $products->get($cartItem->product_id);
             $updated = $this->productRepository->decrementQuantity($product->product_id, $cartItem->quantity);
 
@@ -394,6 +369,62 @@ class OrderService
         $this->cartItemRepository->deleteByCartIdAndProductIds($activeCart->cart_id, $productIds);
     }
 
+    private function findUserOrderOrFail(int $userId, int $orderId)
+    {
+        $order = $this->orderRepository->findUserOrder($userId, $orderId);
+
+        if (!$order) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
+        }
+
+        return $order;
+    }
+
+    private function assertCanUpdateShipping(Order $order): void
+    {
+        if (!$this->isUpdatableOrder($order)) {
+            throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
+                'message' => 'Cannot update this order.',
+                'current_status' => $order->status,
+            ]);
+        }
+    }
+
+    private function isUpdatableOrder(Order $order): bool
+    {
+        return $this->isUpdatableStatus($order->status) &&
+            !$this->isPastUpdateDeadline($order->orders_at);
+    }
+
+    private function isUpdatableStatus(int $status): bool
+    {
+        $updatableStatuses = [
+            OrderStatus::PENDING_PAYMENT,
+            OrderStatus::PAID,
+            OrderStatus::PROCESSING,
+        ];
+
+        return in_array($status, $updatableStatuses);
+    }
+
+    private function isPastUpdateDeadline($ordersAt): bool
+    {
+        $updateDeadline = $ordersAt->copy()->addHours(2);
+
+        return !now()->greaterThan($updateDeadline);
+    }
+
+    private function findAndLockUserOrderOrFail(int $userId, int $orderId): Order
+    {
+        $order = $this->orderRepository->findAndLockUserOrder($userId, $orderId);
+
+        if (!$order) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
+        }
+
+        return $order;
+    }
+
     private function assertCanCancelOrder(Order $order): void
     {
         if (!$this->isCancelableStatus($order->status)) {
@@ -413,5 +444,27 @@ class OrderService
         ];
 
         return in_array($status, $cancelableStatuses);
+    }
+
+    private function findOrderWithItemsByIdOrFail(int $orderId): Order
+    {
+        $order = $this->orderRepository->findWithItemsById($orderId);
+
+        if (!$order) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
+        }
+
+        return $order;
+    }
+
+    private function findOrderByIdOrFail(int $orderId): Order
+    {
+        $order = $this->orderRepository->findById($orderId);
+
+        if (!$order) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
+        }
+
+        return $order;
     }
 }

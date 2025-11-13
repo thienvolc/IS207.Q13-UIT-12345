@@ -72,4 +72,13 @@ class OrderController extends AppController
         $result = $this->orderService->updateOrderStatus($dto);
         return $this->success($result);
     }
+
+    /**
+     * DELETE /admin/orders/{order_id}/cancel
+     */
+    public function cancel(int $order_Id): JsonResponse
+    {
+        $result = $this->orderService->cancelOrderAdmin($order_Id);
+        return $this->success($result);
+    }
 }
