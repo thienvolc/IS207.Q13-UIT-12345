@@ -17,73 +17,23 @@
         </span>
       </div>
 
-      <a href="/" class="btn-cta">Mua ngay</a>
+      <a href="/san-pham/tai-nghe-pinkcapy" class="btn-cta">Mua ngay</a>
 
       <div class="hero__dots" aria-hidden="true">
-        @foreach($heroProducts as $index => $hero)
-        <span class="dot {{ $index === 0 ? 'is-active' : '' }}" data-index="{{ $index }}"></span>
-        @endforeach
+        <span class="dot is-active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
       </div>
     </div>
 
     <div class="hero__visual">
-      <img src="" alt="" class="hero__img">
+      <img src="/img/hero1.png" alt="" class="hero__img">
     </div>
   </div>
 </section>
 
 @push('scripts')
-<script>
-  // ============================================
-  // ✅ Hero Slider - DATA THẬT từ Aiven Cloud
-  // ============================================
-  const heroSlides = @json($heroProducts);
-
-  let currentSlide = 0;
-  const heroTitle = document.querySelector('.hero__title');
-  const heroSubtitle = document.querySelector('.hero__subtitle');
-  const heroPrice = document.querySelector('.hero__price strong');
-  const heroImg = document.querySelector('.hero__img');
-  const heroCta = document.querySelector('.btn-cta');
-  const dots = document.querySelectorAll('.hero__dots .dot');
-
-  function updateHeroSlide(index) {
-    const slide = heroSlides[index];
-    if (!slide) return;
-
-    heroTitle.textContent = slide.name;
-    heroSubtitle.textContent = 'Sản phẩm chất lượng cao';
-    heroPrice.textContent = new Intl.NumberFormat('vi-VN').format(slide.price);
-    heroImg.src = slide.thumbnail;
-    heroImg.alt = slide.name;
-    heroCta.href = '/san-pham/' + slide.slug;
-
-    // Update dots
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('is-active', i === index);
-    });
-  }
-
-  // Auto slide every 5 seconds
-  function autoSlide() {
-    currentSlide = (currentSlide + 1) % heroSlides.length;
-    updateHeroSlide(currentSlide);
-  }
-
-  // Dot click handlers
-  dots.forEach((dot, index) => {
-    dot.addEventListener('click', () => {
-      currentSlide = index;
-      updateHeroSlide(currentSlide);
-    });
-  });
-
-  // Initialize first slide
-  updateHeroSlide(0);
-
-  // Start auto slide
-  setInterval(autoSlide, 5000);
-</script>
+<script src="{{ asset('js/home.js') }}"></script>
 @endpush
 
 <section class="grid">
@@ -91,10 +41,10 @@
   <div class="mb-5">
     <div class="grid-row">
       {{-- ============================================ --}}
-      {{-- ✅ DATA THẬT - Categories từ Aiven Cloud DB --}}
+      {{-- DATA THẬT - Categories từ Aiven Cloud DB --}}
       {{-- ============================================ --}}
       @php
-      // 🔒 HARDCODE TẠM: Banner images (categories chưa có field 'image')
+      // HARDCODE TẠM: Banner images (categories chưa có field 'image')
       // TODO: Thêm field 'banner_image' vào bảng categories
       $bannerImages = [
       '/img/rcm1.png',
@@ -165,10 +115,10 @@
           </div>
           <div class="deal-hang">
             <div class="deal-soluong">
-              {{-- ✅ DATA THẬT: Quantity từ database --}}
+              {{-- DATA THẬT: Quantity từ database --}}
               <span class="">Available: <strong>{{ $dealProduct['quantity'] }}</strong></span>
 
-              {{-- 🔒 HARDCODE TẠM: Already Sold (DB chưa có field này) --}}
+              {{-- HARDCODE TẠM: Already Sold (DB chưa có field này) --}}
               {{-- TODO: Khi có field 'sold' trong products table, thay bằng: {{ $dealProduct['sold'] }} --}}
               <span class="">Already Sold: <strong>{{ rand(20, 100) }}</strong></span>
             </div>

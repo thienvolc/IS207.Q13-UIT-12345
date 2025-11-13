@@ -217,16 +217,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 selectedTab.classList.add("active");
             }
         }, 100);
-
-        // Update indicators
-        const dots = document.querySelectorAll(".tab-dot");
-        dots.forEach((dot, index) => {
-            if (index + 1 === tabNumber) {
-                dot.classList.add("active");
-            } else {
-                dot.classList.remove("active");
-            }
-        });
     }
 
     // Event delegation for navigation buttons
