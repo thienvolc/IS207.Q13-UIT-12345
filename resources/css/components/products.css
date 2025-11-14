@@ -76,10 +76,18 @@
 
 .product-item__badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #ff424e;
-    color: white;
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-left: 8px;
+    box-shadow: 0 2px 8px rgba(255, 66, 78, 0.08);
+    transition: all 0.2s;
     font-size: 12px;
     font-weight: 700;
     padding: 4px 8px;
@@ -113,41 +121,6 @@
 
 .product-item:hover .product-item__image img {
     transform: scale(1.05);
-}
-
-/* Floating Add Button */
-.product-item__image .btn-add-floating {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    background: var(--primary);
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s ease;
-    z-index: 3;
-}
-
-.product-item__image .btn-add-floating i {
-    font-size: 18px;
-}
-
-.product-item:hover .product-item__image .btn-add-floating {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.product-item__image .btn-add-floating:hover {
-    background: #d91e42;
-    transform: scale(1.1);
 }
 
 .product-item__content {
@@ -230,16 +203,40 @@
     color: #333;
 }
 
-.product-item__actions .btn-add-cart {
+button.btn-add-cart,
+.btn-add-cart {
     background: var(--primary);
-    border-color: var(--primary);
+    border: none;
     color: #fff;
-    display: none;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    margin-left: 12px;
+    box-shadow: 0 3px 10px rgba(255, 66, 78, 0.1);
+    font-size: 18px;
+    padding: 0 8px;
+    transition:
+        background 0.2s,
+        box-shadow 0.2s,
+        transform 0.2s;
+    outline: none;
+    cursor: pointer;
 }
 
-.product-item__actions .btn-add-cart:hover {
+button.btn-add-cart:hover,
+.btn-add-cart:hover {
     background: #d91e42;
-    border-color: #d91e42;
+    box-shadow: 0 4px 12px rgba(255, 66, 78, 0.16);
+    transform: translateY(-1px) scale(1.05);
+}
+
+button.btn-add-cart i,
+.btn-add-cart i {
+    font-size: 20px;
+    margin: 0;
 }
 
 .product-item__actions .btn-wishlist:hover {
@@ -383,7 +380,6 @@
     border: 1px solid #e8e8e8;
     border-radius: 4px;
     padding: 10px;
-    padding-bottom: 50px;
     transition: all 0.3s ease;
     position: relative;
     overflow: visible;

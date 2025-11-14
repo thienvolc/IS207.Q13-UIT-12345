@@ -1,7 +1,7 @@
 {{-- resources/views/pages/products/detail.blade.php --}}
 @extends('layouts.app')
 
-@section('title', $product['name'])
+@section('title', $product['title'])
 
 @section('content')
 <div class="grid">
@@ -11,7 +11,7 @@
         'items' => [
         ['name' => 'Sản phẩm', 'url' => route('products.index')],
         ],
-        'current' => $product['name']
+        'current' => $product['title']
         ])
     </div>
 
@@ -20,8 +20,8 @@
         <div class="col-lg-5">
             <div class="product-detail-image sticky-top" style="top: 90px;">
                 <div class="product-detail-image__main bg-light rounded-3 p-4 mb-3">
-                    <img src="{{ $product['thumbnail'] }}"
-                        alt="{{ $product['name'] }}"
+                    <img src="{{ $product['thumb'] }}"
+                        alt="{{ $product['title'] }}"
                         class="w-100 rounded"
                         style="height: 400px; object-fit: contain;">
                 </div>
@@ -43,7 +43,7 @@
         <div class="col-lg-7">
             <div class="product-detail-info">
                 <!-- Tên sản phẩm -->
-                <h1 class="product-detail-title h2 fw-bold mb-3">{{ $product['name'] }}</h1>
+                <h1 class="product-detail-title h2 fw-bold mb-3">{{ $product['title'] }}</h1>
 
                 <!-- Rating & Reviews -->
                 <div class="product-detail-rating d-flex align-items-center gap-3 mb-4 fs-5">
@@ -64,15 +64,15 @@
                 <!-- Giá -->
                 <div class="product-detail-price bg-light p-4 rounded-3 mb-4">
                     <div class="d-flex align-items-baseline gap-3 mb-2">
-                        <span class="h1 text-danger fw-bold mb-0">{{ number_format($product['price_sale']) }}đ</span>
-                        @if($product['price_sale'] < $product['price'])
+                        <span class="h1 text-danger fw-bold mb-0">{{ number_format($product['price']) }}đ</span>
+                        @if($product['price'] < $product['price'])
                             <del class="h5 text-muted mb-0">{{ number_format($product['price']) }}đ</del>
                             <span class="badge bg-danger fs-5">-{{ $product['discount'] }}%</span>
                             @endif
                     </div>
                     <p class="text-muted mb-0">
                         <i class="fa-solid fa-tag me-1"></i>
-                        Tiết kiệm: <strong class="text-danger">{{ number_format($product['price'] - $product['price_sale']) }}đ</strong>
+                        Tiết kiệm: <strong class="text-danger">{{ number_format($product['price'] - $product['price']) }}đ</strong>
                     </p>
                 </div>
 
@@ -114,11 +114,11 @@
                     </div>
 
                     <div class="d-flex gap-3 mb-3">
-                        <button class="btn btn-primary btn-lg flex-grow-1 px-4 py-3 fs-5 add-to-cart" data-product-id="{{ $product['id'] }}">
+                        <button class="btn btn-primary btn-lg flex-grow-1 px-4 py-3 fs-5 add-to-cart" data-product-id="{{ $product['product_id'] }}">
                             <i class="fa-solid fa-cart-plus me-2 fs-5"></i>
                             Thêm vào giỏ hàng
                         </button>
-                        <button class="btn btn-danger btn-lg px-4 py-3 fs-5 buy-now" data-product-id="{{ $product['id'] }}">
+                        <button class="btn btn-danger btn-lg px-4 py-3 fs-5 buy-now" data-product-id="{{ $product['product_id'] }}">
                             <i class="fa-solid fa-bolt me-2 fs-5"></i>
                             Mua ngay
                         </button>
@@ -198,7 +198,7 @@
             <!-- Mô tả -->
             <div class="tab-pane fade show active" id="desc" role="tabpanel">
                 <div class="product-description bg-white p-4 rounded fs-5">
-                    {!! $product['description'] ?? '<p class="text-muted">Chưa có mô tả chi tiết.</p>' !!}
+                    {!! $product['desc'] ?? '<p class="text-muted">Chưa có mô tả chi tiết.</p>' !!}
                 </div>
             </div>
 
@@ -252,28 +252,13 @@
                             @endif
                         </tbody>
                     </table>
-
-                    {{-- 🔒 HARDCODE TẠM: Specs cũ (Screen, CPU, RAM...) cho điện thoại --}}
-                    {{-- TODO: Tạo meta keys phù hợp khi bán điện thoại/laptop --}}
-                    {{-- Hiện tại DB có: brand, rms_watt, battery_life_h, waterproof_ip, bluetooth_version, warranty_months --}}
-                    {{-- Phù hợp với: Loa, Tai nghe --}}
-                </div>
-            </div>
-
-            <!-- Đánh giá -->
-            <div class="tab-pane fade" id="reviews" role="tabpanel">
-                <div class="product-reviews p-4 fs-5">
-                    <p class="text-muted text-center py-5">
-                        <i class="fa-regular fa-comment-dots d-block mb-3 text-secondary" style="font-size: 3rem;"></i>
-                        Chưa có đánh giá nào cho sản phẩm này.
-                    </p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Sản phẩm liên quan -->
-    @if(isset($related) && count($related) > 0)
+    @if(isset($related) && $related['total_count'] > 0)
     <div class="mt-5 pt-5 mb-5 border-top">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="h4 fw-bold mb-0">Sản phẩm tương tự</h3>

@@ -85,7 +85,9 @@
                         <!-- Product Count -->
                         <div class="ms-auto text-muted">
                             <i class="fa-solid fa-box"></i>
-                            <strong>{{ $products->total() }}</strong> sản phẩm
+                            <strong>
+                                {{ count($products) }}
+                            </strong> sản phẩm
                         </div>
 
                         <!-- Clear Filter -->
@@ -103,7 +105,7 @@
     </div>
 
     <!-- Products Grid -->
-    @if($products->count())
+    @if(count($products))
     <div class="grid-row">
         @foreach($products as $product)
         <div class="grid__col-2-4 product-col">
@@ -112,9 +114,7 @@
         @endforeach
     </div>
 
-    <div class="mt-5">
-        {{ $products->links('components.pagination') }}
-    </div>
+    <!-- Không có phân trang khi trả về mảng -->
     @else
     <p class="text-center text-muted py-5">Không có sản phẩm nào.</p>
     @endif

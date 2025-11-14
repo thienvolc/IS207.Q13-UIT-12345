@@ -16,6 +16,19 @@ class ProductController extends AppController
         private ProductReadService $readService
     ) {}
 
+    /**
+     * Hiển thị danh sách sản phẩm.
+     */
+    public function index()
+    {
+        // Sử dụng service để lấy danh sách sản phẩm
+        $products = $this->readService->getAll();
+
+        // Trả về view với danh sách sản phẩm
+        return view('pages.products.index', [
+            'products' => $products
+        ]);
+    }
     public function search(SearchProductRequest $request): JsonResponse
     {
         $filters = $request->only(['query', 'category', 'price_min', 'price_max']);
@@ -49,15 +62,15 @@ class ProductController extends AppController
         $productId = $product['product_id'];
         [$sortField, $sortOrder] = ['created_at', 'desc'];
 
-//        $dto = GetRelatedProductsDto::fromArray([
-//            'productId' => $productId,
-//            'offset' => 0,
-//            'limit' => 4,
-//            'sortField' => $sortField,
-//            'sortOrder' => $sortOrder,
-//        ]);
-//
-//        $related = $this->readService->getRelatedProductsById($dto);
+        //        $dto = GetRelatedProductsDto::fromArray([
+        //            'productId' => $productId,
+        //            'offset' => 0,
+        //            'limit' => 4,
+        //            'sortField' => $sortField,
+        //            'sortOrder' => $sortOrder,
+        //        ]);
+        //
+        //        $related = $this->readService->getRelatedProductsById($dto);
         $related = null;
 
         return view('pages.products.detail2', compact('product', 'related'));

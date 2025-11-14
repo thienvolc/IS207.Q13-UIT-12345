@@ -20,9 +20,29 @@ class ProductReadService
 {
     public function __construct(
         private ProductRepository $productRepository
-    ) {
-    }
+    ) {}
 
+    /**
+     * Lấy tất cả sản phẩm public (giới hạn 100).
+     */
+    public function getAll(int $limit = 100): array
+    {
+        $dto = \App\Dtos\Product\ListProductsPublicDto::fromArray([
+            'limit' => $limit,
+            'offset' => 0,
+            'sortField' => 'created_at',
+            'sortOrder' => 'desc',
+            'filters' => []
+        ]);
+        $products = $this->productRepository->searchActiveWithFilters(
+            $dto->getFilters(),
+            $dto->sortField,
+            $dto->sortOrder,
+            $dto->offset,
+            $dto->limit
+        );
+        return ProductPublicResource::collection($products);
+    }
     public function getByIdForAdmin(int $productId): array
     {
         $product = $this->productRepository->findById($productId);
@@ -133,7 +153,7 @@ class ProductReadService
 
     private function extractCategoryIds(Product $product): array
     {
-//        return $product->categories()->pluck('pivot.category_id')->toArray();
+        //        return $product->categories()->pluck('pivot.category_id')->toArray();
         return DB::table('product_categories')
             ->where('product_id', $product->product_id)
             ->pluck('category_id')
@@ -142,7 +162,7 @@ class ProductReadService
 
     private function extractTagIds(Product $product): array
     {
-//        return $product->tags()->pluck('pivot.tag_id')->toArray();
+        //        return $product->tags()->pluck('pivot.tag_id')->toArray();
         return DB::table('product_tags')
             ->where('product_id', $product->product_id)
             ->pluck('tag_id')

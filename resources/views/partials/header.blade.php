@@ -118,8 +118,7 @@
     </div>
 
     <div class="under-nav-right">
-      <a href="/so-sanh" class="under-nav-icons-compare"><i class="fa-solid fa-code-compare"></i></a>
-      <a href="/yeu-thich" class="under-nav-icons-tym"><i class="bi bi-heart-fill"></i></a>
+      <!-- Đã loại bỏ nút so sánh và yêu thích -->
     </div>
   </nav>
 

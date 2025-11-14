@@ -95,28 +95,27 @@
             <div class="deal-header-coupon">
               <span>Tiết kiệm</span>
               <div class="deal-header-coupon_price">
-                {{ number_format(($dealProduct['price'] - $dealProduct['price_sale']) / 1000) }}K
+                {{ number_format(($dealProduct['price']) / 1000) }}K
               </div>
             </div>
           </div>
           <div class="deal-img">
             <a href="{{ route('products.show', $dealProduct['slug']) }}">
-              <img src="{{ $dealProduct['thumbnail'] }}" alt="{{ $dealProduct['name'] }}" class="img-fluid">
+              <img src="{{ $dealProduct['thumb'] ?? '' }}" alt="{{ $dealProduct['title'] ?? '' }}" class="img-fluid">
             </a>
           </div>
           <h5 class="deal-name-produce">
-            <a href="{{ route('products.show', $dealProduct['slug']) }}">
-              {{ $dealProduct['name'] }}
+            <a href="{{ route('products.show', $dealProduct['slug'] ?? '') }}">
+              {{ $dealProduct['title'] ?? '' }}
             </a>
           </h5>
           <div class="deal-price">
-            <del class="deal-price-main">{{ number_format($dealProduct['price']) }}đ</del>
-            <ins class="deal-price-reduce">{{ number_format($dealProduct['price_sale']) }}đ</ins>
+            <span class="deal-price-main">{{ number_format($dealProduct['price'] ?? 0) }}đ</span>
           </div>
           <div class="deal-hang">
             <div class="deal-soluong">
               {{-- DATA THẬT: Quantity từ database --}}
-              <span class="">Available: <strong>{{ $dealProduct['quantity'] }}</strong></span>
+              <span class="">Available: <strong>{{ $dealProduct['quantity'] ?? 0 }}</strong></span>
 
               {{-- HARDCODE TẠM: Already Sold (DB chưa có field này) --}}
               {{-- TODO: Khi có field 'sold' trong products table, thay bằng: {{ $dealProduct['sold'] }} --}}
@@ -180,7 +179,7 @@
           <div class="tab-pane fade show active" id="featured" role="tabpanel" aria-labelledby="featured-tab">
             <div class="grid-row">
               @foreach($newProducts as $product)
-              <div class="grid__col-3 product-col">
+              <div class="grid__col-3 product-col" data-product-id="{{ $product['product_id'] ?? '' }}">
                 <x-product-card :product="$product" />
               </div>
               @endforeach
@@ -192,7 +191,7 @@
           <div class="tab-pane fade" id="onsale" role="tabpanel" aria-labelledby="onsale-tab">
             <div class="grid-row">
               @foreach($featuredProducts as $product)
-              <div class="grid__col-3 product-col">
+              <div class="grid__col-3 product-col" data-product-id="{{ $product['product_id'] ?? '' }}">
                 <x-product-card :product="$product" />
               </div>
               @endforeach
@@ -254,31 +253,20 @@
         <div class="grid-row product-tab active" id="tab-page-1">
           @foreach($tab1 as $product)
           <div class="grid__col-3 product-col">
-            <div class="product-item product-item-horizontal" data-product-id="{{ $product['id'] }}">
+            <div class="product-item product-item-horizontal" data-product-id="{{ $product['product_id'] ?? '' }}">
               <div class="product-item__image">
                 <a href="{{ route('products.show', $product['slug']) }}">
-                  <img src="{{ $product['thumbnail'] }}" alt="{{ $product['name'] }}" class="img-fluid" loading="lazy">
+                  <img src="{{ $product['thumb'] ?? '' }}" alt="{{ $product['title'] ?? '' }}" class="img-fluid" loading="lazy">
                 </a>
               </div>
               <div class="product-item__content">
-                <div class="product-item__category">
-                  <a href="{{ route('products.index') }}">{{ $product['category'] }}</a>
-                </div>
                 <h5 class="product-item__title">
-                  <a href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
+                  <a href="{{ route('products.show', $product['slug']) }}">{{ $product['title'] ?? '' }}</a>
                 </h5>
-                <div class="product-item__price">{{ number_format($product['price_sale']) }}đ</div>
-
-                <!-- 3 nút dưới chân - 1 hàng ngang -->
-                <div class="product-item__actions-right">
-                  <button class="btn-icon-vertical btn-add-cart" title="Thêm vào giỏ">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="product-item__price mb-0">{{ number_format($product['price'] ?? 0) }}đ</div>
+                  <button class="btn-icon-vertical btn-add-cart ms-3" title="Thêm vào giỏ">
                     <i class="bi bi-cart-plus"></i>
-                  </button>
-                  <button class="btn-icon-vertical btn-wishlist" title="Thích">
-                    <i class="bi bi-heart"></i>
-                  </button>
-                  <button class="btn-icon-vertical btn-compare" title="So sánh">
-                    <i class="bi bi-arrow-left-right"></i>
                   </button>
                 </div>
               </div>
@@ -292,31 +280,21 @@
         <div class="grid-row product-tab" id="tab-page-2">
           @foreach($tab2 as $product)
           <div class="grid__col-3 product-col">
-            <div class="product-item product-item-horizontal" data-product-id="{{ $product['id'] }}">
+            <div class="product-item product-item-horizontal" data-product-id="{{ $product['product_id'] ?? '' }}">
               <div class="product-item__image">
                 <a href="{{ route('products.show', $product['slug']) }}">
-                  <img src="{{ $product['thumbnail'] }}" alt="{{ $product['name'] }}" class="img-fluid" loading="lazy">
+                  <img src="{{ $product['thumb'] ?? '' }}" alt="{{ $product['title'] ?? '' }}" class="img-fluid" loading="lazy">
                 </a>
               </div>
               <div class="product-item__content">
-                <div class="product-item__category">
-                  <a href="{{ route('products.index') }}">{{ $product['category'] }}</a>
-                </div>
                 <h5 class="product-item__title">
-                  <a href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
+                  <a href="{{ route('products.show', $product['slug']) }}">{{ $product['title'] ?? '' }}</a>
                 </h5>
-                <div class="product-item__price">{{ number_format($product['price_sale']) }}đ</div>
+                <div class="product-item__price">{{ number_format($product['price'] ?? 0) }}đ</div>
 
-                <!-- 3 nút dưới chân - 1 hàng ngang -->
                 <div class="product-item__actions-right">
                   <button class="btn-icon-vertical btn-add-cart" title="Thêm vào giỏ">
                     <i class="bi bi-cart-plus"></i>
-                  </button>
-                  <button class="btn-icon-vertical btn-wishlist" title="Thích">
-                    <i class="bi bi-heart"></i>
-                  </button>
-                  <button class="btn-icon-vertical btn-compare" title="So sánh">
-                    <i class="bi bi-arrow-left-right"></i>
                   </button>
                 </div>
               </div>
