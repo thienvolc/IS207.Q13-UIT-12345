@@ -1,35 +1,294 @@
 @extends('layouts.app')
+
 @section('title', 'Giỏ hàng')
+
 @section('content')
-<div class="cart-page-container" style="max-width:900px;margin:40px auto;padding:32px;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(255,111,145,0.08);">
-    <h2 class="cart-title" style="color:#ff6f91;font-weight:700;margin-bottom:32px;text-align:center;">Giỏ hàng của bạn</h2>
-    <div class="cart-items">
-        @if(isset($cartItems) && count($cartItems) > 0)
-        @foreach($cartItems as $item)
-        <div class="cart-item" style="display:flex;align-items:center;gap:24px;padding:18px 0;border-bottom:1px solid #ffe3ec;">
-            <img src="{{ $item->product->image_url ?? '/img/no-image.png' }}" alt="{{ $item->product->name }}" style="width:90px;height:90px;object-fit:cover;border-radius:12px;border:2px solid #ff6f91;">
-            <div style="flex:1;">
-                <h4 style="margin:0 0 8px 0;font-size:1.1rem;font-weight:600;color:#ff6f91;">
-                    <a href="{{ route('products.show', $item->product->slug) }}" style="color:#ff6f91;text-decoration:none;">{{ $item->product->name }}</a>
-                </h4>
-                <div style="font-size:0.98rem;color:#555;">Số lượng: <strong>{{ $item->quantity }}</strong></div>
-                <div style="font-size:0.98rem;color:#555;">Giá: <strong>{{ number_format($item->product->price) }}₫</strong></div>
-            </div>
-            <form method="POST" action="{{ route('cart.remove', $item->id) }}">
-                @csrf
-                <button type="submit" class="btn btn-danger" style="background:#ff6f91;border:none;">Xóa</button>
-            </form>
+<div class="cart-page-wrapper mb-5">
+    <div class="grid">
+        <!-- Breadcrumb -->
+        <div class="mb-4">
+            @include('partials.breadcrumb', [
+                'items' => [],
+                'current' => 'Giỏ hàng'
+            ])
         </div>
-        @endforeach
-        @else
-        <p style="text-align:center;color:#888;font-size:1.1rem;">Giỏ hàng của bạn đang trống.</p>
-        @endif
-    </div>
-    <div class="cart-summary" style="margin-top:32px;text-align:right;">
-        <h3 style="color:#ff6f91;font-weight:700;">Tổng cộng: {{ isset($total) ? number_format($total) : 0 }}₫</h3>
-        <a href="{{ route('order.checkout') }}" class="btn btn-primary" style="background:linear-gradient(90deg,#ff6f91,#ff9671);border:none;font-weight:600;">Thanh toán</a>
+
+        <div class="cart-header mb-4">
+            <h1 class="cart-title">
+                <i class="bi bi-cart3"></i> Giỏ hàng của bạn
+            </h1>
+            <p class="cart-subtitle">Bạn có <strong id="cart-count">3</strong> sản phẩm trong giỏ hàng</p>
+        </div>
+
+        <div class="grid-row">
+            <!-- Cart Items -->
+            <div class="grid__col-8">
+                <div class="cart-items-card">
+                    <!-- Cart Item 1 -->
+                    <div class="cart-item">
+                        <div class="cart-item-checkbox">
+                            <input type="checkbox" class="form-check-input" checked>
+                        </div>
+                        <div class="cart-item-image">
+                            <img src="/img/hero1.png" alt="Tai nghe PinkCapy Pro">
+                        </div>
+                        <div class="cart-item-info">
+                            <h4 class="cart-item-name">Tai nghe PinkCapy Pro - Chống ồn chủ động</h4>
+                            <p class="cart-item-variant">Màu: Hồng | Bảo hành: 12 tháng</p>
+                            <div class="cart-item-price">
+                                <span class="price-current">1.990.000₫</span>
+                                <span class="price-original">2.490.000₫</span>
+                                <span class="price-discount">-20%</span>
+                            </div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="qty-btn qty-minus">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" class="qty-input" value="1" min="1" max="10">
+                            <button class="qty-btn qty-plus">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <div class="cart-item-total">
+                            <span class="item-total-price">1.990.000₫</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="btn-icon btn-delete" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cart Item 2 -->
+                    <div class="cart-item">
+                        <div class="cart-item-checkbox">
+                            <input type="checkbox" class="form-check-input" checked>
+                        </div>
+                        <div class="cart-item-image">
+                            <img src="/img/hero2.png" alt="Loa Bluetooth PinkCapy">
+                        </div>
+                        <div class="cart-item-info">
+                            <h4 class="cart-item-name">Loa Bluetooth PinkCapy Mini - Bass mạnh mẽ</h4>
+                            <p class="cart-item-variant">Màu: Trắng | Bảo hành: 24 tháng</p>
+                            <div class="cart-item-price">
+                                <span class="price-current">890.000₫</span>
+                                <span class="price-original">1.190.000₫</span>
+                                <span class="price-discount">-25%</span>
+                            </div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="qty-btn qty-minus">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" class="qty-input" value="2" min="1" max="10">
+                            <button class="qty-btn qty-plus">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <div class="cart-item-total">
+                            <span class="item-total-price">1.780.000₫</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="btn-icon btn-delete" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cart Item 3 -->
+                    <div class="cart-item">
+                        <div class="cart-item-checkbox">
+                            <input type="checkbox" class="form-check-input" checked>
+                        </div>
+                        <div class="cart-item-image">
+                            <img src="/img/hero3.png" alt="Cáp sạc PinkCapy">
+                        </div>
+                        <div class="cart-item-info">
+                            <h4 class="cart-item-name">Cáp sạc nhanh PinkCapy Type-C 1.5m</h4>
+                            <p class="cart-item-variant">Màu: Hồng | Bảo hành: 6 tháng</p>
+                            <div class="cart-item-price">
+                                <span class="price-current">149.000₫</span>
+                            </div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="qty-btn qty-minus">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" class="qty-input" value="1" min="1" max="10">
+                            <button class="qty-btn qty-plus">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <div class="cart-item-total">
+                            <span class="item-total-price">149.000₫</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="btn-icon btn-delete" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cart Actions -->
+                    <div class="cart-actions">
+                        <div class="cart-select-all">
+                            <input type="checkbox" class="form-check-input" id="selectAll" checked>
+                            <label for="selectAll">Chọn tất cả (3)</label>
+                        </div>
+                        <button class="btn-text btn-delete-selected">
+                            <i class="bi bi-trash"></i> Xóa đã chọn
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="grid__col-4">
+                <div class="cart-summary-card">
+                    <h3 class="summary-title">Thông tin đơn hàng</h3>
+                    
+                    <!-- Voucher -->
+                    <div class="voucher-section">
+                        <div class="voucher-input-group">
+                            <input type="text" class="form-control" placeholder="Nhập mã giảm giá">
+                            <button class="btn btn-apply">Áp dụng</button>
+                        </div>
+                        <div class="voucher-list">
+                            <div class="voucher-item">
+                                <i class="bi bi-ticket-perforated"></i>
+                                <span>Giảm 100K cho đơn từ 500K</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price Details -->
+                    <div class="price-details">
+                        <div class="price-row">
+                            <span>Tạm tính</span>
+                            <span class="price-value">3.919.000₫</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Giảm giá</span>
+                            <span class="price-value text-danger">-0₫</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Phí vận chuyển</span>
+                            <span class="price-value">30.000₫</span>
+                        </div>
+                        <div class="price-row price-total">
+                            <span>Tổng cộng</span>
+                            <span class="price-value">3.949.000₫</span>
+                        </div>
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <a href="{{ route('order.checkout') }}" class="btn btn-checkout">
+                     Mua hàng
+                    </a>
+
+                    <!-- Benefits -->
+                    <div class="cart-benefits">
+                        <div class="benefit-item">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Bảo hành chính hãng</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="bi bi-truck"></i>
+                            <span>Miễn phí vận chuyển từ 500K</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span>Đổi trả trong 7 ngày</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Continue Shopping -->
+                <a href="{{ route('products.index') }}" class="btn btn-continue-shopping">
+                    <i class="bi bi-arrow-left"></i> Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quantity buttons
+    document.querySelectorAll('.qty-minus').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('.qty-input');
+            const value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+                updateItemTotal(this.closest('.cart-item'));
+            }
+        });
+    });
+
+    document.querySelectorAll('.qty-plus').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('.qty-input');
+            const value = parseInt(input.value);
+            const max = parseInt(input.max);
+            if (value < max) {
+                input.value = value + 1;
+                updateItemTotal(this.closest('.cart-item'));
+            }
+        });
+    });
+
+    // Delete item
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+                this.closest('.cart-item').remove();
+                updateCartSummary();
+            }
+        });
+    });
+
+    // Select all
+    document.getElementById('selectAll')?.addEventListener('change', function() {
+        document.querySelectorAll('.cart-item-checkbox input').forEach(cb => {
+            cb.checked = this.checked;
+        });
+    });
+
+    function updateItemTotal(item) {
+        const qty = parseInt(item.querySelector('.qty-input').value);
+        const priceText = item.querySelector('.price-current').textContent;
+        const price = parseInt(priceText.replace(/[^\d]/g, ''));
+        const total = qty * price;
+        item.querySelector('.item-total-price').textContent = total.toLocaleString('vi-VN') + '₫';
+        updateCartSummary();
+    }
+
+    function updateCartSummary() {
+        let subtotal = 0;
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const totalText = item.querySelector('.item-total-price').textContent;
+            const total = parseInt(totalText.replace(/[^\d]/g, ''));
+            subtotal += total;
+        });
+        
+        const shipping = 30000;
+        const total = subtotal + shipping;
+        
+        document.querySelector('.price-details .price-row:nth-child(1) .price-value').textContent = 
+            subtotal.toLocaleString('vi-VN') + '₫';
+        document.querySelector('.price-total .price-value').textContent = 
+            total.toLocaleString('vi-VN') + '₫';
+        
+        const count = document.querySelectorAll('.cart-item').length;
+        document.getElementById('cart-count').textContent = count;
+    }
+});
+</script>
+@endpush
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/pages/cart.css') }}">
 @endpush

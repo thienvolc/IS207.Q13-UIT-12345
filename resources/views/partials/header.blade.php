@@ -11,7 +11,7 @@
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
       <a href="/account" class="mbar__icon"><i class="fa-regular fa-user"></i></a>
-      <a href="/cart" class="mbar__icon position-relative">
+      <a href="{{ route('cart.page') }}" class="mbar__icon position-relative">
         <i class="bi bi-handbag-fill"></i>
         <span class="mbar__badge">2</span>
       </a>
@@ -20,10 +20,10 @@
 
   <!-- search collapse mobile -->
   <div class="collapse d-lg-none" id="mSearchCollapse">
-    <div class="msearch">
-      <input class="msearch__input" type="text" placeholder="Bạn muốn tìm gì hôm nay?">
-      <button class="msearch__btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-    </div>
+    <form action="{{ route('products.index') }}" method="GET" class="msearch">
+      <input class="msearch__input" type="text" name="search" placeholder="Bạn muốn tìm gì hôm nay?" value="{{ request('search') }}">
+      <button type="submit" class="msearch__btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
   </div>
   <div class="header-main"></div>
   <!-- Header topbar -->
@@ -48,44 +48,45 @@
     <a class="logo" href="/">
       <img src="{{ asset('img/logo.svg') }}" alt="PinkCapy" class="logo-img">
     </a>
-    <div class="header-search">
-      <input type="text" class="header-search-input" placeholder="Bạn muốn tìm gì hôm nay?">
+    <form action="{{ route('products.index') }}" method="GET" class="header-search">
+      <input type="text" name="search" class="header-search-input" placeholder="Bạn muốn tìm gì hôm nay?" value="{{ request('search') }}">
       <div class="header-search-category dropdown">
         <button class="btn dropdown-toggle search-cat-btn" type="button"
           data-bs-toggle="dropdown" aria-expanded="false">
           Danh mục
         </button>
         <ul class="dropdown-menu header-search-category-menu">
-          <li><a class="dropdown-item" href="/san-pham">Laptops</a></li>
-          <li><a class="dropdown-item" href="/san-pham">Đồng hồ</a></li>
-          <li><a class="dropdown-item" href="/san-pham">Phụ kiện</a></li>
+          <li><a class="dropdown-item" href="{{ route('products.index') }}">Tất cả</a></li>
+          <li><a class="dropdown-item" href="{{ route('products.index') }}?category=laptops">Laptops</a></li>
+          <li><a class="dropdown-item" href="{{ route('products.index') }}?category=dong-ho">Đồng hồ</a></li>
+          <li><a class="dropdown-item" href="{{ route('products.index') }}?category=phu-kien">Phụ kiện</a></li>
         </ul>
       </div>
       <button type="submit" class="header-search-button"><i class="fa-solid fa-magnifying-glass"></i></button>
-    </div>
+    </form>
     <div class="header-options">
       <div class="header-cart">
-        <a href="/cart" class="header-cart-item">
+        <a href="{{ route('cart.page') }}" class="header-cart-item">
           <span class="header-cart-text">Giỏ hàng</span>
           <i class="bi bi-handbag-fill"></i>
         </a>
       </div>
-      <div class="header-auth"><a href="/login">Đăng nhập</a> <span class="separate"></span> <a href="/register">Đăng ký</a></div>
+      <!-- <div class="header-auth"><a href="/login">Đăng nhập</a> <span class="separate"></span> <a href="/register">Đăng ký</a></div> -->
       <!-- Tài khoản -->
-      <!-- <div class="nav-item dropdown header-user">
+      <div class="nav-item dropdown header-user">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
           data-bs-toggle="dropdown" aria-expanded="false">
           <img src="{{ asset('img/LOGO_Admin.png') }}" alt="avatar" class="header-user-avt"> Admin
         </a>
         <ul class="dropdown-menu header-user-menu" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="/">Tài khoản của tôi</a></li>
-          <li><a class="dropdown-item" href="/">Đơn mua</a></li>
+          <li><a class="dropdown-item" href="{{ route('account.profile') }}">Tài khoản của tôi</a></li>
+          <li><a class="dropdown-item" href="{{ route('cart.page') }}">Đơn mua</a></li>
           <li>
             <hr class="dropdown-divider">
           </li>
           <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
         </ul>
-      </div> -->
+      </div>
     </div>
   </div>
   <!-- Header bottom -->

@@ -25,13 +25,29 @@ Route::get('/products/{slug}', [Public\ProductController::class, 'showBySlugView
 // ==================== ĐĂNG NHẬP & ĐĂNG KÝ ====================
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
 // ==================== GIỎ HÀNG ====================
-Route::get('/cart', [\App\Http\Controllers\Me\CartController::class, 'index'])->name('cart.page');
+// Route::get('/cart', [\App\Http\Controllers\Me\CartController::class, 'index'])->middleware('auth')->name('cart.page');
+
+// Tạm thời tắt auth để code UI
+Route::get('/cart', fn() => view('pages.cart'))->name('cart.page');
 
 // ==================== THANH TOÁN ====================
 Route::get('/checkout', [\App\Http\Controllers\Me\OrderController::class, 'checkout'])->name('order.checkout');
+
+// ==================== TÀI KHOẢN ====================
+// Route::middleware('auth')->prefix('account')->group(function () {
+//     Route::get('/profile', fn() => view('pages.account.profile'))->name('account.profile');
+//     Route::get('/password', fn() => view('pages.account.password'))->name('account.password');
+// });
+
+// Tạm thời tắt auth để xem giao diện
+Route::prefix('account')->group(function () {
+    Route::get('/profile', fn() => view('pages.account.profile'))->name('account.profile');
+    Route::get('/password', fn() => view('pages.account.password'))->name('account.password');
+});

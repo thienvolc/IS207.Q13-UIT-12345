@@ -18,6 +18,33 @@ use Illuminate\Support\Facades\DB;
 
 class ProductReadService
 {
+    /**
+     * Lấy sản phẩm public với phân trang (limit, offset).
+     */
+    public function getAllWithOffset(
+        int $limit = 12, 
+        int $offset = 0, 
+        array $filters = [], 
+        string $sortField = 'created_at', 
+        string $sortOrder = 'desc'
+    ): array
+    {
+        $dto = \App\Dtos\Product\ListProductsPublicDto::fromArray([
+            'limit' => $limit,
+            'offset' => $offset,
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+            'filters' => $filters
+        ]);
+        $products = $this->productRepository->searchActiveWithFilters(
+            $dto->getFilters(),
+            $dto->sortField,
+            $dto->sortOrder,
+            $dto->offset,
+            $dto->limit
+        );
+        return ProductPublicResource::collection($products);
+    }
     public function __construct(
         private ProductRepository $productRepository
     ) {}

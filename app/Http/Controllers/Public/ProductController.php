@@ -22,11 +22,42 @@ class ProductController extends AppController
     public function index()
     {
         // Sử dụng service để lấy danh sách sản phẩm
-        $products = $this->readService->getAll();
+        $limit = (int)request('limit', 20);
+        $offset = (int)request('offset', 0);
+        $searchQuery = request('search');
+        
+        $filters = [
+            'category' => request('category'),
+            'price_min' => is_numeric(request('price_min')) ? (int)request('price_min') : null,
+            'price_max' => is_numeric(request('price_max')) ? (int)request('price_max') : null,
+        ];
+        
+        // Thêm search query vào filters nếu có (key phải là 'query' theo repository)
+        if ($searchQuery) {
+            $filters['query'] = $searchQuery;
+        }
+        
+        $sortField = match(request('sort')) {
+            'price_asc' => 'price',
+            'price_desc' => 'price',
+            'name' => 'name',
+            default => 'created_at',
+        };
+        $sortOrder = match(request('sort')) {
+            'price_asc' => 'asc',
+            'price_desc' => 'desc',
+            default => 'desc',
+        };
+        
+        $products = $this->readService->getAllWithOffset($limit, $offset, $filters, $sortField, $sortOrder);
+        $hasMore = count($products) === $limit;
 
-        // Trả về view với danh sách sản phẩm
         return view('pages.products.index', [
-            'products' => $products
+            'products' => $products,
+            'limit' => $limit,
+            'offset' => $offset,
+            'hasMore' => $hasMore,
+            'searchQuery' => $searchQuery
         ]);
     }
     public function search(SearchProductRequest $request): JsonResponse
@@ -73,7 +104,7 @@ class ProductController extends AppController
         //        $related = $this->readService->getRelatedProductsById($dto);
         $related = null;
 
-        return view('pages.products.detail2', compact('product', 'related'));
+        return view('pages.products.detail', compact('product', 'related'));
     }
 
     public function showBySlug(string $slug): JsonResponse

@@ -45,22 +45,6 @@
                 <!-- Tên sản phẩm -->
                 <h1 class="product-detail-title h2 fw-bold mb-3">{{ $product['title'] }}</h1>
 
-                <!-- Rating & Reviews -->
-                <div class="product-detail-rating d-flex align-items-center gap-3 mb-4 fs-5">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="text-warning fs-5">
-                            @for($i = 1; $i <= 5; $i++)
-                                <i class="fa{{ $i <= ($product['rating'] ?? 0) ? 's' : 'r' }} fa-star"></i>
-                                @endfor
-                        </div>
-                        <span class="fw-bold fs-5">{{ $product['rating'] ?? 0 }}</span>
-                    </div>
-                    <span class="text-muted">|</span>
-                    <span class="text-muted fs-5"><strong>{{ $product['reviews_count'] ?? 0 }}</strong> đánh giá</span>
-                    <span class="text-muted">|</span>
-                    <span class="text-muted fs-5"><strong>{{ $product['sold'] ?? 0 }}</strong> đã bán</span>
-                </div>
-
                 <!-- Giá -->
                 <div class="product-detail-price bg-light p-4 rounded-3 mb-4">
                     <div class="d-flex align-items-baseline gap-3 mb-2">
@@ -123,10 +107,6 @@
                             Mua ngay
                         </button>
                     </div>
-                    <button class="btn btn-outline-danger w-100 fs-5">
-                        <i class="fa-regular fa-heart me-2"></i>
-                        Yêu thích
-                    </button>
                 </div>
 
                 <!-- Chính sách -->
@@ -174,7 +154,7 @@
         </div>
     </div>
 
-    <!-- Tabs: Mô tả, Thông số, Đánh giá -->
+    <!-- Tabs: Mô tả, Thông số -->
     <div class="mt-5">
         <ul class="nav nav-tabs nav-fill border-bottom mb-4" role="tablist">
             <li class="nav-item" role="presentation">
@@ -185,11 +165,6 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link fw-bold fs-5" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button">
                     <i class="bi bi-cpu me-2 fs-4"></i>Thông số kỹ thuật
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link fw-bold fs-5" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button">
-                    <i class="bi bi-star me-2 fs-4"></i>Đánh giá ({{ $product['reviews_count'] ?? 0 }})
                 </button>
             </li>
         </ul>

@@ -48,7 +48,9 @@ readonly class CartService
             $this->assertProductIsAvailable($product);
 
             $existingCartItem = $this->cartItemRepository->findByCartAndProduct(
-                $cart->cart_id, $addCartItemDto->productId);
+                $cart->cart_id,
+                $addCartItemDto->productId
+            );
 
             $inCartQuantity = $existingCartItem ? $existingCartItem->quantity : 0;
             $newQuantity = $addCartItemDto->quantity + $inCartQuantity;
@@ -56,8 +58,12 @@ readonly class CartService
             $this->assertSufficientStock($product, $newQuantity, $inCartQuantity);
 
             if ($existingCartItem) {
-                $this->updateExistingCartItem($existingCartItem,
-                    $product, $newQuantity, $addCartItemDto->note);
+                $this->updateExistingCartItem(
+                    $existingCartItem,
+                    $product,
+                    $newQuantity,
+                    $addCartItemDto->note
+                );
             } else {
                 $existingCartItem = $this->createNewCartItem($cart, $product, $addCartItemDto);
             }
@@ -147,7 +153,13 @@ readonly class CartService
 
     private function getAuthUserId(): int
     {
-        return Auth::id();
+        $userId = Auth::id();
+        if ($userId === null) {
+            throw new \App\Exceptions\BusinessException(\App\Constants\ResponseCode::UNAUTHORIZED, [], [
+                'message' => 'Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn.'
+            ]);
+        }
+        return $userId;
     }
 
     private function assertProductIsAvailable(?Product $product): void
@@ -178,8 +190,7 @@ readonly class CartService
         Product $product,
         int     $totalQuantity,
         int     $inCartQuantity
-    ): void
-    {
+    ): void {
         if ($product->quantity < $totalQuantity) {
             throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
                 'message' => 'Not enough product in stock',
@@ -196,8 +207,7 @@ readonly class CartService
         Product  $product,
         int      $quantity,
         ?string  $note
-    ): void
-    {
+    ): void {
         $cartItem->update([
             'quantity' => $quantity,
             'price' => $product->price,
@@ -225,8 +235,7 @@ readonly class CartService
         CartItem $cartItem,
         Product  $product,
         int      $quantity
-    ): void
-    {
+    ): void {
         $cartItem->update([
             'quantity' => $quantity,
             'price' => $product->price,

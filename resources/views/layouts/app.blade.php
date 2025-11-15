@@ -31,7 +31,6 @@
   </main>
   @include('partials.footer')
   @include('partials.chatbot')
+  
   @stack('scripts')
 </body>
-
-</html>

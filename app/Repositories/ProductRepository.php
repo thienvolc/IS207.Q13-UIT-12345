@@ -157,7 +157,12 @@ class ProductRepository
 
         if (!empty($filters['category'])) {
             $query->whereHas('categories', function (Builder $q) use ($filters) {
-                $q->where('category_id', $filters['category']);
+                // Check if it's numeric (category_id) or string (slug)
+                if (is_numeric($filters['category'])) {
+                    $q->where('category_id', $filters['category']);
+                } else {
+                    $q->where('slug', $filters['category']);
+                }
             });
         }
 
