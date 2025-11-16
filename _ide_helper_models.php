@@ -11,7 +11,7 @@
  */
 
 
-namespace App\Models{
+namespace App\Models{use App\Domains\Identity\Entities\AuthToken;
 /**
  * @property int $id
  * @property string $token
@@ -19,7 +19,7 @@ namespace App\Models{
  * @property int $is_admin
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $user
+ * @property-read \App\Domains\Identity\Entities\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken query()
@@ -35,7 +35,7 @@ namespace App\Models{
 	class IdeHelperAuthToken {}
 }
 
-namespace App\Models{
+namespace App\Models{use App\Domains\Blog\Entities\BlogPost;
 /**
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogPost newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BlogPost newQuery()
@@ -54,7 +54,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CartItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\User $user
+ * @property-read \App\Domains\Identity\Entities\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart query()
@@ -115,7 +115,7 @@ namespace App\Models{
 	class IdeHelperCategory {}
 }
 
-namespace App\Models{
+namespace App\Models{use App\Domains\Common\Entities\Config;
 /**
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Config newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Config newQuery()
@@ -145,7 +145,7 @@ namespace App\Models{
  * @property-read int|null $items_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Transaction> $transactions
  * @property-read int|null $transactions_count
- * @property-read \App\Models\User $user
+ * @property-read \App\Domains\Identity\Entities\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order query()
@@ -262,9 +262,9 @@ namespace App\Models{
 	class IdeHelperProductMeta {}
 }
 
-namespace App\Models{
+namespace App\Models{use App\Domains\Identity\Entities\Role;
 /**
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Domains\Identity\Entities\User> $users
  * @property-read int|null $users_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role newQuery()
@@ -300,7 +300,7 @@ namespace App\Models{
 	class IdeHelperTransaction {}
 }
 
-namespace App\Models{
+namespace App\Models{use App\Domains\Identity\Entities\User;
 /**
  * @property int $id
  * @property string $name
@@ -316,8 +316,8 @@ namespace App\Models{
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
  * @property-read int|null $orders_count
- * @property-read \App\Models\UserProfile|null $profile
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
+ * @property-read \App\Domains\Identity\Entities\UserProfile|null $profile
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Domains\Identity\Entities\Role> $roles
  * @property-read int|null $roles_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
@@ -337,9 +337,9 @@ namespace App\Models{
 	class IdeHelperUser {}
 }
 
-namespace App\Models{
+namespace App\Models{use App\Domains\Identity\Entities\UserProfile;
 /**
- * @property-read \App\Models\User|null $user
+ * @property-read \App\Domains\Identity\Entities\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile query()

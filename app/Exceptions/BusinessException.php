@@ -2,11 +2,10 @@
 
 namespace App\Exceptions;
 
-use App\Helpers\StringHelper;
-use App\Utils\ResponseFactory;
-use Exception;
+use App\Infra\Helpers\StringHelper;
+use RuntimeException;
 
-class BusinessException extends Exception
+class BusinessException extends RuntimeException
 {
     protected array $responseCode;
     protected array $args;

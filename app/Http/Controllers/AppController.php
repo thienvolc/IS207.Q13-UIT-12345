@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Traits\AppResponse;
+use App\Http\Traits\AppResponseTrait;
 
 class AppController extends Controller
 {
-    use AppResponse;
+    use AppResponseTrait;
 }
 

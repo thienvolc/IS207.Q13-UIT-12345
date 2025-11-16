@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use App\Constants\UserStatus;
+use App\Domains\Common\Constants\ResponseCode;
+use App\Domains\Identity\Constants\UserStatus;
+use App\Domains\Identity\Entities\User;
 use App\Exceptions\BusinessException;
-use App\Constants\ResponseCode;
-use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

@@ -2,12 +2,12 @@
 
 namespace App\Exceptions;
 
-use App\Constants\ResponseCode;
-use App\Utils\ResponseFactory;
+use App\Applications\DTOs\Responses\ResponseDTO;
+use App\Applications\Services\ResponseFactory;
+use App\Domains\Common\Constants\ResponseCode;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -74,12 +74,12 @@ class Handler extends ExceptionHandler
         });
     }
 
-    protected function unauthenticated($request, AuthenticationException $exception): JsonResponse
+    protected function unauthenticated($request, AuthenticationException $exception): ResponseDTO
     {
         return ResponseFactory::error(ResponseCode::UNAUTHORIZED);
     }
 
-    protected function invalidJson($request, ValidationException $exception): JsonResponse
+    protected function invalidJson($request, ValidationException $exception): ResponseDTO
     {
         return ResponseFactory::error(
             ResponseCode::VALIDATION_ERROR,

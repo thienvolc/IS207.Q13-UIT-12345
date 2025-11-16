@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Product;
+use App\Domains\Catalog\Entities\Product;
+use App\Domains\Identity\Entities\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
