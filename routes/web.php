@@ -12,7 +12,7 @@ Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('h
 
 Route::get('/gioi-thieu', fn() => view('pages.about'))->name('about');
 Route::get('/lien-he', fn() => view('pages.contact'))->name('contact');
-Route::get('/tin-tuc', fn() => view('pages.blog.index'))->name('blog.index');
+Route::get('/tin-tuc', [\App\Http\Controllers\Public\BlogPostController::class, 'index'])->name('blog.index');
 Route::get('/khuyen-mai', fn() => view('pages.super-deal'))->name('super-deal');
 
 // ==================== SẢN PHẨM ====================
@@ -51,3 +51,7 @@ Route::prefix('account')->group(function () {
     Route::get('/profile', fn() => view('pages.account.profile'))->name('account.profile');
     Route::get('/password', fn() => view('pages.account.password'))->name('account.password');
 });
+
+
+// Blog
+Route::get('/blog/create', fn() => view('pages.blog.create'))->name('blog.create');

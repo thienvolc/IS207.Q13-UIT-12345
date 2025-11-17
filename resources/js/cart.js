@@ -235,4 +235,136 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         updateGuestCartCount();
     }
+
+    // Khởi tạo khi DOM ready
+    if (document.querySelector(".cart-items-card")) {
+        initCartPageEvents();
+        updateCartSummary();
+    }
 });
+
+// Cart page dynamic logic
+function updateCartSummary() {
+    let subtotal = 0;
+    const cartItems = document.querySelectorAll(".cart-item");
+    cartItems.forEach((item) => {
+        const totalText = item.querySelector(".item-total-price").textContent;
+        const total = parseInt(totalText.replace(/[^\d]/g, ""));
+        subtotal += total;
+    });
+
+    const shipping = 0; // Sửa lại nếu có phí vận chuyển động
+    const total = subtotal + shipping;
+
+    const priceDetails = document.querySelector(
+        ".price-details .price-row:nth-child(1) .price-value",
+    );
+    if (priceDetails)
+        priceDetails.textContent = subtotal.toLocaleString("vi-VN") + "₫";
+    const priceTotal = document.querySelector(".price-total .price-value");
+    if (priceTotal)
+        priceTotal.textContent = total.toLocaleString("vi-VN") + "₫";
+
+    // Số lượng sản phẩm động
+    const count = cartItems.length;
+    const cartCountEl = document.getElementById("cart-count");
+    if (cartCountEl) cartCountEl.textContent = count;
+    // Cập nhật label chọn tất cả
+    const selectAllLabel = document.querySelector(".cart-select-all label");
+    if (selectAllLabel) selectAllLabel.textContent = `Chọn tất cả (${count})`;
+
+    // Hiển thị giao diện trống nếu không có sản phẩm
+    const cartItemsCard = document.querySelector(".cart-items-card");
+    const cartEmptyMsg = document.getElementById("cart-empty-message");
+    const cartSummaryCard = document.querySelector(".cart-summary-card");
+    if (count === 0) {
+        if (cartItemsCard) cartItemsCard.style.display = "none";
+        if (cartEmptyMsg) cartEmptyMsg.style.display = "block";
+        if (cartSummaryCard) cartSummaryCard.style.display = "none";
+    } else {
+        if (cartItemsCard) cartItemsCard.style.display = "block";
+        if (cartEmptyMsg) cartEmptyMsg.style.display = "none";
+        if (cartSummaryCard) cartSummaryCard.style.display = "block";
+    }
+}
+
+function updateItemTotal(item) {
+    const qty = parseInt(item.querySelector(".qty-input").value);
+    const priceText = item.querySelector(".price-current").textContent;
+    const price = parseInt(priceText.replace(/[^\d]/g, ""));
+    const total = qty * price;
+    item.querySelector(".item-total-price").textContent =
+        total.toLocaleString("vi-VN") + "₫";
+    updateCartSummary();
+}
+
+// Khởi tạo event cho các nút trên trang giỏ hàng
+function initCartPageEvents() {
+    // Quantity buttons
+    document.querySelectorAll(".qty-minus").forEach((btn) => {
+        btn.addEventListener("click", function () {
+            const input = this.parentElement.querySelector(".qty-input");
+            const value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+                updateItemTotal(this.closest(".cart-item"));
+            }
+        });
+    });
+
+    document.querySelectorAll(".qty-plus").forEach((btn) => {
+        btn.addEventListener("click", function () {
+            const input = this.parentElement.querySelector(".qty-input");
+            const value = parseInt(input.value);
+            const max = parseInt(input.max);
+            if (value < max) {
+                input.value = value + 1;
+                updateItemTotal(this.closest(".cart-item"));
+            }
+        });
+    });
+
+    // Delete item
+    document.querySelectorAll(".btn-delete").forEach((btn) => {
+        btn.addEventListener("click", function () {
+            if (confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
+                this.closest(".cart-item").remove();
+                updateCartSummary();
+            }
+        });
+    });
+
+    // Delete selected items
+    const btnDeleteSelected = document.querySelector(".btn-delete-selected");
+    if (btnDeleteSelected) {
+        btnDeleteSelected.addEventListener("click", function () {
+            const checkedItems = document.querySelectorAll(
+                ".cart-item-checkbox input:checked",
+            );
+            if (checkedItems.length === 0) {
+                alert("Vui lòng chọn sản phẩm cần xóa!");
+                return;
+            }
+            if (confirm("Bạn có chắc muốn xóa các sản phẩm đã chọn?")) {
+                checkedItems.forEach((cb) => {
+                    const cartItem = cb.closest(".cart-item");
+                    cartItem?.remove();
+                });
+                updateCartSummary();
+            }
+        });
+    }
+
+    // Select all checkbox
+    const selectAll = document.getElementById("selectAll");
+    if (selectAll) {
+        selectAll.addEventListener("change", function () {
+            const checked = this.checked;
+            document
+                .querySelectorAll(".cart-item-checkbox input")
+                .forEach((cb) => {
+                    cb.checked = checked;
+                });
+        });
+    }
+}

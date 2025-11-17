@@ -21,7 +21,7 @@
             <div class="product-item__price mb-0">
                 <span class="price">{{ number_format($product['price']) }}đ</span>
             </div>
-            <button class="btn-icon btn-add-cart ms-3" title="Thêm vào giỏ" style="opacity:1; visibility:visible;">
+            <button class="btn-add-cart ms-3" title="Thêm vào giỏ" style="opacity:1; visibility:visible;">
                 <i class="bi bi-cart-plus"></i>
             </button>
         </div>

@@ -8,57 +8,22 @@
         <!-- Breadcrumb -->
         <div class="mb-4">
             @include('partials.breadcrumb', [
-                'items' => [],
-                'current' => 'Giỏ hàng'
+            'items' => [],
+            'current' => 'Giỏ hàng'
             ])
         </div>
 
         <div class="cart-header mb-4">
             <h1 class="cart-title">
-                <i class="bi bi-cart3"></i> Giỏ hàng của bạn
+                <i class="bi bi-bag"></i> Giỏ hàng của bạn
             </h1>
-            <p class="cart-subtitle">Bạn có <strong id="cart-count">3</strong> sản phẩm trong giỏ hàng</p>
+            <p class="cart-subtitle">Bạn có <strong id="cart-count">2</strong> sản phẩm trong giỏ hàng</p>
         </div>
 
         <div class="grid-row">
             <!-- Cart Items -->
             <div class="grid__col-8">
                 <div class="cart-items-card">
-                    <!-- Cart Item 1 -->
-                    <div class="cart-item">
-                        <div class="cart-item-checkbox">
-                            <input type="checkbox" class="form-check-input" checked>
-                        </div>
-                        <div class="cart-item-image">
-                            <img src="/img/hero1.png" alt="Tai nghe PinkCapy Pro">
-                        </div>
-                        <div class="cart-item-info">
-                            <h4 class="cart-item-name">Tai nghe PinkCapy Pro - Chống ồn chủ động</h4>
-                            <p class="cart-item-variant">Màu: Hồng | Bảo hành: 12 tháng</p>
-                            <div class="cart-item-price">
-                                <span class="price-current">1.990.000₫</span>
-                                <span class="price-original">2.490.000₫</span>
-                                <span class="price-discount">-20%</span>
-                            </div>
-                        </div>
-                        <div class="cart-item-quantity">
-                            <button class="qty-btn qty-minus">
-                                <i class="bi bi-dash"></i>
-                            </button>
-                            <input type="number" class="qty-input" value="1" min="1" max="10">
-                            <button class="qty-btn qty-plus">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                        </div>
-                        <div class="cart-item-total">
-                            <span class="item-total-price">1.990.000₫</span>
-                        </div>
-                        <div class="cart-item-actions">
-                            <button class="btn-icon btn-delete" title="Xóa">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
 
                     <!-- Cart Item 2 -->
                     <div class="cart-item">
@@ -134,7 +99,7 @@
                     <div class="cart-actions">
                         <div class="cart-select-all">
                             <input type="checkbox" class="form-check-input" id="selectAll" checked>
-                            <label for="selectAll">Chọn tất cả (3)</label>
+                            <label for="selectAll">Chọn tất cả (2)</label>
                         </div>
                         <button class="btn-text btn-delete-selected">
                             <i class="bi bi-trash"></i> Xóa đã chọn
@@ -147,7 +112,7 @@
             <div class="grid__col-4">
                 <div class="cart-summary-card">
                     <h3 class="summary-title">Thông tin đơn hàng</h3>
-                    
+
                     <!-- Voucher -->
                     <div class="voucher-section">
                         <div class="voucher-input-group">
@@ -174,7 +139,7 @@
                         </div>
                         <div class="price-row">
                             <span>Phí vận chuyển</span>
-                            <span class="price-value">30.000₫</span>
+                            <span class="price-value">0đ</span>
                         </div>
                         <div class="price-row price-total">
                             <span>Tổng cộng</span>
@@ -183,8 +148,8 @@
                     </div>
 
                     <!-- Checkout Button -->
-                    <a href="{{ route('order.checkout') }}" class="btn btn-checkout">
-                     Mua hàng
+                    <a href="{{ route('order.checkout') }}" class="btn-checkout">
+                        Mua hàng
                     </a>
 
                     <!-- Benefits -->
@@ -203,93 +168,20 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Continue Shopping -->
-                <a href="{{ route('products.index') }}" class="btn btn-continue-shopping">
-                    <i class="bi bi-arrow-left"></i> Tiếp tục mua sắm
-                </a>
             </div>
+            <!-- Continue Shopping -->
+            <a href="{{ route('products.index') }}" class="btn-continue-shopping">
+                <i class="bi bi-arrow-left"></i> Tiếp tục mua sắm
+            </a>
         </div>
     </div>
 </div>
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Quantity buttons
-    document.querySelectorAll('.qty-minus').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const input = this.parentElement.querySelector('.qty-input');
-            const value = parseInt(input.value);
-            if (value > 1) {
-                input.value = value - 1;
-                updateItemTotal(this.closest('.cart-item'));
-            }
-        });
-    });
-
-    document.querySelectorAll('.qty-plus').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const input = this.parentElement.querySelector('.qty-input');
-            const value = parseInt(input.value);
-            const max = parseInt(input.max);
-            if (value < max) {
-                input.value = value + 1;
-                updateItemTotal(this.closest('.cart-item'));
-            }
-        });
-    });
-
-    // Delete item
-    document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-                this.closest('.cart-item').remove();
-                updateCartSummary();
-            }
-        });
-    });
-
-    // Select all
-    document.getElementById('selectAll')?.addEventListener('change', function() {
-        document.querySelectorAll('.cart-item-checkbox input').forEach(cb => {
-            cb.checked = this.checked;
-        });
-    });
-
-    function updateItemTotal(item) {
-        const qty = parseInt(item.querySelector('.qty-input').value);
-        const priceText = item.querySelector('.price-current').textContent;
-        const price = parseInt(priceText.replace(/[^\d]/g, ''));
-        const total = qty * price;
-        item.querySelector('.item-total-price').textContent = total.toLocaleString('vi-VN') + '₫';
-        updateCartSummary();
-    }
-
-    function updateCartSummary() {
-        let subtotal = 0;
-        document.querySelectorAll('.cart-item').forEach(item => {
-            const totalText = item.querySelector('.item-total-price').textContent;
-            const total = parseInt(totalText.replace(/[^\d]/g, ''));
-            subtotal += total;
-        });
-        
-        const shipping = 30000;
-        const total = subtotal + shipping;
-        
-        document.querySelector('.price-details .price-row:nth-child(1) .price-value').textContent = 
-            subtotal.toLocaleString('vi-VN') + '₫';
-        document.querySelector('.price-total .price-value').textContent = 
-            total.toLocaleString('vi-VN') + '₫';
-        
-        const count = document.querySelectorAll('.cart-item').length;
-        document.getElementById('cart-count').textContent = count;
-    }
-});
-</script>
-@endpush
-
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/pages/cart.css') }}">
+@endpush
+
+@push('scripts')
+<script src="{{ asset('js/cart.js') }}"></script>
 @endpush
 @endsection
