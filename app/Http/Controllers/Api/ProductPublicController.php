@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\GetProductsByCategoryDTO;
-use App\Domains\Catalog\DTOs\Product\FormRequests\SearchProductRequest;
-use App\Domains\Catalog\DTOs\Product\Requests\GetRelatedProductsDTO;
-use App\Domains\Catalog\DTOs\Product\Requests\SearchProductsPublicDTO;
-use App\Domains\Catalog\DTOs\Tag\Requests\GetProductsByTagDTO;
+use App\Domains\Catalog\DTOs\Product\FormRequests\PublicSearchProductsRequest;
 use App\Domains\Catalog\Services\ProductReadService;
 use App\Http\Controllers\AppController;
 
@@ -17,86 +13,57 @@ class ProductPublicController extends AppController
         private readonly ProductReadService $readService
     ) {}
 
-    public function search(SearchProductRequest $request): ResponseDTO
+    /**
+     * [GET] /api/products
+    */
+    public function search(PublicSearchProductsRequest $req): ResponseDTO
     {
-        $filters = $request->only(['query', 'category', 'price_min', 'price_max']);
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = SearchProductsPublicDTO::fromArray([
-            ...$filters,
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->readService->searchPublic($dto);
-
+        $result = $this->readService->searchPublic($req->toDTO());
         return $this->success($result);
     }
 
-    public function searchByCategorySlug(string $slug, SearchProductRequest $request): ResponseDTO
+    /**
+     * [GET] /api/categories/{slug}products
+     */
+    public function searchByCategorySlug(string $slug, PublicSearchProductsRequest $req): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = GetProductsByCategoryDTO::fromArray([
-            'slug' => $slug,
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->readService->searchPublicByCategorySlug($dto);
-
+        $result = $this->readService->searchPublicByCategorySlug($req->toProductsByCategoryDTO($slug));
         return $this->success($result);
     }
 
-    public function searchByTagId(int $tag_id, SearchProductRequest $request): ResponseDTO
+    /**
+     * [GET] /api/tags/{tag_id}/products
+     */
+    public function searchByTagId(int $tag_id, PublicSearchProductsRequest $req): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = GetProductsByTagDto::fromArray([
-            'tagId' => $tag_id,
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->readService->searchPublicByTagId($dto);
-
+        $result = $this->readService->searchPublicByTagId($req->toProductsByTagDTO($tag_id));
         return $this->success($result);
     }
 
+    /**
+     * [GET] /api/products/{product_id}
+     */
     public function show(int $product_id): ResponseDTO
     {
         $product = $this->readService->getPublicById($product_id);
-
         return $this->success($product);
     }
 
+    /**
+     * [GET] /api/products/{slug}
+     */
     public function showBySlug(string $slug): ResponseDTO
     {
         $product = $this->readService->getPublicBySlug($slug);
-
         return $this->success($product);
     }
 
-    public function related(int $product_id, SearchProductRequest $request): ResponseDTO
+    /**
+     * [GET] /api/products/{product_id}/related
+     */
+    public function related(int $product_id, PublicSearchProductsRequest $req): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = GetRelatedProductsDTO::fromArray([
-            'productId' => $product_id,
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->readService->searchRelated($dto);
-
+        $result = $this->readService->searchRelated($req->toRelatedDTO($product_id));
         return $this->success($result);
     }
 }

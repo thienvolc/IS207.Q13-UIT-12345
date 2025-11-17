@@ -26,6 +26,7 @@ Route::prefix('products')->group(function () {
 
 Route::prefix('categories')->group(function () {
     Route::get('/', [PublicCategoryController::class, 'index']);
+    Route::get('/all', [PublicCategoryController::class, 'all']);
     Route::get('/{slug}', [PublicCategoryController::class, 'show']);
     Route::get('/{slug}/products', [ProductPublicController::class, 'searchByCategorySlug']);
 });
@@ -50,7 +51,7 @@ Route::middleware($auth)->prefix('me')->group(function () {
 
     Route::get('carts', [UserCartController::class, 'index']);
     Route::post('carts/items', [UserCartController::class, 'addItem']);
-    Route::delete('carts/items/{cart_item_id}', [UserCartController::class, 'deleteItem']);
+    Route::delete('carts/items/{cart_item_id}', [UserCartController::class, 'removeItem']);
     Route::delete('carts/clear', [UserCartController::class, 'clearCart']);
     Route::patch('carts/checkout', [UserCartController::class, 'checkout']);
 

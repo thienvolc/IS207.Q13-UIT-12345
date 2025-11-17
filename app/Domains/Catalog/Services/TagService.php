@@ -2,14 +2,16 @@
 
 namespace App\Domains\Catalog\Services;
 
-use App\Applications\DTOs\Responses\OffsetPageResponseDTO;
-use App\Applications\DTOs\Responses\PageResponseDTO;
-use App\Domains\Catalog\DTOs\Product\Responses\ProductAdminResponseDTO;
-use App\Domains\Catalog\DTOs\Tag\Requests\CreateTagDTO;
-use App\Domains\Catalog\DTOs\Tag\Requests\GetAllTagsDTO;
-use App\Domains\Catalog\DTOs\Tag\Requests\UpdateTagDTO;
-use App\Domains\Catalog\DTOs\Tag\Responses\TagResponseDTO;
+use App\Domains\Catalog\DTOs\Product\Responses\ProductDTO;
+use App\Domains\Catalog\DTOs\Tag\Commands\CreateTagDTO;
+use App\Domains\Catalog\DTOs\Tag\Commands\UpdateTagDTO;
+use App\Domains\Catalog\DTOs\Tag\Queries\SearchTagsDTO;
+use App\Domains\Catalog\DTOs\Tag\Responses\TagDTO;
+use App\Domains\Catalog\Mappers\ProductMapper;
+use App\Domains\Catalog\Mappers\TagMapper;
 use App\Domains\Catalog\Repositories\TagRepository;
+use App\Domains\Common\DTOs\OffsetPageResponseDTO;
+use App\Domains\Common\DTOs\PageResponseDTO;
 use App\Infra\Helpers\StringHelper;
 use App\Infra\Utils\Pagination\Pageable;
 use App\Infra\Utils\Pagination\PaginationUtil;
@@ -19,40 +21,50 @@ use Illuminate\Support\Facades\DB;
 readonly class TagService
 {
     public function __construct(
-        private TagRepository $tagRepository
+        private TagRepository $tagRepository,
+        private TagMapper     $tagMapper,
+        private ProductMapper $productMapper,
     ) {}
 
-    /** @return OffsetPageResponseDTO<ProductAdminResponseDTO> */
-    public function searchPublic(GetAllTagsDTO $dto): OffsetPageResponseDTO
+    /**
+     * @return OffsetPageResponseDTO<ProductDTO>
+     */
+    public function searchPublic(SearchTagsDTO $dto): OffsetPageResponseDTO
     {
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
         $size = $dto->limit;
         $pageable = Pageable::of($page, $size);
         $products = $this->tagRepository->searchPublic($pageable);
-        return OffsetPageResponseDTO::fromPaginator($products);
+
+        return OffsetPageResponseDTO::fromPaginator($products,
+            fn($p) => $this->productMapper->toPublicDTO($p));
     }
 
-    /** @return PageResponseDTO<ProductAdminResponseDTO> */
-    public function search(GetAllTagsDTO $dto): PageResponseDTO
+    /**
+     * @return PageResponseDTO<ProductDTO>
+     */
+    public function search(SearchTagsDTO $dto): PageResponseDTO
     {
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
         $size = $dto->limit;
         $pageable = Pageable::of($page, $size);
         $products = $this->tagRepository->searchPublic($pageable);
-        return PageResponseDTO::fromPaginator($products);
+
+        return PageResponseDTO::fromPaginator($products,
+            fn($p) => $this->productMapper->toDTO($p));
     }
 
-    public function create(CreateTagDTO $dto): TagResponseDTO
+    public function create(CreateTagDTO $dto): TagDTO
     {
         return DB::transaction(function () use ($dto) {
             $data = $this->prepareCreateData($dto);
             $tag = $this->tagRepository->create($data);
 
-            return TagResponseDTO::fromModel($tag);
+            return $this->tagMapper->toDTO($tag);
         });
     }
 
-    public function update(UpdateTagDTO $dto): TagResponseDTO
+    public function update(UpdateTagDTO $dto): TagDTO
     {
         $tag = $this->tagRepository->getByIdOrFail($dto->tagId);
 
@@ -61,11 +73,11 @@ readonly class TagService
             $tag->update($data);
             $tag->refresh();
 
-            return TagResponseDTO::fromModel($tag);
+            return $this->tagMapper->toDTO($tag);
         });
     }
 
-    public function delete(int $tagId): array
+    public function delete(int $tagId): TagDTO
     {
         $tag = $this->tagRepository->getByIdOrFail($tagId);
 
@@ -75,7 +87,7 @@ readonly class TagService
             $tag->products()->detach();
             $tag->delete();
 
-            return TagResponseDTO::fromModel($replica);
+            return $this->tagMapper->toDTO($replica);
         });
 
     }

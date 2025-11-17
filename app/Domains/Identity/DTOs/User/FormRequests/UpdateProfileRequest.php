@@ -2,6 +2,7 @@
 
 namespace App\Domains\Identity\DTOs\User\FormRequests;
 
+use App\Domains\Identity\DTOs\User\Commands\UpdateUserProfileDTO;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -37,5 +38,17 @@ class UpdateProfileRequest extends FormRequest
             'phone.unique' => 'This phone number is already in use by another user.',
             'avatar.url' => 'The avatar must be a valid URL.',
         ];
+    }
+
+    public function toDTO(): UpdateUserProfileDTO
+    {
+        $v = $this->validated();
+
+        return new UpdateUserProfileDTO(
+            firstName: string_or_null($v['first_name'] ?? null),
+            middleName: string_or_null($v['middle_name'] ?? null),
+            lastName: string_or_null($v['last_name'] ?? null),
+            phone: string_or_null($v['phone'] ?? null),
+        );
     }
 }

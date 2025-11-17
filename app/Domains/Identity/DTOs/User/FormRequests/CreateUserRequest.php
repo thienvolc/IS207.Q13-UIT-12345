@@ -2,6 +2,7 @@
 
 namespace App\Domains\Identity\DTOs\User\FormRequests;
 
+use App\Domains\Identity\DTOs\User\Commands\CreateUserDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateUserRequest extends FormRequest
@@ -24,6 +25,22 @@ class CreateUserRequest extends FormRequest
             'roles' => 'nullable|array',
             'roles.*.role_id' => 'required|integer|exists:roles,role_id',
         ];
+    }
+
+    public function toDTO(): CreateUserDTO
+    {
+        $v = $this->validated();
+
+        return new CreateUserDTO(
+            email: $v['email'],
+            password: $v['password'],
+            phone: string_or_null($v['phone'] ?? null),
+            firstName: string_or_null($v['first_name'] ?? null),
+            middleName: string_or_null($v['middle_name'] ?? null),
+            lastName: string_or_null($v['last_name'] ?? null),
+            isAdmin: (bool)($v['is_admin']),
+            roles: $v['roles'] ?? [],
+        );
     }
 }
 

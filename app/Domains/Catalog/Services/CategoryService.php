@@ -2,15 +2,16 @@
 
 namespace App\Domains\Catalog\Services;
 
-use App\Applications\DTOs\Responses\OffsetPageResponseDTO;
-use App\Applications\DTOs\Responses\PageResponseDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\CreateCategoryDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\SearchCategoriesAdminDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\SearchCategoriesPublicDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\UpdateCategoryDTO;
-use App\Domains\Catalog\DTOs\Category\Responses\CategoryPublicResponseDTO;
-use App\Domains\Catalog\DTOs\Category\Responses\CategoryResponseDTO;
+use App\Domains\Catalog\DTOs\Category\Commands\CreateCategoryDTO;
+use App\Domains\Catalog\DTOs\Category\Commands\UpdateCategoryDTO;
+use App\Domains\Catalog\DTOs\Category\Queries\AdminSearchCategoriesDTO;
+use App\Domains\Catalog\DTOs\Category\Queries\PublicSearchCategoriesDTO;
+use App\Domains\Catalog\DTOs\Category\Responses\PublicCategoryDTO;
+use App\Domains\Catalog\DTOs\Category\Responses\CategoryDTO;
+use App\Domains\Catalog\Mappers\CategoryMapper;
 use App\Domains\Catalog\Repositories\CategoryRepository;
+use App\Domains\Common\DTOs\OffsetPageResponseDTO;
+use App\Domains\Common\DTOs\PageResponseDTO;
 use App\Infra\Helpers\StringHelper;
 use App\Infra\Utils\Pagination\Pageable;
 use App\Infra\Utils\Pagination\PaginationUtil;
@@ -22,21 +23,22 @@ readonly class CategoryService
 {
     public function __construct(
         private CategoryRepository $categoryRepository,
+        private CategoryMapper     $categoryMapper,
     ) {}
 
     /**
-     * @return CategoryPublicResponseDTO[]
+     * @return PublicCategoryDTO[]
      */
     public function getAllPublic(): array
     {
         $categories = $this->categoryRepository->getAllWithChildren();
-        return CategoryPublicResponseDTO::collection($categories);
+        return $this->categoryMapper->toPublicDTOs($categories);
     }
 
     /**
-     * @return OffsetPageResponseDTO<CategoryPublicResponseDTO>
+     * @return OffsetPageResponseDTO<PublicCategoryDTO>
      */
-    public function searchPublic(SearchCategoriesPublicDTO $dto): OffsetPageResponseDTO
+    public function searchPublic(PublicSearchCategoriesDTO $dto): OffsetPageResponseDTO
     {
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
@@ -45,45 +47,47 @@ readonly class CategoryService
 
         $categories = $this->categoryRepository->searchPublic($pageable, $dto->level, $dto->query);
 
-        return OffsetPageResponseDTO::fromPaginator($categories);
+        return OffsetPageResponseDTO::fromPaginator($categories,
+            fn($c) => $this->categoryMapper->toPublicDTOs($c));
     }
 
-    public function getBySlug(string $slug): CategoryPublicResponseDTO
+    public function getBySlug(string $slug): PublicCategoryDTO
     {
         $category = $this->categoryRepository->getBySlugWithChildrenOrFail($slug);
-        return CategoryPublicResponseDTO::fromModel($category);
+        return $this->categoryMapper->toPublicDTO($category);
     }
 
     /**
-     * @return PageResponseDTO<CategoryResponseDTO>
+     * @return PageResponseDTO<CategoryDTO>
      */
-    public function search(SearchCategoriesAdminDTO $dto): PageResponseDTO
+    public function search(AdminSearchCategoriesDTO $dto): PageResponseDTO
     {
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $pageable = Pageable::of($dto->page, $dto->size, $sort);
 
         $categories = $this->categoryRepository->search($pageable, $dto->level, $dto->query);
 
-        return PageResponseDTO::fromPaginator($categories);
+        return PageResponseDTO::fromPaginator($categories,
+            fn($c) => $this->categoryMapper->toDTOs($c));
     }
 
-    public function getById(int $categoryId): CategoryResponseDTO
+    public function getById(int $categoryId): CategoryDTO
     {
         $category = $this->categoryRepository->getByIdWithChildrenOrFail($categoryId);
-        return CategoryResponseDTO::fromModel($category);
+        return $this->categoryMapper->toDTO($category);
     }
 
-    public function create(CreateCategoryDTO $dto): CategoryResponseDTO
+    public function create(CreateCategoryDTO $dto): CategoryDTO
     {
         return DB::transaction(function () use ($dto) {
             $data = $this->prepareCreateData($dto);
             $category = $this->categoryRepository->create($data);
 
-            return CategoryResponseDTO::fromModel($category);
+            return $this->categoryMapper->toDTO($category);
         });
     }
 
-    public function update(UpdateCategoryDTO $dto): CategoryResponseDTO
+    public function update(UpdateCategoryDTO $dto): CategoryDTO
     {
         $category = $this->categoryRepository->getByIdWithChildrenOrFail($dto->categoryId);
 
@@ -94,11 +98,11 @@ readonly class CategoryService
             $category->refresh();
             $category->load('children');
 
-            return CategoryResponseDTO::fromModel($category);
+            return $this->categoryMapper->toDTO($category);
         });
     }
 
-    public function delete(int $categoryId): array
+    public function delete(int $categoryId): CategoryDTO
     {
         $category = $this->categoryRepository->getByIdWithChildrenOrFail($categoryId);
 
@@ -109,7 +113,7 @@ readonly class CategoryService
             $replica = $category->replicate();
             $category->delete();
 
-            return CategoryResponseDTO::fromModel($replica);
+            return $this->categoryMapper->toDTO($replica);
         });
     }
 

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
-use App\Domains\Sales\DTOs\Order\FormRequest\GetOrdersRequest;
-use App\Domains\Sales\DTOs\Order\FormRequest\PlaceOrderRequest;
-use App\Domains\Sales\DTOs\Order\FormRequest\UpdateOrderShippingRequest;
-use App\Domains\Sales\DTOs\Order\Requests\GetUserOrdersDTO;
-use App\Domains\Sales\DTOs\Order\Requests\PlaceOrderDTO;
-use App\Domains\Sales\DTOs\Order\Requests\UpdateOrderShippingDTO;
-use App\Domains\Sales\Services\OrderService;
+use App\Domains\Order\DTOs\Commands\PlaceOrderDTO;
+use App\Domains\Order\DTOs\Commands\UpdateOrderShippingDTO;
+use App\Domains\Order\DTOs\FormRequest\PlaceOrderRequest;
+use App\Domains\Order\DTOs\FormRequest\UpdateOrderShippingRequest;
+use App\Domains\Order\DTOs\FormRequest\UserSearchOrdersRequest;
+use App\Domains\Order\DTOs\Queries\UserSearchOrdersDTO;
+use App\Domains\Order\Services\OrderService;
 use App\Http\Controllers\AppController;
 
 class UserOrderController extends AppController
@@ -21,30 +21,18 @@ class UserOrderController extends AppController
     /**
      * GET /me/orders
      */
-    public function index(GetOrdersRequest $request): ResponseDTO
+    public function index(UserSearchOrdersRequest $req): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = GetUserOrdersDTO::fromArray([
-            'status' => $request->input('status'),
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sort_field' => $sortField,
-            'sort_order' => $sortOrder,
-        ]);
-
-        $orders = $this->orderService->searchUserOrders($dto);
-
+        $orders = $this->orderService->searchUserOrders($req->toDTO());
         return $this->success($orders);
     }
 
     /**
      * POST /me/orders
      */
-    public function place(PlaceOrderRequest $request): ResponseDTO
+    public function place(PlaceOrderRequest $req): ResponseDTO
     {
-        $dto = PlaceOrderDTO::fromArray($request->validated());
-        $order = $this->orderService->placeOrder($dto);
+        $order = $this->orderService->placeOrder($req->toDTO());
         return $this->created($order);
     }
 
@@ -69,10 +57,9 @@ class UserOrderController extends AppController
     /**
      * PATCH /me/orders/{order_id}/shipping
      */
-    public function updateShipping(UpdateOrderShippingRequest $request, int $order_id): ResponseDTO
+    public function updateShipping(UpdateOrderShippingRequest $req, int $order_id): ResponseDTO
     {
-        $dto = UpdateOrderShippingDTO::fromArray($request->validated(), $order_id);
-        $order = $this->orderService->updateShippingInfo($dto);
+        $order = $this->orderService->updateShippingInfo($req->toDTO($order_id));
         return $this->success($order);
     }
 

@@ -4,11 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
 use App\Domains\Catalog\DTOs\Category\FormRequests\CreateCategoryRequest;
-use App\Domains\Catalog\DTOs\Category\FormRequests\SearchCategoryRequest;
+use App\Domains\Catalog\DTOs\Category\FormRequests\SearchCategoriesRequest;
 use App\Domains\Catalog\DTOs\Category\FormRequests\UpdateCategoryRequest;
-use App\Domains\Catalog\DTOs\Category\Requests\CreateCategoryDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\SearchCategoriesAdminDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\UpdateCategoryDTO;
 use App\Domains\Catalog\Services\CategoryService;
 use App\Http\Controllers\AppController;
 
@@ -18,54 +15,48 @@ class CategoryController extends AppController
         private readonly CategoryService $categoryService
     ) {}
 
-    public function index(SearchCategoryRequest $request): ResponseDTO
+    /**
+     * [GET] /api/admin/categories
+     */
+    public function index(SearchCategoriesRequest $req): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = SearchCategoriesAdminDTO::fromArray([
-            'level' => $request->input('level'),
-            'page' => $request->getPage(),
-            'size' => $request->getSize(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->categoryService->search($dto);
-
+        $result = $this->categoryService->search($req->toAdminDTO());
         return $this->success($result);
     }
 
+    /**
+     * [GET] /api/admin/categories/{category_id}
+     */
     public function show(int $category_id): ResponseDTO
     {
         $category = $this->categoryService->getById($category_id);
-
         return $this->success($category);
     }
 
-    public function store(CreateCategoryRequest $request): ResponseDTO
+    /**
+     * [POST] /api/admin/categories
+     */
+    public function store(CreateCategoryRequest $req): ResponseDTO
     {
-        $dto = CreateCategoryDTO::fromArray($request->validated());
-        $category = $this->categoryService->create($dto);
-
+        $category = $this->categoryService->create($req->toDTO());
         return $this->created($category);
     }
 
-    public function update(UpdateCategoryRequest $request, int $category_id): ResponseDTO
+    /**
+     * [PUT] /api/admin/categories/{category_id}
+     */
+    public function update(UpdateCategoryRequest $req, int $category_id): ResponseDTO
     {
-        $dto = UpdateCategoryDTO::fromArray([
-            'category_id' => $category_id,
-            ...$request->validated()
-        ]);
-
-        $category = $this->categoryService->update($dto);
-
+        $category = $this->categoryService->update($req->toDTO($category_id));
         return $this->success($category);
     }
 
+    /**
+     * [DELETE] /api/admin/categories/{category_id}
+     */
     public function destroy(int $category_id): ResponseDTO
     {
         $category = $this->categoryService->delete($category_id);
-
         return $this->success($category);
     }
 }

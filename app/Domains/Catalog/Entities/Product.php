@@ -2,7 +2,7 @@
 
 namespace App\Domains\Catalog\Entities;
 
-use App\Domains\Sales\Entities\OrderItem;
+use App\Domains\Order\Entities\OrderItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +17,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property mixed $status
  * @property mixed $title
  * @property mixed $published_at
+ * @property mixed $categories
+ * @property mixed $tags
+ * @property mixed $meta_title
+ * @property mixed $slug
  */
 class Product extends Model
 {
@@ -24,7 +28,6 @@ class Product extends Model
     protected $table = 'products';
 
     protected $fillable = [
-        'category_id',
         'title',
         'meta_title',
         'slug',

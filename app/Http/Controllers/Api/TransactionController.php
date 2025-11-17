@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
-use App\Domains\Sales\DTOs\Transaction\FormRequest\SearchTransactionsRequest;
-use App\Domains\Sales\DTOs\Transaction\Requests\SearchTransactionsDTO;
-use App\Domains\Sales\Services\TransactionService;
+use App\Domains\Transaction\DTOs\FormRequest\SearchTransactionsRequest;
+use App\Domains\Transaction\DTOs\Queries\SearchTransactionsDTO;
+use App\Domains\Transaction\Services\TransactionService;
 use App\Http\Controllers\AppController;
 
 class TransactionController extends AppController

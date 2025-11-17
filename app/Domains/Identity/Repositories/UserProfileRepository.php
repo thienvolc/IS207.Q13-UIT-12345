@@ -16,9 +16,4 @@ class UserProfileRepository
     {
         return UserProfile::create($data);
     }
-
-    public function delete(User $user): bool
-    {
-        return $user->profile()->delete();
-    }
 }

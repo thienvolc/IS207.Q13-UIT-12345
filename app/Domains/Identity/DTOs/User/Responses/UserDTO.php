@@ -4,52 +4,28 @@ namespace App\Domains\Identity\DTOs\User\Responses;
 
 use App\Domains\Common\DTOs\BaseDTO;
 
-readonly class UserDTO implements BaseDTO
+class UserDTO implements BaseDTO
 {
     public function __construct(
-        public int $userId,
-        public string $email,
+        public int     $userId,
+        public string  $email,
         public ?string $phone,
-        public bool $isAdmin,
-        public int $status,
-        public ?string $firstName = null,
-        public ?string $middleName = null,
-        public ?string $lastName = null,
-        public ?string $avatar = null,
-        public ?array $profile = null,
-        public ?string $registeredAt = null,
-        public ?string $lastLogin = null,
+        public string  $isAdmin,
+        public string  $status,
+        public string  $firstName,
+        public ?string $middleName,
+        public string  $lastName,
+        public ?string $avatar,
+        public ?string $profile,
+        public string  $registeredAt,
+        public string  $lastLogin,
+        public string  $createdAt,
+        public string  $updatedAt,
+        public string  $createdBy,
+        public string  $updatedBy,
+        /** @var RoleDTO[] */
+        public array   $roles
     ) {}
-
-    public static function fromModel($user): self
-    {
-        $profile = null;
-        $firstName = $middleName = $lastName = $avatar = null;
-        if ($user->relationLoaded('profile') && $user->profile) {
-            $p = $user->profile;
-            $firstName = $p->first_name;
-            $middleName = $p->middle_name;
-            $lastName = $p->last_name;
-            $avatar = $p->avatar;
-            // keep profile raw array/object if necessary
-            $profile = method_exists($p, 'toArray') ? $p->toArray() : (array)$p;
-        }
-
-        return new self(
-            userId: $user->user_id,
-            email: $user->email,
-            phone: $user->phone,
-            isAdmin: (bool)$user->is_admin,
-            status: $user->status,
-            firstName: $firstName,
-            middleName: $middleName,
-            lastName: $lastName,
-            avatar: $avatar,
-            profile: $profile,
-            registeredAt: optional($user->registered_at)?->toIso8601String(),
-            lastLogin: optional($user->last_login)?->toIso8601String(),
-        );
-    }
 
     public function toArray(): array
     {
@@ -66,11 +42,11 @@ readonly class UserDTO implements BaseDTO
             'profile' => $this->profile,
             'registered_at' => $this->registeredAt,
             'last_login' => $this->lastLogin,
+            'created_at' => $this->createdAt,
+            'updated_at' => $this->updatedAt,
+            'created_by' => $this->createdBy,
+            'updated_by' => $this->updatedBy,
+            'roles' => array_map(fn($role) => $role->toArray(), $this->roles),
         ];
-    }
-
-    public static function collection($users): array
-    {
-        return $users->map(fn($u) => self::fromModel($u)->toArray())->toArray();
     }
 }

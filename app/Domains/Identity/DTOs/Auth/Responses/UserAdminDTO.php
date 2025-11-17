@@ -16,7 +16,6 @@ class UserAdminDTO
             'updated_at' => $user->updated_at?->toIso8601String(),
         ];
 
-        // Include profile if loaded
         if ($user->relationLoaded('profile') && $user->profile) {
             $data['first_name'] = $user->profile->first_name;
             $data['middle_name'] = $user->profile->middle_name;
@@ -37,7 +36,6 @@ class UserAdminDTO
             ]];
         }
 
-        // Include roles if loaded
         if ($user->relationLoaded('roles')) {
             $data['roles'] = $user->roles->map(function ($role) {
                 return [
@@ -48,11 +46,6 @@ class UserAdminDTO
         }
 
         return $data;
-    }
-
-    public static function collection($users): array
-    {
-        return $users->map(fn($user) => self::transform($user))->toArray();
     }
 }
 

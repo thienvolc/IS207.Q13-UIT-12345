@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
+use App\Domains\Identity\DTOs\User\Commands\AssignRolesDTO;
+use App\Domains\Identity\DTOs\User\Commands\CreateUserDTO;
+use App\Domains\Identity\DTOs\User\Commands\UpdateUserStatusDTO;
 use App\Domains\Identity\DTOs\User\FormRequests\AssignRolesRequest;
 use App\Domains\Identity\DTOs\User\FormRequests\CreateUserRequest;
 use App\Domains\Identity\DTOs\User\FormRequests\SearchUsersRequest;
 use App\Domains\Identity\DTOs\User\FormRequests\UpdateUserStatusRequest;
-use App\Domains\Identity\DTOs\User\Requests\AssignRolesDTO;
-use App\Domains\Identity\DTOs\User\Requests\CreateUserDTO;
-use App\Domains\Identity\DTOs\User\Requests\SearchUsersDTO;
-use App\Domains\Identity\DTOs\User\Requests\UpdateUserStatusDTO;
+use App\Domains\Identity\DTOs\User\Queries\SearchUsersDTO;
 use App\Domains\Identity\Services\UserService;
 use App\Http\Controllers\AppController;
 
@@ -50,7 +50,7 @@ class UserController extends AppController
     public function store(CreateUserRequest $request): ResponseDTO
     {
         $dto = CreateUserDTO::fromArray($request->validated());
-        $user = $this->userService->createUser($dto);
+        $user = $this->userService->create($dto);
         return $this->created($user);
     }
 
@@ -68,7 +68,7 @@ class UserController extends AppController
      */
     public function destroy(int $user_id): ResponseDTO
     {
-        $user = $this->userService->deleteUser($user_id);
+        $user = $this->userService->deleteById($user_id);
         return $this->success($user);
     }
 

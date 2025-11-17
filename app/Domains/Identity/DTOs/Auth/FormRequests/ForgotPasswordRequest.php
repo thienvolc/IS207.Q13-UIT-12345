@@ -2,6 +2,7 @@
 
 namespace App\Domains\Identity\DTOs\Auth\FormRequests;
 
+use App\Domains\Identity\DTOs\Auth\Commands\SendPasswordResetDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ForgotPasswordRequest extends FormRequest
@@ -16,6 +17,15 @@ class ForgotPasswordRequest extends FormRequest
         return [
             'email' => 'required|email|max:100',
         ];
+    }
+
+    public function toDTO(): SendPasswordResetDTO
+    {
+        $v = $this->validated();
+
+        return new SendPasswordResetDTO(
+            email: $v['email'],
+        );
     }
 }
 

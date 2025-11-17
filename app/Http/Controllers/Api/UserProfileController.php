@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
+use App\Domains\Identity\DTOs\User\Commands\UpdateUserProfileDTO;
+use App\Domains\Identity\DTOs\User\Commands\UpdatePasswordDTO;
 use App\Domains\Identity\DTOs\User\FormRequests\UpdatePasswordRequest;
 use App\Domains\Identity\DTOs\User\FormRequests\UpdateProfileRequest;
-use App\Domains\Identity\DTOs\User\Requests\UpdateCurrentUserDTO;
-use App\Domains\Identity\DTOs\User\Requests\UpdatePasswordDTO;
 use App\Domains\Identity\Services\UserService;
 use App\Http\Controllers\AppController;
 
@@ -23,7 +23,7 @@ class UserProfileController extends AppController
      */
     public function show(): ResponseDTO
     {
-        $user = $this->userService->getCurrentUser();
+        $user = $this->userService->getCurrent();
         return $this->success($user);
     }
 
@@ -32,8 +32,8 @@ class UserProfileController extends AppController
      */
     public function update(UpdateProfileRequest $request): ResponseDTO
     {
-        $dto = UpdateCurrentUserDTO::fromArray($request->validated());
-        $user = $this->userService->updateCurrentUser($dto);
+        $dto = UpdateUserProfileDTO::fromArray($request->validated());
+        $user = $this->userService->updateCurrent($dto);
         return $this->success($user);
     }
 

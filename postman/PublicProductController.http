@@ -23,7 +23,7 @@ GET {{base_url}}/api/products/chu%E1%BB%99t-logitech-model-557
 Accept: application/json
 
 ### Search products by category slug
-GET {{base_url}}/api/categories/tai-nghe/products
+GET {{base_url}}/api/categories/updated-category/products
     ?offset=1&limit=20
     &sort=created_at:desc
 Accept: application/json

@@ -2,16 +2,17 @@
 
 namespace App\Domains\Catalog\Services;
 
-use App\Applications\DTOs\Responses\OffsetPageResponseDTO;
-use App\Applications\DTOs\Responses\PageResponseDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\GetProductsByCategoryDTO;
-use App\Domains\Catalog\DTOs\Product\Requests\GetRelatedProductsDTO;
-use App\Domains\Catalog\DTOs\Product\Requests\SearchProductsAdminDTO;
-use App\Domains\Catalog\DTOs\Product\Requests\SearchProductsPublicDTO;
-use App\Domains\Catalog\DTOs\Product\Responses\ProductAdminResponseDTO;
-use App\Domains\Catalog\DTOs\Product\Responses\ProductPublicResponseDTO;
-use App\Domains\Catalog\DTOs\Tag\Requests\GetProductsByTagDTO;
+use App\Domains\Catalog\DTOs\Category\Queries\SearchProductsByCategorySlugDTO;
+use App\Domains\Catalog\DTOs\Product\Queries\SearchRelatedProductsDTO;
+use App\Domains\Catalog\DTOs\Product\Queries\AdminSearchProductsDTO;
+use App\Domains\Catalog\DTOs\Product\Queries\PublicSearchProductsDTO;
+use App\Domains\Catalog\DTOs\Product\Responses\ProductDTO;
+use App\Domains\Catalog\DTOs\Product\Responses\PublicProductDTO;
+use App\Domains\Catalog\DTOs\Tag\Queries\SearchProductsByTagDTO;
+use App\Domains\Catalog\Mappers\ProductMapper;
 use App\Domains\Catalog\Repositories\ProductRepository;
+use App\Domains\Common\DTOs\OffsetPageResponseDTO;
+use App\Domains\Common\DTOs\PageResponseDTO;
 use App\Infra\Utils\Pagination\Pageable;
 use App\Infra\Utils\Pagination\PaginationUtil;
 use App\Infra\Utils\Pagination\Sort;
@@ -19,29 +20,32 @@ use App\Infra\Utils\Pagination\Sort;
 readonly class ProductReadService
 {
     public function __construct(
-        private ProductRepository $productRepository
+        private ProductRepository $productRepository,
+        private ProductMapper     $productMapper
     ) {}
 
-    public function getById(int $productId): ProductAdminResponseDTO
+    public function getById(int $productId): ProductDTO
     {
         $product = $this->productRepository->getByIdOrFail($productId);
-        return ProductAdminResponseDTO::fromModel($product);
+        return $this->productMapper->toDTO($product);
     }
 
-    public function getPublicById(int $productId): ProductPublicResponseDTO
+    public function getPublicById(int $productId): PublicProductDTO
     {
         $product = $this->productRepository->getActiveByIdWithRelationsOrFail($productId);
-        return ProductPublicResponseDTO::fromModel($product);
+        return $this->productMapper->toPublicDTO($product);
     }
 
-    public function getPublicBySlug(string $slug): ProductPublicResponseDTO
+    public function getPublicBySlug(string $slug): PublicProductDTO
     {
         $product = $this->productRepository->getActiveBySlugWithRelationsOrFail($slug);
-        return ProductPublicResponseDTO::fromModel($product);
+        return $this->productMapper->toPublicDTO($product);
     }
 
-    /** @return OffsetPageResponseDTO<ProductPublicResponseDTO> */
-    public function searchPublicByCategorySlug(GetProductsByCategoryDTO $dto): OffsetPageResponseDTO
+    /**
+     * @return OffsetPageResponseDTO<PublicProductDTO>
+     */
+    public function searchPublicByCategorySlug(SearchProductsByCategorySlugDTO $dto): OffsetPageResponseDTO
     {
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
@@ -50,11 +54,14 @@ readonly class ProductReadService
 
         $products = $this->productRepository->searchPublicByCategorySlug($pageable, $dto->slug);
 
-        return OffsetPageResponseDTO::fromPaginator($products);
+        return OffsetPageResponseDTO::fromPaginator($products,
+            fn($p) => $this->productMapper->toPublicDTO($p));
     }
 
-    /** @return OffsetPageResponseDTO<ProductPublicResponseDTO> */
-    public function searchPublicByTagId(GetProductsByTagDTO $dto): OffsetPageResponseDTO
+    /**
+     * @return OffsetPageResponseDTO<PublicProductDTO>
+     */
+    public function searchPublicByTagId(SearchProductsByTagDTO $dto): OffsetPageResponseDTO
     {
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
@@ -63,37 +70,46 @@ readonly class ProductReadService
 
         $products = $this->productRepository->searchPublicByTagId($pageable, $dto->tagId);
 
-        return OffsetPageResponseDTO::fromPaginator($products);
+        return OffsetPageResponseDTO::fromPaginator($products,
+            fn($p) => $this->productMapper->toPublicDTO($p));
     }
 
-    /** @return PageResponseDTO<ProductAdminResponseDTO> */
-    public function search(SearchProductsAdminDTO $dto): PageResponseDTO
+    /**
+     * @return PageResponseDTO<ProductDTO>
+     */
+    public function search(AdminSearchProductsDTO $dto): PageResponseDTO
     {
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $pageable = Pageable::of($dto->page, $dto->size, $sort);
-        $filters = $dto->getFilters();
+        $filters = $dto->getFilter();
 
         $products = $this->productRepository->search($pageable, $filters);
 
-        return PageResponseDTO::fromPaginator($products);
+        return PageResponseDTO::fromPaginator($products,
+            fn($p) => $this->productMapper->toDTO($p));
     }
 
-    /** @return OffsetPageResponseDTO<ProductPublicResponseDTO> */
-    public function searchPublic(SearchProductsPublicDTO $dto): OffsetPageResponseDTO
+    /**
+     * @return OffsetPageResponseDTO<PublicProductDTO>
+     */
+    public function searchPublic(PublicSearchProductsDTO $dto): OffsetPageResponseDTO
     {
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
         $size = $dto->limit;
         $pageable = Pageable::of($page, $size, $sort);
-        $filters = $dto->getFilters();
+        $filters = $dto->getFilter();
 
         $products = $this->productRepository->searchPublic($pageable, $filters);
 
-        return OffsetPageResponseDTO::fromPaginator($products);
+        return OffsetPageResponseDTO::fromPaginator($products,
+            fn($p) => $this->productMapper->toPublicDTO($p));
     }
 
-    /** @return OffsetPageResponseDTO<ProductPublicResponseDTO> */
-    public function searchRelated(GetRelatedProductsDTO $dto): OffsetPageResponseDTO
+    /**
+     * @return OffsetPageResponseDTO<PublicProductDTO>
+     */
+    public function searchRelated(SearchRelatedProductsDTO $dto): OffsetPageResponseDTO
     {
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
@@ -111,6 +127,7 @@ readonly class ProductReadService
             $tagIds
         );
 
-        return OffsetPageResponseDTO::fromPaginator($products);
+        return OffsetPageResponseDTO::fromPaginator($products,
+            fn($p) => $this->productMapper->toPublicDTO($p));
     }
 }

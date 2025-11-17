@@ -3,9 +3,9 @@
 namespace App\Domains\Catalog\Repositories;
 
 use App\Domains\Catalog\Constants\ProductStatus;
-use App\Domains\Catalog\DTOs\Product\Requests\ProductAdminFilter;
-use App\Domains\Catalog\DTOs\Product\Requests\ProductFilter;
-use App\Domains\Catalog\DTOs\Product\Requests\ProductPublicFilter;
+use App\Domains\Catalog\DTOs\Product\Queries\AdminProductFilter;
+use App\Domains\Catalog\DTOs\Product\Queries\ProductFilter;
+use App\Domains\Catalog\DTOs\Product\Queries\PublicProductFilter;
 use App\Domains\Catalog\Entities\Product;
 use App\Domains\Common\Constants\ResponseCode;
 use App\Exceptions\BusinessException;
@@ -65,7 +65,7 @@ class ProductRepository
             ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 
-    public function search(Pageable $pageable, ProductAdminFilter $filters): LengthAwarePaginator
+    public function search(Pageable $pageable, AdminProductFilter $filters): LengthAwarePaginator
     {
         $query = Product::query()->with(['categories', 'tags', 'metas']);
         $this->applyFilters($query, $filters);
@@ -75,7 +75,7 @@ class ProductRepository
             ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 
-    public function searchPublic(Pageable $pageable, ProductPublicFilter $filters): LengthAwarePaginator
+    public function searchPublic(Pageable $pageable, PublicProductFilter $filters): LengthAwarePaginator
     {
         $query = Product::query()->with(['categories', 'tags', 'metas']);
         $this->applyFilters($query, $filters);

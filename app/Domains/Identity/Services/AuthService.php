@@ -4,10 +4,10 @@ namespace App\Domains\Identity\Services;
 
 use App\Domains\Common\Constants\ResponseCode;
 use App\Domains\Identity\Constants\UserStatus;
-use App\Domains\Identity\DTOs\Auth\Requests\LoginDTO;
-use App\Domains\Identity\DTOs\Auth\Requests\RegisterDTO;
-use App\Domains\Identity\DTOs\Auth\Requests\ResetPasswordDTO;
-use App\Domains\Identity\DTOs\Auth\Requests\SendPasswordResetDTO;
+use App\Domains\Identity\DTOs\Auth\Commands\LoginDTO;
+use App\Domains\Identity\DTOs\Auth\Commands\RegisterDTO;
+use App\Domains\Identity\DTOs\Auth\Commands\ResetPasswordDTO;
+use App\Domains\Identity\DTOs\Auth\Commands\SendPasswordResetDTO;
 use App\Domains\Identity\Entities\User;
 use App\Domains\Identity\Mappers\AuthMapper;
 use App\Domains\Identity\Repositories\AuthRepository;
@@ -26,9 +26,7 @@ readonly class AuthService
         private UserRepository        $userRepository,
         private UserProfileRepository $userProfileRepository,
         private AuthRepository        $authRepository
-    )
-    {
-    }
+    ) {}
 
     public function register(RegisterDTO $registerDto): array
     {

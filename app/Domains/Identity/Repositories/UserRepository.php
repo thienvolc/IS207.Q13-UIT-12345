@@ -2,24 +2,26 @@
 
 namespace App\Domains\Identity\Repositories;
 
+use App\Domains\Common\Constants\ResponseCode;
+use App\Domains\Identity\DTOs\User\Queries\UserFilter;
 use App\Domains\Identity\Entities\User;
+use App\Exceptions\BusinessException;
+use App\Infra\Utils\Pagination\Pageable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserRepository
 {
-    public function findById(int $userId): ?User
+    public function findByIdWithRolesOrFail(int $userId): ?User
     {
-        return User::with(['profile', 'roles'])->find($userId);
+        return User::with(['profile', 'roles'])->find($userId)
+            ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 
-    public function findByIdWithRelations(int $userId, array $relations): ?User
+    public function getByIdOrFail(int $authId): ?User
     {
-        return User::with($relations)->find($userId);
-    }
-
-    public function findAuthenticatedUser(int $authId): ?User
-    {
-        return User::with('profile')->find($authId);
+        return User::with('profile')->find($authId)
+            ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 
     public function findByEmail(string $email): ?User
@@ -47,19 +49,20 @@ class UserRepository
         return User::create($data);
     }
 
-    public function update(User $user, array $data): bool
-    {
-        return $user->update($data);
-    }
-
     public function updatePasswordByEmail(string $email, string $hashedPassword): int
     {
         return User::where('email', $email)->update(['password' => $hashedPassword]);
     }
 
-    public function delete(User $user): bool
+    public function searchUsers(Pageable $pageable, UserFilter $filters): LengthAwarePaginator
     {
-        return $user->delete();
+        $query = User::query()->with(['profile', 'roles']);
+
+        $this->applyFilters($query, $filters);
+
+        return $query
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 
     public function searchWithFilters(array $filters, string $sortField, string $sortOrder, int $offset, int $limit): Collection

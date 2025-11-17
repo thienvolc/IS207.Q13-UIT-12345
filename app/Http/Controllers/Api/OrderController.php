@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
-use App\Domains\Sales\DTOs\Order\FormRequest\SearchOrdersAdminRequest;
-use App\Domains\Sales\DTOs\Order\FormRequest\UpdateOrderStatusRequest;
-use App\Domains\Sales\DTOs\Order\Requests\SearchOrdersAdminDTO;
-use App\Domains\Sales\DTOs\Order\Requests\UpdateOrderStatusDTO;
-use App\Domains\Sales\Services\OrderService;
+use App\Domains\Order\DTOs\FormRequest\AdminSearchOrdersRequest;
+use App\Domains\Order\DTOs\FormRequest\UpdateOrderStatusRequest;
+use App\Domains\Order\Services\OrderService;
 use App\Http\Controllers\AppController;
 
 class OrderController extends AppController
@@ -19,26 +17,9 @@ class OrderController extends AppController
     /**
      * [GET] /admin/orders
      */
-    public function index(SearchOrdersAdminRequest $request): ResponseDTO
+    public function index(AdminSearchOrdersRequest $req): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = SearchOrdersAdminDTO::fromArray([
-            'query' => $request->input('query'),
-            'status' => $request->input('status'),
-            'user_id' => $request->input('user_id'),
-            'start' => $request->input('start'),
-            'end' => $request->input('end'),
-            'min' => $request->input('min'),
-            'max' => $request->input('max'),
-            'page' => $request->getPage(),
-            'size' => $request->getSize(),
-            'sort_field' => $sortField,
-            'sort_order' => $sortOrder,
-        ]);
-
-        $orders = $this->orderService->search($dto);
-
+        $orders = $this->orderService->searchOrders($req->toDTO());
         return $this->success($orders);
     }
 
@@ -63,10 +44,9 @@ class OrderController extends AppController
     /**
      * [PATCH] /admin/orders/{order_id}/status
      */
-    public function updateStatus(UpdateOrderStatusRequest $request, int $order_id): ResponseDTO
+    public function updateStatus(UpdateOrderStatusRequest $req, int $order_id): ResponseDTO
     {
-        $dto = UpdateOrderStatusDTO::fromArray($request->validated(), $order_id);
-        $result = $this->orderService->updateOrderStatus($dto);
+        $result = $this->orderService->updateOrderStatus($req->toDTO($order_id));
         return $this->success($result);
     }
 

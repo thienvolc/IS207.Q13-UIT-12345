@@ -2,6 +2,7 @@
 
 namespace App\Domains\Identity\DTOs\Auth\FormRequests;
 
+use App\Domains\Identity\DTOs\Auth\Commands\LoginDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
@@ -17,6 +18,16 @@ class LoginRequest extends FormRequest
             'email' => 'required|email|max:100',
             'password' => 'required|string',
         ];
+    }
+
+    public function toDTO(): LoginDTO
+    {
+        $v = $this->validated();
+
+        return new LoginDTO(
+            email: $v['email'],
+            password: $v['password'],
+        );
     }
 }
 

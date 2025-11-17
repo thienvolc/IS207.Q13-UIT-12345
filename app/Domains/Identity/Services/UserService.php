@@ -3,20 +3,24 @@
 namespace App\Domains\Identity\Services;
 
 use App\Domains\Common\Constants\ResponseCode;
+use App\Domains\Common\DTOs\PageResponseDTO;
 use App\Domains\Identity\Constants\UserStatus;
-use App\Domains\Identity\DTOs\Auth\Responses\UserAdminDTO;
-use App\Domains\Identity\DTOs\User\Requests\AssignRolesDTO;
-use App\Domains\Identity\DTOs\User\Requests\CreateUserDTO;
-use App\Domains\Identity\DTOs\User\Requests\SearchUsersDTO;
-use App\Domains\Identity\DTOs\User\Requests\UpdateCurrentUserDTO;
-use App\Domains\Identity\DTOs\User\Requests\UpdatePasswordDTO;
-use App\Domains\Identity\DTOs\User\Requests\UpdateUserStatusDTO;
+use App\Domains\Identity\DTOs\User\Commands\AssignRolesDTO;
+use App\Domains\Identity\DTOs\User\Commands\CreateUserDTO;
+use App\Domains\Identity\DTOs\User\Commands\UpdateUserProfileDTO;
+use App\Domains\Identity\DTOs\User\Commands\UpdatePasswordDTO;
+use App\Domains\Identity\DTOs\User\Commands\UpdateUserStatusDTO;
+use App\Domains\Identity\DTOs\User\Queries\SearchUsersDTO;
+use App\Domains\Identity\DTOs\User\Responses\CurrentUserDTO;
 use App\Domains\Identity\DTOs\User\Responses\UserDTO;
+use App\Domains\Identity\DTOs\User\Responses\UserEmailDTO;
 use App\Domains\Identity\Entities\User;
+use App\Domains\Identity\Mappers\UserMapper;
 use App\Domains\Identity\Repositories\UserProfileRepository;
 use App\Domains\Identity\Repositories\UserRepository;
 use App\Exceptions\BusinessException;
-use App\Infra\Utils\Pagination\PaginationUtil;
+use App\Infra\Utils\Pagination\Pageable;
+use App\Infra\Utils\Pagination\Sort;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -24,177 +28,132 @@ use Illuminate\Support\Facades\Hash;
 readonly class UserService
 {
     public function __construct(
+        private UserMapper            $userMapper,
         private UserRepository        $userRepository,
         private UserProfileRepository $userProfileRepository
-    )
+    ) {}
+
+    public function getCurrent(): CurrentUserDTO
     {
+        $user = $this->userRepository->getByIdOrFail($this->userId());
+        return $this->userMapper->toCurrentDTO($user);
     }
 
-    public function getCurrentUser(): array
+    public function updateCurrent(UpdateUserProfileDTO $dto): CurrentUserDTO
     {
-        $user = $this->findAuthenticatedUser();
-        return UserDTO::transform($user);
-    }
+        $userId = $this->userId();
 
-    public function updateCurrentUser(UpdateCurrentUserDTO $dto): array
-    {
-        return DB::transaction(function () use ($dto) {
-            $user = $this->findAuthenticatedUser();
+        return DB::transaction(function () use ($userId, $dto) {
+            $user = $this->userRepository->getByIdOrFail($userId);
 
+            $this->updateUserPhone($user, $dto->phone);
             $this->updateUserProfile($user, $dto);
-            $this->updateUserPhone($user, $dto);
 
             $user->load('profile');
-            return UserDTO::transform($user);
+            return $this->userMapper->toCurrentDTO($user);
         });
     }
 
-    public function updatePassword(UpdatePasswordDTO $dto): array
+    public function updatePassword(UpdatePasswordDTO $dto): UserEmailDTO
     {
         return DB::transaction(function () use ($dto) {
-            $user = $this->findAuthenticatedUser();
+            $user = $this->userRepository->getByIdOrFail($this->userId());
+
             $this->assertOldPasswordMatches($user, $dto->oldPassword);
+            $user->update(['password' => Hash::make($dto->newPassword)]);
 
-            $this->userRepository->update($user, ['password' => Hash::make($dto->newPassword)]);
-
-            return [
-                'user_id' => $user->user_id,
-                'email' => $user->email,
-            ];
+            return $this->userMapper->toEmailDTO($user);
         });
     }
 
-    public function searchUsers(SearchUsersDTO $dto): array
+    /**
+     * @return PageResponseDTO<UserDTO>
+     */
+    public function searchUsers(SearchUsersDTO $dto): PageResponseDTO
     {
         $filters = $dto->getFilters();
-        $offset = ($dto->page - 1) * $dto->size;
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $pageable = Pageable::of($dto->page, $dto->size, $sort);
 
-        $totalCount = $this->userRepository->countWithFilters($filters);
-        $users = $this->userRepository->searchWithFilters($filters, $dto->sortField, $dto->sortOrder, $offset, $dto->size);
+        $users = $this->userRepository->searchUsers($pageable, $filters);
 
-        return PaginationUtil::fromPageSize(
-            UserAdminDTO::collection($users),
-            $dto->page,
-            $dto->size,
-            $totalCount
-        );
+        return PageResponseDTO::fromPaginator($users,
+            fn($user) => $this->userMapper->toDTOs($user));
     }
 
-    public function createUser(CreateUserDTO $dto): array
+    public function create(CreateUserDTO $dto): UserDTO
     {
         return DB::transaction(function () use ($dto) {
-            $this->ensureEmailUnique($dto->email);
+            $this->assertEmailUnique($dto->email);
 
-            $user = $this->createUserRecord($dto);
+            $user = $this->createUser($dto);
             $this->createUserProfile($user, $dto);
             $this->assignUserRoles($user, $dto->roles);
 
             $user->load(['profile', 'roles']);
-            return UserAdminDTO::transform($user);
+            return $this->userMapper->toDTO($user);
         });
     }
 
-    public function getUserById(int $userId): array
+    public function getUserById(int $userId): UserDTO
     {
-        $user = $this->userRepository->findById($userId);
-
-        if (!$user) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
-
-        return UserAdminDTO::transform($user);
+        $user = $this->userRepository->findByIdWithRolesOrFail($userId);
+        return $this->userMapper->toDTO($user);
     }
 
-    public function deleteUser(int $userId): array
+    public function deleteById(int $userId): UserDTO
     {
         return DB::transaction(function () use ($userId) {
-            $user = $this->userRepository->findById($userId);
-
-            if (!$user) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
+            $user = $this->userRepository->findByIdWithRolesOrFail($userId);
 
             $this->assertNotDeletingOwnAccount($user);
 
-            $deletedUser = $user->replicate();
-            $deletedUser->load(['profile', 'roles']);
+            $replica = $user->replicate();
+            $replica->load(['profile', 'roles']);
 
             $this->deleteUserData($user);
 
-            return UserAdminDTO::transform($deletedUser);
+            return $this->userMapper->toDTO($replica);
         });
     }
 
     public function updateUserStatus(UpdateUserStatusDTO $dto): array
     {
         return DB::transaction(function () use ($dto) {
-            $user = $this->userRepository->findById($dto->userId);
+            $user = $this->userRepository->findByIdWithRolesOrFail($dto->userId);
 
-            if (!$user) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
+            $user->update(['status' => $dto->status]);
 
-            $this->userRepository->update($user, ['status' => $dto->status]);
-
-            return [
-                'user_id' => $user->user_id,
-                'status' => $user->status,
-            ];
+            return $this->userMapper->toStatusDTO($user);
         });
     }
 
-    public function assignRoles(AssignRolesDTO $dto): array
+    public function assignRoles(AssignRolesDTO $dto): UserDTO
     {
         return DB::transaction(function () use ($dto) {
-            $user = $this->userRepository->findById($dto->userId);
+            $user = $this->userRepository->findByIdWithRolesOrFail($dto->userId);
 
-            if (!$user) {
-                throw new BusinessException(ResponseCode::NOT_FOUND);
-            }
-
-            $roleIds = array_column($dto->roles, 'role_id');
-            $user->roles()->sync($roleIds);
-
+            $user->roles()->sync($dto->roleIds);
             $user->load('roles');
 
-            return $user->roles->map(function ($role) {
-                return [
-                    'role_id' => $role->role_id,
-                    'name' => $role->name,
-                ];
-            })->toArray();
+            return $this->userMapper->toDTO($user);
         });
     }
 
-    private function findAuthenticatedUser(): User
+    private function updateUserPhone(User $user, ?string $phone): void
     {
-        $user = $this->userRepository->findAuthenticatedUser(Auth::id());
-
-        if (!$user) {
-            throw new BusinessException(ResponseCode::UNAUTHORIZED);
+        if (!is_null($phone) && $phone !== $user->$phone) {
+            $this->assertPhoneUnique($phone);
+            $user->update(['phone' => $phone]);
         }
-
-        return $user;
     }
 
-    private function updateUserProfile(User $user, UpdateCurrentUserDTO $dto): void
+    private function updateUserProfile(User $user, UpdateUserProfileDTO $dto): void
     {
-        $profileData = array_filter([
-            'first_name' => $dto->firstName,
-            'middle_name' => $dto->middleName,
-            'last_name' => $dto->lastName,
-        ], fn($value) => !is_null($value));
+        $profileData = $dto->toArray();
 
         if (!empty($profileData)) {
             $this->userProfileRepository->updateOrCreate($user->user_id, $profileData);
-        }
-    }
-
-    private function updateUserPhone(User $user, UpdateCurrentUserDTO $dto): void
-    {
-        if (!is_null($dto->phone) && $dto->phone !== $user->phone) {
-            $this->ensurePhoneUnique($dto->phone);
-            $this->userRepository->update($user, ['phone' => $dto->phone]);
         }
     }
 
@@ -205,21 +164,21 @@ readonly class UserService
         }
     }
 
-    private function ensureEmailUnique(string $email): void
+    private function assertEmailUnique(string $email): void
     {
         if ($this->userRepository->existsByEmail($email)) {
             throw new BusinessException(ResponseCode::EMAIL_CONFLICT);
         }
     }
 
-    private function ensurePhoneUnique(string $phone): void
+    private function assertPhoneUnique(string $phone): void
     {
         if ($this->userRepository->existsByPhone($phone)) {
             throw new BusinessException(ResponseCode::PHONE_CONFLICT);
         }
     }
 
-    private function createUserRecord(CreateUserDTO $dto): User
+    private function createUser(CreateUserDTO $dto): User
     {
         return $this->userRepository->create([
             'email' => $dto->email,
@@ -258,8 +217,13 @@ readonly class UserService
 
     private function deleteUserData(User $user): void
     {
-        $this->userProfileRepository->delete($user);
+        $user->profile->delete();
         $user->roles()->detach();
-        $this->userRepository->delete($user);
+        $user->delete();
+    }
+
+    private function userId(): int
+    {
+        return Auth::id();
     }
 }

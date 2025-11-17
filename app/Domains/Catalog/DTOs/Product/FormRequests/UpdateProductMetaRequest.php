@@ -2,6 +2,7 @@
 
 namespace App\Domains\Catalog\DTOs\Product\FormRequests;
 
+use App\Domains\Catalog\DTOs\Product\Commands\UpdateProductMetaDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProductMetaRequest extends FormRequest
@@ -17,6 +18,18 @@ class UpdateProductMetaRequest extends FormRequest
             'key' => 'nullable|string|max:255',
             'content' => 'nullable|string',
         ];
+    }
+
+    public function toDTO(int $productId, int $metaId): UpdateProductMetaDTO
+    {
+        $v = $this->validated();
+
+        return new UpdateProductMetaDTO(
+            productId: $productId,
+            metaId: $metaId,
+            key: string_or_null($v['key'] ?? null),
+            content: string_or_null($v['content'] ?? null),
+        );
     }
 }
 

@@ -2,6 +2,7 @@
 
 namespace App\Domains\Identity\DTOs\Auth\FormRequests;
 
+use App\Domains\Identity\DTOs\Auth\Commands\RegisterDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
@@ -21,5 +22,19 @@ class RegisterRequest extends FormRequest
             'middle_name' => 'nullable|string|max:150',
             'last_name' => 'required|string|max:150',
         ];
+    }
+
+    public function toDTO(): RegisterDTO
+    {
+        $v = $this->validated();
+
+        return new RegisterDTO(
+            email: $v['email'],
+            password: $v['password'],
+            phone: string_or_null($v['phone'] ?? null),
+            firstName: string_or_null($v['first_name'] ?? null),
+            middleName: string_or_null($v['middle_name'] ?? null),
+            lastName: string_or_null($v['last_name'] ?? null),
+        );
     }
 }

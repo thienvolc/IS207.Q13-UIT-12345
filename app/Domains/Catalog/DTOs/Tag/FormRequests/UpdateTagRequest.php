@@ -2,6 +2,7 @@
 
 namespace App\Domains\Catalog\DTOs\Tag\FormRequests;
 
+use App\Domains\Catalog\DTOs\Tag\Commands\UpdateTagDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTagRequest extends FormRequest
@@ -21,6 +22,19 @@ class UpdateTagRequest extends FormRequest
             'slug' => 'nullable|string|max:255|unique:tags,slug,' . $tagId . ',tag_id',
             'desc' => 'nullable|string',
         ];
+    }
+
+    public function toDTO(int $tagId): UpdateTagDTO
+    {
+        $v = $this->validated();
+
+        return new UpdateTagDTO(
+            tagId: $tagId,
+            title: $v['title'] ?? null,
+            metaTitle: $v['meta_title'] ?? null,
+            slug: $v['slug'] ?? null,
+            desc: $v['desc'] ?? null,
+        );
     }
 }
 

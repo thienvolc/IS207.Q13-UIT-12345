@@ -2,6 +2,8 @@
 
 namespace App\Domains\Catalog\DTOs\Product\FormRequests;
 
+use App\Domains\Catalog\DTOs\Product\Commands\CreateProductDTO;
+use App\Domains\Catalog\DTOs\Product\Commands\UpdateProductDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProductRequest extends FormRequest
@@ -16,7 +18,6 @@ class UpdateProductRequest extends FormRequest
         $productId = $this->route('id');
 
         return [
-            'category_id' => 'nullable|integer|exists:categories,category_id',
             'title' => 'nullable|string|max:255',
             'meta_title' => 'nullable|string|max:255',
             'slug' => 'nullable|string|max:255|unique:products,slug,' . $productId . ',product_id',
@@ -30,5 +31,28 @@ class UpdateProductRequest extends FormRequest
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after:starts_at',
         ];
+    }
+
+    public function toDTO(int $productId): UpdateProductDTO
+    {
+
+        $v = $this->validated();
+
+        return new UpdateProductDTO(
+            productId: $productId,
+            title: string_or_null($v['title'] ?? null),
+            metaTitle: string_or_null($v['meta_title'] ?? null),
+            slug: string_or_null($v['slug'] ?? null),
+            thumb: string_or_null($v['thumb'] ?? null),
+            desc: string_or_null($v['desc'] ?? null),
+            summary: string_or_null($v['summary'] ?? null),
+            type: string_or_null($v['type'] ?? null),
+            sku: string_or_null($v['sku'] ?? null),
+            price: float_or_null($v['price'] ?? null),
+            discount: int_or_null($v['discount'] ?? null),
+            status: int_or_null($v['status'] ?? null) ?? 1,
+            startsAt: string_or_null($v['starts_at'] ?? null),
+            endsAt: string_or_null($v['ends_at'] ?? null),
+        );
     }
 }

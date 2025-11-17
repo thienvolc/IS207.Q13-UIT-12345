@@ -2,6 +2,8 @@
 
 namespace App\Domains\Identity\DTOs\User\FormRequests;
 
+use App\Domains\Identity\DTOs\User\Queries\SearchUsersDTO;
+use App\Infra\Utils\Pagination\PaginationUtil;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SearchUsersRequest extends FormRequest
@@ -23,26 +25,21 @@ class SearchUsersRequest extends FormRequest
         ];
     }
 
-    public function getPage(): int
+    public function toDTO(): SearchUsersDTO
     {
-        return (int)$this->input('page', 1);
-    }
+        $v = $this->validated();
+        $sort = $v['sort'] ?? 'created_at:desc';
+        [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
-    public function getSize(): int
-    {
-        return (int)$this->input('size', 10);
-    }
-
-    public function getSort(): array
-    {
-        $sort = $this->input('sort', 'created_at:desc');
-
-        if (!str_contains($sort, ':')) {
-            return ['created_at', 'desc'];
-        }
-
-        [$field, $order] = explode(':', $sort);
-        return [$field, $order];
+        return new SearchUsersDTO(
+            query: string_or_null($v['query'] ?? null),
+            isAdmin: bool_or_null($v['is_admin'] ?? null),
+            status: int_or_null($v['status'] ?? null),
+            page: int_or_null($v['page']) ?? 1,
+            size: int_or_null($v['size']) ?? 10,
+            sortField: $sortField,
+            sortOrder: $sortOrder,
+        );
     }
 }
 

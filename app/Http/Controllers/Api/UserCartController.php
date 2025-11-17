@@ -3,19 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
-use App\Domains\Sales\DTOs\Cart\FormRequest\AddCartItemRequest;
-use App\Domains\Sales\DTOs\Cart\FormRequest\CheckoutCartRequest;
-use App\Domains\Sales\DTOs\Cart\FormRequest\UpdateCartItemRequest;
-use App\Domains\Sales\DTOs\Cart\Requests\AddCartItemDTO;
-use App\Domains\Sales\DTOs\Cart\Requests\CheckoutCartDTO;
-use App\Domains\Sales\DTOs\Cart\Requests\UpdateCartItemDTO;
-use App\Domains\Sales\Services\CartService;
-use App\Domains\Sales\Services\CheckoutService;
+use App\Domains\Cart\DTOs\FormRequest\AddCartItemRequest;
+use App\Domains\Cart\Services\CartService;
+use App\Domains\Checkout\DTOs\Commands\CheckoutCartDTO;
+use App\Domains\Checkout\DTOs\FormRequests\CheckoutCartRequest;
+use App\Domains\Checkout\Services\CheckoutService;
 use App\Http\Controllers\AppController;
 
 class UserCartController extends AppController
 {
-
     public function __construct(
         private readonly CartService     $cartService,
         private readonly CheckoutService $checkoutService
@@ -33,17 +29,16 @@ class UserCartController extends AppController
     /**
      * [POST] /me/carts/items
      */
-    public function addItem(AddCartItemRequest $request): ResponseDTO
+    public function addItem(AddCartItemRequest $req): ResponseDTO
     {
-        $dto = AddCartItemDTO::fromArray($request->validated());
-        $item = $this->cartService->addOrIncrementQuantityCartItem($dto);
+        $item = $this->cartService->addOrIncrementQuantityCartItem($req->toDTO());
         return $this->success($item);
     }
 
     /**
      * [DELETE] /me/carts/items/{cart_item_id}
      */
-    public function deleteItem(int $cart_item_id): ResponseDTO
+    public function removeItem(int $cart_item_id): ResponseDTO
     {
         $item = $this->cartService->removeItem($cart_item_id);
         return $this->success($item);
@@ -61,10 +56,9 @@ class UserCartController extends AppController
     /**
      * [PATCH] /me/carts/checkout
      */
-    public function checkout(CheckoutCartRequest $request): ResponseDTO
+    public function checkout(CheckoutCartRequest $req): ResponseDTO
     {
-        $dto = CheckoutCartDTO::fromArray($request->validated());
-        $result = $this->checkoutService->checkout($dto);
+        $result = $this->checkoutService->checkout($req->toDTO());
         return $this->success($result);
     }
 }

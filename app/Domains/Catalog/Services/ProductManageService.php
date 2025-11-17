@@ -3,14 +3,15 @@
 namespace App\Domains\Catalog\Services;
 
 use App\Domains\Catalog\Constants\ProductStatus;
-use App\Domains\Catalog\DTOs\Product\Requests\CreateProductDTO;
-use App\Domains\Catalog\DTOs\Product\Requests\UpdateCategoriesDTO;
-use App\Domains\Catalog\DTOs\Product\Requests\UpdateProductDTO;
-use App\Domains\Catalog\DTOs\Product\Requests\UpdateStatusDTO;
-use App\Domains\Catalog\DTOs\Product\Requests\UpdateTagsDTO;
-use App\Domains\Catalog\DTOs\Product\Responses\ProductAdminResponseDTO;
-use App\Domains\Catalog\DTOs\Product\Responses\ProductUpdateStatusResponseDTO;
+use App\Domains\Catalog\DTOs\Product\Commands\CreateProductDTO;
+use App\Domains\Catalog\DTOs\Product\Commands\AssignProductCategoriesDTO;
+use App\Domains\Catalog\DTOs\Product\Commands\UpdateProductDTO;
+use App\Domains\Catalog\DTOs\Product\Commands\UpdateProductStatusDTO;
+use App\Domains\Catalog\DTOs\Product\Commands\AssignProductTagsDTO;
+use App\Domains\Catalog\DTOs\Product\Responses\ProductDTO;
+use App\Domains\Catalog\DTOs\Product\Responses\ProductStatusDTO;
 use App\Domains\Catalog\Entities\Product;
+use App\Domains\Catalog\Mappers\ProductMapper;
 use App\Domains\Catalog\Repositories\ProductRepository;
 use App\Infra\Helpers\StringHelper;
 use Illuminate\Support\Facades\Auth;
@@ -19,20 +20,21 @@ use Illuminate\Support\Facades\DB;
 readonly class ProductManageService
 {
     public function __construct(
-        private ProductRepository $productRepository
+        private ProductRepository $productRepository,
+        private ProductMapper     $productMapper,
     ) {}
 
-    public function create(CreateProductDTO $dto): ProductAdminResponseDTO
+    public function create(CreateProductDTO $dto): ProductDTO
     {
         return DB::transaction(function () use ($dto) {
             $data = $this->prepareCreateData($dto);
             $product = $this->productRepository->create($data);
 
-            return ProductAdminResponseDTO::fromModel($product);
+            return $this->productMapper->toDTO($product);
         });
     }
 
-    public function update(UpdateProductDTO $dto): ProductAdminResponseDTO
+    public function update(UpdateProductDTO $dto): ProductDTO
     {
         $product = $this->productRepository->getByIdOrFail($dto->productId);
 
@@ -42,11 +44,11 @@ readonly class ProductManageService
             $product->refresh();
             $product->load(['categories', 'tags', 'metas']);
 
-            return ProductAdminResponseDTO::fromModel($product);
+            return $this->productMapper->toDTO($product);
         });
     }
 
-    public function delete(int $productId): ProductAdminResponseDTO
+    public function delete(int $productId): ProductDTO
     {
         $product = $this->productRepository->getByIdOrFail($productId);
 
@@ -59,11 +61,11 @@ readonly class ProductManageService
             $replica = $product->replicate();
             $product->delete();
 
-            return ProductAdminResponseDTO::fromModel($replica);
+            return $this->productMapper->toDTO($product);
         });
     }
 
-    public function updateCategories(UpdateCategoriesDTO $dto): ProductAdminResponseDTO
+    public function updateCategories(AssignProductCategoriesDTO $dto): ProductDTO
     {
         $product = $this->productRepository->getByIdOrFail($dto->productId);
 
@@ -74,10 +76,10 @@ readonly class ProductManageService
 
         $product->load(['categories', 'tags', 'metas']);
 
-        return ProductAdminResponseDTO::fromModel($product);
+        return $this->productMapper->toDTO($product);
     }
 
-    public function updateTags(UpdateTagsDTO $dto): ProductAdminResponseDTO
+    public function updateTags(AssignProductTagsDTO $dto): ProductDTO
     {
         $product = $this->productRepository->getByIdOrFail($dto->productId);
 
@@ -88,10 +90,10 @@ readonly class ProductManageService
 
         $product->load(['categories', 'tags', 'metas']);
 
-        return ProductAdminResponseDTO::fromModel($product);
+        return $this->productMapper->toDTO($product);
     }
 
-    public function updateStatus(UpdateStatusDTO $dto): ProductUpdateStatusResponseDTO
+    public function updateStatus(UpdateProductStatusDTO $dto): ProductStatusDTO
     {
         $product = $this->productRepository->getByIdOrFail($dto->productId);
 
@@ -99,7 +101,7 @@ readonly class ProductManageService
             $updateData = $this->prepareStatusUpdateData($product, $dto->status);
             $product->update($updateData);
 
-            return ProductUpdateStatusResponseDTO::fromModel($product);
+            return $this->productMapper->toStatusDTO($product);
         });
     }
 

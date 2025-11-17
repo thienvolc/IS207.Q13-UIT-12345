@@ -7,8 +7,8 @@ use App\Domains\Identity\DTOs\Auth\FormRequests\ForgotPasswordRequest;
 use App\Domains\Identity\DTOs\Auth\FormRequests\LoginRequest;
 use App\Domains\Identity\DTOs\Auth\FormRequests\RegisterRequest;
 use App\Domains\Identity\DTOs\Auth\FormRequests\ResetPasswordRequest;
-use App\Domains\Identity\DTOs\Auth\Requests\LoginDTO;
-use App\Domains\Identity\DTOs\Auth\Requests\RegisterDTO;
+use App\Domains\Identity\DTOs\Auth\Commands\LoginDTO;
+use App\Domains\Identity\DTOs\Auth\Commands\RegisterDTO;
 use App\Domains\Identity\Services\AuthService;
 use App\Http\Controllers\AppController;
 
@@ -54,7 +54,7 @@ class AuthController extends AppController
      */
     public function forgotPassword(ForgotPasswordRequest $request): ResponseDTO
     {
-        $dto = \App\Domains\Identity\DTOs\Auth\Requests\SendPasswordResetDTO::fromArray($request->validated());
+        $dto = \App\Domains\Identity\DTOs\Auth\Commands\SendPasswordResetDTO::fromArray($request->validated());
         $this->authService->sendPasswordResetEmail($dto);
         return $this->noContent();
     }
@@ -64,7 +64,7 @@ class AuthController extends AppController
      */
     public function resetPassword(ResetPasswordRequest $request): ResponseDTO
     {
-        $dto = \App\Domains\Identity\DTOs\Auth\Requests\ResetPasswordDTO::fromArray($request->validated());
+        $dto = \App\Domains\Identity\DTOs\Auth\Commands\ResetPasswordDTO::fromArray($request->validated());
         $this->authService->resetPassword($dto);
         return $this->noContent();
     }

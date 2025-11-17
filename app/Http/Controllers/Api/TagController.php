@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
+use App\Domains\Catalog\DTOs\Tag\Commands\CreateTagDTO;
+use App\Domains\Catalog\DTOs\Tag\Commands\UpdateTagDTO;
 use App\Domains\Catalog\DTOs\Tag\FormRequests\CreateTagRequest;
-use App\Domains\Catalog\DTOs\Tag\FormRequests\SearchTagRequest;
+use App\Domains\Catalog\DTOs\Tag\FormRequests\SearchTagsRequest;
 use App\Domains\Catalog\DTOs\Tag\FormRequests\UpdateTagRequest;
-use App\Domains\Catalog\DTOs\Tag\Requests\CreateTagDTO;
-use App\Domains\Catalog\DTOs\Tag\Requests\GetAllTagsDTO;
-use App\Domains\Catalog\DTOs\Tag\Requests\UpdateTagDTO;
+use App\Domains\Catalog\DTOs\Tag\Queries\SearchTagsDTO;
 use App\Domains\Catalog\Services\TagService;
 use App\Http\Controllers\AppController;
 
@@ -16,67 +16,50 @@ class TagController extends AppController
 {
     public function __construct(
         private readonly TagService $tagService
-    )
+    ) {}
+
+    /**
+     * [GET] /api/tags
+     */
+    public function index(SearchTagsRequest $req): ResponseDTO
     {
-    }
-
-    public function index(SearchTagRequest $request): ResponseDTO
-    {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = GetAllTagsDTO::fromArray([
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->tagService->searchPublic($dto);
-
+        $result = $this->tagService->searchPublic($req->toDTO());
         return $this->success($result);
     }
 
-    public function searchAdmin(SearchTagRequest $request): ResponseDTO
+    /**
+     * [GET] /api/admin/tags
+     */
+    public function searchAdmin(SearchTagsRequest $req): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = GetAllTagsDTO::fromArray([
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->tagService->search($dto);
-
+        $result = $this->tagService->search($req->toDTO());
         return $this->success($result);
     }
 
-    public function store(CreateTagRequest $request): ResponseDTO
+    /**
+     * [POST] /api/admin/tags
+     */
+    public function store(CreateTagRequest $req): ResponseDTO
     {
-        $dto = CreateTagDTO::fromArray($request->validated());
-
-        $tag = $this->tagService->create($dto);
-
+        $tag = $this->tagService->create($req->toDTO());
         return $this->created($tag);
     }
 
-    public function update(UpdateTagRequest $request, int $tag_id): ResponseDTO
+    /**
+     * [PUT] /api/admin/tags/{tag_id}
+     */
+    public function update(UpdateTagRequest $req, int $tag_id): ResponseDTO
     {
-        $dto = UpdateTagDTO::fromArray([
-            'tag_id' => $tag_id,
-            ...$request->validated()
-        ]);
-
-        $tag = $this->tagService->update($dto);
-
+        $tag = $this->tagService->update($req->toDTO($tag_id));
         return $this->success($tag);
     }
 
+    /**
+     * [DELETE] /api/admin/tags/{tag_id}
+     */
     public function destroy(int $tag_id): ResponseDTO
     {
         $tag = $this->tagService->delete($tag_id);
-
         return $this->success($tag);
     }
 }

@@ -11,7 +11,7 @@
  */
 
 
-namespace App\Models{use App\Domains\Identity\Entities\AuthToken;
+namespace App\Models{use App\Domains\Identity\DTOs\Auth\Responses\AuthTokenDTO;
 /**
  * @property int $id
  * @property string $token
@@ -20,15 +20,15 @@ namespace App\Models{use App\Domains\Identity\Entities\AuthToken;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Domains\Identity\Entities\User|null $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken whereIsAdmin($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken whereToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthToken whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO whereIsAdmin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO whereToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuthTokenDTO whereUserId($value)
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]

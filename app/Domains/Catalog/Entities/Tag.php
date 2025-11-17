@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Model;
  * @method static find(int $tagId)
  * @method static count()
  * @method static create(array $data)
+ * @property mixed $tag_id
+ * @property mixed $title
+ * @property mixed $meta_title
+ * @property mixed $slug
+ * @property mixed $desc
+ * @property mixed $created_at
+ * @property mixed $updated_at
+ * @property mixed $created_by
+ * @property mixed $updated_by
  */
 class Tag extends Model
 {

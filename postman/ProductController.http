@@ -4,9 +4,10 @@
 
 ### search products (admin)
 GET {{base_url}}/api/admin/products
-    ?query=logitech&category=1
+    ?query=&category=1
+    &status=1
     &price_min=0&price_max=100000000
-    &page=1&size=20
+    &page=3&size=15
     &sort=created_at:desc
 Accept: application/json
 Authorization: Bearer {{admin_token}}
@@ -21,6 +22,7 @@ Authorization: Bearer {{admin_token}}
   "meta_title": "New Product",
   "slug": "new-product",
   "price": 199.99,
+  "sku": "NEWPROUDCT",
   "quantity": 10,
   "status": 1
 }
@@ -30,7 +32,7 @@ GET {{base_url}}/api/admin/products/1
 Authorization: Bearer {{admin_token}}
 
 ### Update product
-PUT {{base_url}}/api/admin/products/1
+PUT {{base_url}}/api/admin/products/244
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
