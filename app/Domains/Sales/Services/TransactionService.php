@@ -19,20 +19,20 @@ readonly class TransactionService
         private TransactionRepository $repository,
     ) {}
 
-    public function searchTransactions(SearchTransactionsDTO $dto): PageResponseDTO
+    public function search(SearchTransactionsDTO $dto): PageResponseDTO
     {
         $filters = $dto->getFilters();
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $pageable = Pageable::of($dto->page, $dto->size, $sort);
 
-        $transactions = $this->repository->findFilters($pageable, $filters);
+        $transactions = $this->repository->search($pageable, $filters);
 
         return PageResponseDTO::fromPaginator($transactions);
     }
 
     public function getById(int $transactionId): TransactionResponseDTO
     {
-        $transaction = $this->repository->findByIdOrFail($transactionId);
+        $transaction = $this->repository->getByIdOrFail($transactionId);
         return TransactionResponseDTO::fromModel($transaction);
     }
 
@@ -53,7 +53,7 @@ readonly class TransactionService
     public function updateStatus(UpdateTransactionStatusDTO $dto): TransactionResponseDTO
     {
         return DB::transaction(function () use ($dto) {
-            $transaction = $this->repository->findByIdOrFail($dto->transactionId);
+            $transaction = $this->repository->getByIdOrFail($dto->transactionId);
 
             $transaction->update(['status' => $dto->status]);
             $transaction->load(['order', 'order.user']);

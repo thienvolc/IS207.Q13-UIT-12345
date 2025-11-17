@@ -1,0 +1,26 @@
+@base_url = http://127.0.0.1:8000
+
+### List orders
+GET {{base_url}}/api/admin/orders
+Authorization: Bearer {{admin_token}}
+
+### Get order details
+GET {{base_url}}/api/admin/orders/1
+Authorization: Bearer {{admin_token}}
+
+### Get order status
+GET {{base_url}}/api/admin/orders/1/status
+Authorization: Bearer {{admin_token}}
+
+### Update order status
+PATCH {{base_url}}/api/admin/orders/1/status
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "status": 2
+}
+
+### Cancel order (admin)
+DELETE {{base_url}}/api/admin/orders/1/cancel
+Authorization: Bearer {{admin_token}}

@@ -10,9 +10,7 @@ readonly class GetProductsByCategoryDTO
         public int    $limit,
         public string $sortField,
         public string $sortOrder
-    )
-    {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

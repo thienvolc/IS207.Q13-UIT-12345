@@ -2,16 +2,19 @@
 
 namespace App\Domains\Catalog\Services;
 
+use App\Applications\DTOs\Responses\OffsetPageResponseDTO;
+use App\Applications\DTOs\Responses\PageResponseDTO;
+use App\Domains\Catalog\DTOs\Category\Requests\GetProductsByCategoryDTO;
 use App\Domains\Catalog\DTOs\Product\Requests\GetRelatedProductsDTO;
 use App\Domains\Catalog\DTOs\Product\Requests\SearchProductsAdminDTO;
 use App\Domains\Catalog\DTOs\Product\Requests\SearchProductsPublicDTO;
-use App\Domains\Catalog\DTOs\Product\Responses\ProductAdminDTO;
-use App\Domains\Catalog\DTOs\Product\Responses\ProductPublicDTO;
-use App\Domains\Catalog\Entities\Product;
+use App\Domains\Catalog\DTOs\Product\Responses\ProductAdminResponseDTO;
+use App\Domains\Catalog\DTOs\Product\Responses\ProductPublicResponseDTO;
+use App\Domains\Catalog\DTOs\Tag\Requests\GetProductsByTagDTO;
 use App\Domains\Catalog\Repositories\ProductRepository;
-use App\Domains\Common\Constants\ResponseCode;
-use App\Exceptions\BusinessException;
+use App\Infra\Utils\Pagination\Pageable;
 use App\Infra\Utils\Pagination\PaginationUtil;
+use App\Infra\Utils\Pagination\Sort;
 
 readonly class ProductReadService
 {
@@ -19,121 +22,95 @@ readonly class ProductReadService
         private ProductRepository $productRepository
     ) {}
 
-    public function getByIdForAdmin(int $productId): array
+    public function getById(int $productId): ProductAdminResponseDTO
     {
-        $product = $this->productRepository->findById($productId);
-
-        if (!$product) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
-
-        return ProductAdminDTO::transform($product);
+        $product = $this->productRepository->getByIdOrFail($productId);
+        return ProductAdminResponseDTO::fromModel($product);
     }
 
-    public function getByIdForPublic(int $productId): array
+    public function getPublicById(int $productId): ProductPublicResponseDTO
     {
-        $product = $this->productRepository->findActiveById($productId);
-
-        if (!$product) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
-
-        return ProductPublicDTO::transform($product);
+        $product = $this->productRepository->getActiveByIdWithRelationsOrFail($productId);
+        return ProductPublicResponseDTO::fromModel($product);
     }
 
-    public function getBySlugForPublic(string $slug): array
+    public function getPublicBySlug(string $slug): ProductPublicResponseDTO
     {
-        $product = $this->productRepository->findActiveBySlug($slug);
-
-        if (!$product) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
-
-        return ProductPublicDTO::transform($product);
+        $product = $this->productRepository->getActiveBySlugWithRelationsOrFail($slug);
+        return ProductPublicResponseDTO::fromModel($product);
     }
 
-    public function searchForAdmin(SearchProductsAdminDTO $dto): array
+    /** @return OffsetPageResponseDTO<ProductPublicResponseDTO> */
+    public function searchPublicByCategorySlug(GetProductsByCategoryDTO $dto): OffsetPageResponseDTO
     {
-        $totalCount = $this->productRepository->countWithFilters($dto->getFilters());
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
+        $size = $dto->limit;
+        $pageable = Pageable::of($page, $size, $sort);
 
-        $products = $this->productRepository->searchWithFilters(
-            $dto->getFilters(),
-            $dto->sortField,
-            $dto->sortOrder,
-            ($dto->page - 1) * $dto->size,
-            $dto->size
-        );
+        $products = $this->productRepository->searchPublicByCategorySlug($pageable, $dto->slug);
 
-        return PaginationUtil::fromPageSize(
-            ProductAdminDTO::collection($products),
-            $dto->page,
-            $dto->size,
-            $totalCount
-        );
+        return OffsetPageResponseDTO::fromPaginator($products);
     }
 
-    public function searchForPublic(SearchProductsPublicDTO $dto): array
+    /** @return OffsetPageResponseDTO<ProductPublicResponseDTO> */
+    public function searchPublicByTagId(GetProductsByTagDTO $dto): OffsetPageResponseDTO
     {
-        $totalCount = $this->productRepository->countActiveWithFilters($dto->getFilters());
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
+        $size = $dto->limit;
+        $pageable = Pageable::of($page, $size, $sort);
 
-        $products = $this->productRepository->searchActiveWithFilters(
-            $dto->getFilters(),
-            $dto->sortField,
-            $dto->sortOrder,
-            $dto->offset,
-            $dto->limit
-        );
+        $products = $this->productRepository->searchPublicByTagId($pageable, $dto->tagId);
 
-        return PaginationUtil::offsetLimit(
-            ProductPublicDTO::collection($products),
-            $dto->limit,
-            $dto->offset,
-            $totalCount
-        );
+        return OffsetPageResponseDTO::fromPaginator($products);
     }
 
-    public function getRelatedProductsById(GetRelatedProductsDTO $dto): array
+    /** @return PageResponseDTO<ProductAdminResponseDTO> */
+    public function search(SearchProductsAdminDTO $dto): PageResponseDTO
     {
-        $product = $this->productRepository->findActiveWithRelations($dto->productId);
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $pageable = Pageable::of($dto->page, $dto->size, $sort);
+        $filters = $dto->getFilters();
 
-        if (!$product) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
+        $products = $this->productRepository->search($pageable, $filters);
 
-        $categoryIds = $this->extractCategoryIds($product);
-        $tagIds = $this->extractTagIds($product);
+        return PageResponseDTO::fromPaginator($products);
+    }
 
-        $totalCount = $this->productRepository->countRelatedProducts(
+    /** @return OffsetPageResponseDTO<ProductPublicResponseDTO> */
+    public function searchPublic(SearchProductsPublicDTO $dto): OffsetPageResponseDTO
+    {
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
+        $size = $dto->limit;
+        $pageable = Pageable::of($page, $size, $sort);
+        $filters = $dto->getFilters();
+
+        $products = $this->productRepository->searchPublic($pageable, $filters);
+
+        return OffsetPageResponseDTO::fromPaginator($products);
+    }
+
+    /** @return OffsetPageResponseDTO<ProductPublicResponseDTO> */
+    public function searchRelated(GetRelatedProductsDTO $dto): OffsetPageResponseDTO
+    {
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
+        $size = $dto->limit;
+        $pageable = Pageable::of($page, $size, $sort);
+
+        $product = $this->productRepository->getActiveByIdWithRelationsOrFail($dto->productId);
+        $categoryIds = $product->categories->pluck('category_id')->toArray();
+        $tagIds = $product->tags->pluck('tag_id')->toArray();
+
+        $products = $this->productRepository->searchRelated(
+            $pageable,
             $dto->productId,
             $categoryIds,
             $tagIds
         );
 
-        $products = $this->productRepository->searchRelatedProducts(
-            $dto->productId,
-            $categoryIds,
-            $tagIds,
-            $dto->sortField,
-            $dto->sortOrder,
-            $dto->offset,
-            $dto->limit
-        );
-
-        return PaginationUtil::offsetLimit(
-            ProductPublicDTO::collection($products),
-            $dto->limit,
-            $dto->offset,
-            $totalCount
-        );
-    }
-
-    private function extractCategoryIds(Product $product): array
-    {
-        return $product->categories()->pluck('category_id')->toArray();
-    }
-
-    private function extractTagIds(Product $product): array
-    {
-        return $product->tags()->pluck('tag_id')->toArray();
+        return OffsetPageResponseDTO::fromPaginator($products);
     }
 }

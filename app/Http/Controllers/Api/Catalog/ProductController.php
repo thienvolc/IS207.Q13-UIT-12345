@@ -22,14 +22,18 @@ use App\Domains\Catalog\DTOs\Product\Requests\UpdateProductDTO;
 use App\Domains\Catalog\DTOs\Product\Requests\UpdateStatusDTO;
 use App\Domains\Catalog\DTOs\Product\Requests\UpdateTagsDTO;
 use App\Domains\Catalog\Services\ProductManageService;
+use App\Domains\Catalog\Services\ProductMetaService;
 use App\Domains\Catalog\Services\ProductReadService;
+use App\Domains\Catalog\Services\ProductStockService;
 use App\Http\Controllers\AppController;
 
 class ProductController extends AppController
 {
     public function __construct(
         private readonly ProductReadService   $readService,
-        private readonly ProductManageService $manageService
+        private readonly ProductManageService $manageService,
+        private readonly ProductStockService  $productStockService,
+        private readonly ProductMetaService   $productMetaService
     )
     {
     }
@@ -47,7 +51,7 @@ class ProductController extends AppController
             'sortOrder' => $sortOrder,
         ]);
 
-        $result = $this->readService->searchForAdmin($dto);
+        $result = $this->readService->search($dto);
 
         return $this->success($result);
     }
@@ -56,14 +60,14 @@ class ProductController extends AppController
     {
         $dto = CreateProductDTO::fromArray($request->validated());
 
-        $product = $this->manageService->createProduct($dto);
+        $product = $this->manageService->create($dto);
 
         return $this->created($product);
     }
 
     public function show(int $product_id): ResponseDTO
     {
-        $product = $this->readService->getByIdForAdmin($product_id);
+        $product = $this->readService->getById($product_id);
 
         return $this->success($product);
     }
@@ -75,14 +79,14 @@ class ProductController extends AppController
             ...$request->validated()
         ]);
 
-        $product = $this->manageService->updateProduct($dto);
+        $product = $this->manageService->update($dto);
 
         return $this->success($product);
     }
 
     public function destroy(int $product_id): ResponseDTO
     {
-        $product = $this->manageService->deleteProduct($product_id);
+        $product = $this->manageService->delete($product_id);
 
         return $this->success($product);
     }
@@ -132,7 +136,7 @@ class ProductController extends AppController
             'reason' => $request->input('reason')
         ]);
 
-        $product = $this->manageService->adjustInventory($dto);
+        $product = $this->productStockService->adjustInventory($dto);
 
         return $this->success($product);
     }
@@ -145,7 +149,7 @@ class ProductController extends AppController
             'content' => $request->input('content')
         ]);
 
-        $meta = $this->manageService->createMeta($dto);
+        $meta = $this->productMetaService->create($dto);
 
         return $this->success($meta);
     }
@@ -158,14 +162,14 @@ class ProductController extends AppController
             ...$request->validated()
         ]);
 
-        $meta = $this->manageService->updateMeta($dto);
+        $meta = $this->productMetaService->update($dto);
 
         return $this->success($meta);
     }
 
     public function destroyMeta(int $product_id, int $meta_id): ResponseDTO
     {
-        $meta = $this->manageService->deleteMeta($product_id, $meta_id);
+        $meta = $this->productMetaService->delete($product_id, $meta_id);
 
         return $this->success($meta);
     }

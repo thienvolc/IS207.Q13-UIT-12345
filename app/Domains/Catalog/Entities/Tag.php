@@ -4,6 +4,11 @@ namespace App\Domains\Catalog\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static find(int $tagId)
+ * @method static count()
+ * @method static create(array $data)
+ */
 class Tag extends Model
 {
     protected $primaryKey = 'tag_id';

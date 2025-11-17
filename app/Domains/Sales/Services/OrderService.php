@@ -28,6 +28,7 @@ use App\Infra\Utils\Pagination\PaginationUtil;
 use App\Infra\Utils\Pagination\Sort;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Ramsey\Collection\Collection;
 
 readonly class OrderService
 {
@@ -45,7 +46,7 @@ readonly class OrderService
     /**
      * @return OffsetPageResponseDTO<OrderResponseDTO>
      */
-    public function getUserOrders(GetUserOrdersDTO $dto): OffsetPageResponseDTO
+    public function searchUserOrders(GetUserOrdersDTO $dto): OffsetPageResponseDTO
     {
         $userId = $this->userId();
 
@@ -54,7 +55,7 @@ readonly class OrderService
         $size = $dto->limit;
         $pageable = Pageable::of($page, $size, $sort);
 
-        $orders = $this->orderRepository->findAllUserOrders($userId, $dto->status, $pageable);
+        $orders = $this->orderRepository->searchOrdersForUser($pageable, $userId, $dto->status);
 
         return OffsetPageResponseDTO::fromPaginator($orders);
     }
@@ -64,13 +65,14 @@ readonly class OrderService
         $userId = $this->userId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $cart = $this->cartRepository->findCheckoutWithItemsOrFail($userId, $dto->cartId);
+            $cart = $this->cartRepository->getCheckoutCartByIdAndUserOrFail($dto->cartId, $userId);
             $this->assertCartNotEmpty($cart);
-            $this->productAvailabilityService->lockAndValidate($cart->items);
+
+            $this->productAvailabilityService->lockStockAndValidateAvailability($cart->items);
 
             // TODO: validate stock reserve
 
-            $order = $this->createOrder($userId, $cart, $dto->promo);
+            $order = $this->createOrder($cart, $dto->promo);
             $this->completeCart($cart);
 
             // TODO: Init payment process here
@@ -79,18 +81,18 @@ readonly class OrderService
         });
     }
 
-    public function getOrderDetails(int $orderId): OrderResponseDTO
+    public function getOrderDetailsById(int $orderId): OrderResponseDTO
     {
         $userId = $this->userId();
-        $order = $this->orderRepository->findUserOrderWithItemsOrFail($userId, $orderId);
+        $order = $this->orderRepository->getByIdAndUserWithItemsOrFail($orderId, $userId);
 
         return OrderResponseDTO::fromModel($order);
     }
 
-    public function getOrderStatus(int $orderId): OrderStatusResponseDTO
+    public function getOrderStatusById(int $orderId): OrderStatusResponseDTO
     {
         $userId = $this->userId();
-        $order = $this->orderRepository->findUserOrderOrFail($userId, $orderId);
+        $order = $this->orderRepository->getByIdAndUserOrFail($userId, $orderId);
 
         return OrderStatusResponseDTO::fromModel($order);
     }
@@ -100,7 +102,7 @@ readonly class OrderService
         $userId = $this->userId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $order = $this->orderRepository->findUserOrderWithItemsOrFail($userId, $dto->orderId);
+            $order = $this->orderRepository->getByIdAndUserWithItemsOrFail($dto->orderId, $userId);
             $this->orderRules->assertCanUpdateShipping($order);
 
             $order->update($dto->toArray());
@@ -114,10 +116,10 @@ readonly class OrderService
         $userId = $this->userId();
 
         return DB::transaction(function () use ($userId, $orderId) {
-            $order = $this->orderRepository->findLockedUserOrderOrFail($userId, $orderId);
+            $order = $this->orderRepository->getLockedByIdAndUserWithProductsOrFail($orderId, $userId);
             $this->orderRules->assertCanCancelOrder($order);
 
-            $this->stockReservationService->restoreAllProductStock($order);
+            $this->stockReservationService->restoreAllProductStockInOrder($order);
             $order->update(['status' => OrderStatus::CANCELLED]);
 
             // TODO: Process refund if payment was made
@@ -129,27 +131,27 @@ readonly class OrderService
     /**
      * @return PageResponseDTO<OrderResponseDTO>
      */
-    public function searchOrdersAdmin(SearchOrdersAdminDTO $dto): PageResponseDTO
+    public function search(SearchOrdersAdminDTO $dto): PageResponseDTO
     {
         $filters = $dto->getFilters();
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
         $pageable = Pageable::of($dto->page, $dto->size, $sort);
 
-        $orders = $this->orderRepository->findFilters($pageable, $filters);
+        $orders = $this->orderRepository->search($pageable, $filters);
 
         return PageResponseDTO::fromPaginator($orders);
     }
 
-    public function getOrderDetailsAdmin(int $orderId): OrderResponseDTO
+    public function getOrderAdminDetailsById(int $orderId): OrderResponseDTO
     {
-        $order = $this->orderRepository->findWithItemsByIdOrFail($orderId);
+        $order = $this->orderRepository->getByIdWithItemsOrFail($orderId);
         return OrderResponseDTO::fromModel($order);
     }
 
     public function updateOrderStatus(UpdateOrderStatusDTO $dto): OrderStatusResponseDTO
     {
         return DB::transaction(function () use ($dto) {
-            $order = $this->orderRepository->findByIdOrFail($dto->orderId);
+            $order = $this->orderRepository->getByIdOrFail($dto->orderId);
 
             $order->update(['status' => $dto->status]);
 
@@ -160,10 +162,10 @@ readonly class OrderService
     public function cancelOrderAdmin(int $orderId): OrderStatusResponseDTO
     {
         return DB::transaction(function () use ($orderId) {
-            $order = $this->orderRepository->findWithItemsByIdOrFail($orderId);
+            $order = $this->orderRepository->getByIdWithItemsOrFail($orderId);
 
             if ($order->status !== OrderStatus::CANCELLED) {
-                $this->stockReservationService->restoreAllProductStock($order);
+                $this->stockReservationService->restoreAllProductStockInOrder($order);
             }
             $order->update(['status' => OrderStatus::CANCELLED]);
 
@@ -185,11 +187,11 @@ readonly class OrderService
         }
     }
 
-    private function createOrder(int $userId, Cart $cart, ?string $promo): Order
+    private function createOrder(Cart $cart, ?string $promo): Order
     {
         $orderPrice = $this->pricingService->calculate($cart, $promo);
         $order = $this->orderRepository->create([
-            'user_id'       => $userId,
+            'user_id'       => $cart->user_id,
             'subtotal'      => $orderPrice->subtotal,
             'tax'           => $orderPrice->tax,
             'shipping'      => $orderPrice->shipping,
@@ -237,16 +239,15 @@ readonly class OrderService
     private function completeCart(Cart $cart): void
     {
         $cart->update(['status' => CartStatus::COMPLETED]);
-        $this->deleteCheckedOutItemsInUserCart($cart);
+        $this->removeCheckedOutCartItemsForUserActiveCart($cart->user_id, $cart->items);
     }
 
-    private function deleteCheckedOutItemsInUserCart(Cart $cart): void
+    private function removeCheckedOutCartItemsForUserActiveCart($userId, Collection $cartItems): void
     {
-        $userId = $cart->user_id;
-        $productIds = $cart->items
+        $productIds = $cartItems
             ->map(fn(CartItem $i) => $i->product_id)
             ->toArray();
 
-        $this->cartItemRepository->deleteInActiveCartByUserIdAndProductIds($userId, $productIds);
+        $this->cartItemRepository->deleteAllInActiveCartByUserIdAndProductIds($userId, $productIds);
     }
 }

@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers\Api\Catalog;
 
+use App\Applications\DTOs\Responses\ResponseDTO;
+use App\Domains\Catalog\DTOs\Category\Requests\GetProductsByCategoryDTO;
 use App\Domains\Catalog\DTOs\Product\FormRequests\SearchProductRequest;
 use App\Domains\Catalog\DTOs\Product\Requests\GetRelatedProductsDTO;
 use App\Domains\Catalog\DTOs\Product\Requests\SearchProductsPublicDTO;
+use App\Domains\Catalog\DTOs\Tag\Requests\GetProductsByTagDTO;
 use App\Domains\Catalog\Services\ProductReadService;
 use App\Http\Controllers\AppController;
-use App\Applications\DTOs\Responses\ResponseDTO;
 
-class PublicProductController extends AppController
+class ProductPublicController extends AppController
 {
     public function __construct(
         private readonly ProductReadService $readService
-    )
-    {
-    }
+    ) {}
 
     public function search(SearchProductRequest $request): ResponseDTO
     {
@@ -30,21 +30,55 @@ class PublicProductController extends AppController
             'sortOrder' => $sortOrder,
         ]);
 
-        $result = $this->readService->searchForPublic($dto);
+        $result = $this->readService->searchPublic($dto);
+
+        return $this->success($result);
+    }
+
+    public function searchByCategorySlug(string $slug, SearchProductRequest $request): ResponseDTO
+    {
+        [$sortField, $sortOrder] = $request->getSort();
+
+        $dto = GetProductsByCategoryDTO::fromArray([
+            'slug' => $slug,
+            'offset' => $request->getOffset(),
+            'limit' => $request->getLimit(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->readService->searchPublicByCategorySlug($dto);
+
+        return $this->success($result);
+    }
+
+    public function searchByTagId(int $tag_id, SearchProductRequest $request): ResponseDTO
+    {
+        [$sortField, $sortOrder] = $request->getSort();
+
+        $dto = GetProductsByTagDto::fromArray([
+            'tagId' => $tag_id,
+            'offset' => $request->getOffset(),
+            'limit' => $request->getLimit(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->readService->searchPublicByTagId($dto);
 
         return $this->success($result);
     }
 
     public function show(int $product_id): ResponseDTO
     {
-        $product = $this->readService->getByIdForPublic($product_id);
+        $product = $this->readService->getPublicById($product_id);
 
         return $this->success($product);
     }
 
     public function showBySlug(string $slug): ResponseDTO
     {
-        $product = $this->readService->getBySlugForPublic($slug);
+        $product = $this->readService->getPublicBySlug($slug);
 
         return $this->success($product);
     }
@@ -61,7 +95,7 @@ class PublicProductController extends AppController
             'sortOrder' => $sortOrder,
         ]);
 
-        $result = $this->readService->getRelatedProductsById($dto);
+        $result = $this->readService->searchRelated($dto);
 
         return $this->success($result);
     }

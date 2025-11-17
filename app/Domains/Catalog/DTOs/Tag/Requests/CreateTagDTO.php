@@ -20,4 +20,14 @@ readonly class CreateTagDTO
             desc: $data['desc'] ?? null
         );
     }
+
+    public function toArray()
+    {
+        return [
+            'title' => $this->title,
+            'meta_title' => $this->metaTitle,
+            'slug' => $this->slug,
+            'desc' => $this->desc,
+        ];
+    }
 }

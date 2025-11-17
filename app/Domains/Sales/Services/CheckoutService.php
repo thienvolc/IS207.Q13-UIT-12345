@@ -23,14 +23,14 @@ readonly class CheckoutService
         $userId = $this->userId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $cart = $this->cartRepository->findAndLockActiveByUserIdOrFail($userId);
-            $cartItems = $this->cartItemRepository->findLockedByIdsWithProduct($cart->cart_id, $dto->items);
+            $cart = $this->cartRepository->getActiveCartForUserOrFail($userId);
+            $cartItems = $this->cartItemRepository->listByCartIdAndItemIds($cart->cart_id, $dto->items);
 
-            $this->productAvailabilityService->lockAndValidate($cart->items);
+            $this->productAvailabilityService->lockStockAndValidateAvailability($cart->items);
 
             // TODO: reserve stock for place order
 
-            $checkoutCart = $this->cartRepository->createCheckoutFromItems($userId, $cartItems);
+            $checkoutCart = $this->cartRepository->createCheckoutCartForUser($userId, $cartItems);
             $shippingData = $dto->getShippingData();
             $checkoutCart->update($shippingData);
 

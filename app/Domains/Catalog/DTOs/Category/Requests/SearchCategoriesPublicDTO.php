@@ -11,9 +11,7 @@ readonly class SearchCategoriesPublicDTO
         public string  $sortOrder,
         public int     $offset,
         public int     $limit
-    )
-    {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

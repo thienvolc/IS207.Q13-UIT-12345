@@ -2,189 +2,120 @@
 
 namespace App\Domains\Catalog\Services;
 
-use App\Domains\Catalog\Constants\ProductStatus;
+use App\Applications\DTOs\Responses\OffsetPageResponseDTO;
+use App\Applications\DTOs\Responses\PageResponseDTO;
 use App\Domains\Catalog\DTOs\Category\Requests\CreateCategoryDTO;
-use App\Domains\Catalog\DTOs\Category\Requests\GetProductsByCategoryDTO;
 use App\Domains\Catalog\DTOs\Category\Requests\SearchCategoriesAdminDTO;
 use App\Domains\Catalog\DTOs\Category\Requests\SearchCategoriesPublicDTO;
 use App\Domains\Catalog\DTOs\Category\Requests\UpdateCategoryDTO;
-use App\Domains\Catalog\DTOs\Category\Responses\CategoryDTO;
-use App\Domains\Catalog\DTOs\Category\Responses\CategoryPublicDTO;
-use App\Domains\Catalog\DTOs\Category\Responses\ProductPublicDTO;
-use App\Domains\Catalog\Entities\Category;
+use App\Domains\Catalog\DTOs\Category\Responses\CategoryPublicResponseDTO;
+use App\Domains\Catalog\DTOs\Category\Responses\CategoryResponseDTO;
 use App\Domains\Catalog\Repositories\CategoryRepository;
-use App\Domains\Common\Constants\ResponseCode;
-use App\Exceptions\BusinessException;
 use App\Infra\Helpers\StringHelper;
+use App\Infra\Utils\Pagination\Pageable;
 use App\Infra\Utils\Pagination\PaginationUtil;
+use App\Infra\Utils\Pagination\Sort;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 readonly class CategoryService
 {
     public function __construct(
-        private CategoryRepository $categoryRepository
+        private CategoryRepository $categoryRepository,
     ) {}
 
-    public function searchCategoriesPublic(SearchCategoriesPublicDTO $dto): array
+    /**
+     * @return CategoryPublicResponseDTO[]
+     */
+    public function getAllPublic(): array
     {
-        $totalCount = $this->categoryRepository->countPublic($dto->level, $dto->query);
-
-        $categories = $this->categoryRepository->searchPublic(
-            $dto->level,
-            $dto->query,
-            $dto->sortField,
-            $dto->sortOrder,
-            $dto->offset,
-            $dto->limit
-        );
-
-        return PaginationUtil::offsetLimit(
-            CategoryPublicDTO::collectionWithChildren($categories),
-            $dto->limit,
-            $dto->offset,
-            $totalCount
-        );
+        $categories = $this->categoryRepository->getAllWithChildren();
+        return CategoryPublicResponseDTO::collection($categories);
     }
 
-    public function getCategoryBySlug(string $slug): array
+    /**
+     * @return OffsetPageResponseDTO<CategoryPublicResponseDTO>
+     */
+    public function searchPublic(SearchCategoriesPublicDTO $dto): OffsetPageResponseDTO
     {
-        $category = $this->findCategoryBySlug($slug);
-        return CategoryPublicDTO::transformWithChildren($category);
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
+        $size = $dto->limit;
+        $pageable = Pageable::of($page, $size, $sort);
+
+        $categories = $this->categoryRepository->searchPublic($pageable, $dto->level, $dto->query);
+
+        return OffsetPageResponseDTO::fromPaginator($categories);
     }
 
-    public function getProductsByCategorySlug(GetProductsByCategoryDTO $dto): array
+    public function getBySlug(string $slug): CategoryPublicResponseDTO
     {
-        $category = $this->findCategoryBySlug($dto->slug);
-        $query = $this->buildActiveProductsQuery($category);
-        $totalCount = $query->count();
-
-        $products = $query->orderBy($dto->sortField, $dto->sortOrder)
-            ->offset($dto->offset)
-            ->limit($dto->limit)
-            ->get();
-
-        return PaginationUtil::offsetLimit(
-            ProductPublicDTO::collection($products),
-            $dto->limit,
-            $dto->offset,
-            $totalCount
-        );
+        $category = $this->categoryRepository->getBySlugWithChildrenOrFail($slug);
+        return CategoryPublicResponseDTO::fromModel($category);
     }
 
-    public function searchCategoriesAdmin(SearchCategoriesAdminDTO $dto): array
+    /**
+     * @return PageResponseDTO<CategoryResponseDTO>
+     */
+    public function search(SearchCategoriesAdminDTO $dto): PageResponseDTO
     {
-        $totalCount = $this->categoryRepository->countAdmin($dto->level);
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $pageable = Pageable::of($dto->page, $dto->size, $sort);
 
-        $categories = $this->categoryRepository->searchAdmin(
-            $dto->level,
-            $dto->sortField,
-            $dto->sortOrder,
-            $dto->page,
-            $dto->size
-        );
+        $categories = $this->categoryRepository->search($pageable, $dto->level, $dto->query);
 
-        return PaginationUtil::fromPageSize(
-            CategoryDTO::collectionWithChildren($categories),
-            $dto->page,
-            $dto->size,
-            $totalCount
-        );
+        return PageResponseDTO::fromPaginator($categories);
     }
 
-    public function getCategoryById(int $categoryId): array
+    public function getById(int $categoryId): CategoryResponseDTO
     {
-        $category = $this->findCategoryById($categoryId);
-        return CategoryDTO::transformWithChildren($category);
+        $category = $this->categoryRepository->getByIdWithChildrenOrFail($categoryId);
+        return CategoryResponseDTO::fromModel($category);
     }
 
-    public function createCategory(CreateCategoryDTO $dto): array
+    public function create(CreateCategoryDTO $dto): CategoryResponseDTO
     {
-        $category = DB::transaction(function () use ($dto) {
+        return DB::transaction(function () use ($dto) {
             $data = $this->prepareCreateData($dto);
             $category = $this->categoryRepository->create($data);
 
-            if ($dto->children) {
-                $this->validateAndSetChildren($category, $dto->children);
-            }
-
-            $category->load('children');
-            return $category;
+            return CategoryResponseDTO::fromModel($category);
         });
-
-        return CategoryDTO::transformWithChildren($category);
     }
 
-    public function updateCategory(UpdateCategoryDTO $dto): array
+    public function update(UpdateCategoryDTO $dto): CategoryResponseDTO
     {
-        $category = $this->findCategoryById($dto->categoryId);
+        $category = $this->categoryRepository->getByIdWithChildrenOrFail($dto->categoryId);
 
-        $category = DB::transaction(function () use ($category, $dto) {
+        return DB::transaction(function () use ($category, $dto) {
             $data = $this->prepareUpdateData($dto);
-            $this->categoryRepository->update($category, $data);
 
-            if ($dto->children !== null) {
-                $this->updateCategoryChildren($category, $dto->children);
-            }
-
+            $category->update($data);
             $category->refresh();
             $category->load('children');
-            return $category;
-        });
 
-        return CategoryDTO::transformWithChildren($category);
+            return CategoryResponseDTO::fromModel($category);
+        });
     }
 
-    public function deleteCategory(int $categoryId): array
+    public function delete(int $categoryId): array
     {
-        $category = $this->findCategoryById($categoryId);
+        $category = $this->categoryRepository->getByIdWithChildrenOrFail($categoryId);
 
-        $deletedCategory = DB::transaction(function () use ($category) {
+        return DB::transaction(function () use ($category) {
             $this->removeChildrenParent($category->category_id);
-            $this->categoryRepository->detachAllProducts($category);
+            $category->products()->detach();
 
-            $deletedCategory = $category->replicate();
-            $deletedCategory->load('children');
-            $this->categoryRepository->delete($category);
+            $replica = $category->replicate();
+            $category->delete();
 
-            return $deletedCategory;
+            return CategoryResponseDTO::fromModel($replica);
         });
-
-        return CategoryDTO::transformWithChildren($deletedCategory);
-    }
-
-    private function findCategoryBySlug(string $slug): Category
-    {
-        $category = $this->categoryRepository->findBySlug($slug);
-
-        if (!$category) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
-
-        return $category;
-    }
-
-    private function buildActiveProductsQuery(Category $category)
-    {
-        return $category->products()
-            ->where('status', ProductStatus::ACTIVE)
-            ->with(['categories', 'tags', 'metas']);
-    }
-
-    private function findCategoryById(int $categoryId): Category
-    {
-        $category = $this->categoryRepository->findById($categoryId);
-
-        if (!$category) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
-
-        return $category;
     }
 
     private function prepareCreateData(CreateCategoryDTO $dto): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->userId();
         $data = $dto->toArray();
 
         if (empty($data['slug'])) {
@@ -199,31 +130,9 @@ readonly class CategoryService
         return $data;
     }
 
-    private function validateAndSetChildren(Category $category, array $childrenIds): void
-    {
-        $children = $this->categoryRepository->findByIds($childrenIds);
-
-        foreach ($children as $child) {
-            if ($child->level !== ($category->level + 1)) {
-                throw new BusinessException(ResponseCode::BAD_REQUEST, [], [
-                    'message' => 'Children must have level = parent level + 1'
-                ]);
-            }
-        }
-
-        $this->setChildrenParent($childrenIds, $category->category_id);
-    }
-
-    private function setChildrenParent(array $childrenIds, int $parentId): void
-    {
-        $userId = $this->getAuthUserId();
-
-        $this->categoryRepository->updateParentId($childrenIds, $parentId, $userId);
-    }
-
     private function prepareUpdateData(UpdateCategoryDTO $dto): array
     {
-        $userId = $this->getAuthUserId();
+        $userId = $this->userId();
         $data = $dto->toArray();
 
         if (isset($data['title']) && empty($data['slug'])) {
@@ -237,23 +146,13 @@ readonly class CategoryService
         return $data;
     }
 
-    private function updateCategoryChildren(Category $category, ?array $childrenIds): void
-    {
-        $this->removeChildrenParent($category->category_id);
-
-        if (!empty($childrenIds)) {
-            $this->setChildrenParent($childrenIds, $category->category_id);
-        }
-    }
-
     private function removeChildrenParent(int $parentId): void
     {
-        $userId = $this->getAuthUserId();
-
+        $userId = $this->userId();
         $this->categoryRepository->removeParent($parentId, $userId);
     }
 
-    private function getAuthUserId(): int
+    private function userId(): int
     {
         return Auth::id();
     }

@@ -4,6 +4,18 @@ namespace App\Domains\Catalog\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static whereNull(string $string)
+ * @method static where(string $string, string $slug)
+ * @method static create(array $data)
+ * @property mixed $children
+ * @property mixed $category_id
+ * @property mixed $parent_id
+ * @property mixed $level
+ * @property mixed $title
+ * @property mixed $slug
+ * @property mixed $desc
+ */
 class Category extends Model
 {
     protected $primaryKey = 'category_id';

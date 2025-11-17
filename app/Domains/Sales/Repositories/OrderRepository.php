@@ -17,7 +17,7 @@ class OrderRepository
         return Order::create($data);
     }
 
-    public function findAllUserOrders(int $userId, ?int $status, Pageable $pageable): LengthAwarePaginator
+    public function searchOrdersForUser(Pageable $pageable, int $userId, ?int $status): LengthAwarePaginator
     {
         return Order::where('user_id', $userId)
             ->when($status, fn($q) => $q->where('status', $status))
@@ -25,7 +25,7 @@ class OrderRepository
             ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 
-    public function findFilters(Pageable $pageable, OrderFilterDTO $filters): LengthAwarePaginator
+    public function search(Pageable $pageable, OrderFilterDTO $filters): LengthAwarePaginator
     {
         $query = Order::query()->with('items');
         $this->applyFilters($query, $filters);
@@ -55,7 +55,7 @@ class OrderRepository
         $query->when($f->max !== null, fn($q) => $q->where('grand_total', '<=', $f->max));
     }
 
-    public function findUserOrderWithItemsOrFail(int $userId, int $orderId): Order
+    public function getByIdAndUserWithItemsOrFail(int $orderId, int $userId): Order
     {
         return Order::where('order_id', $orderId)
             ->where('user_id', $userId)
@@ -63,14 +63,14 @@ class OrderRepository
             ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 
-    public function findUserOrderOrFail(int $userId, int $orderId): Order
+    public function getByIdAndUserOrFail(int $userId, int $orderId): Order
     {
         return Order::where('order_id', $orderId)
             ->where('user_id', $userId)
             ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 
-    public function findLockedUserOrderOrFail(int $userId, int $orderId): Order
+    public function getLockedByIdAndUserWithProductsOrFail(int $userId, int $orderId): Order
     {
         return Order::where('order_id', $orderId)
             ->where('user_id', $userId)
@@ -79,13 +79,13 @@ class OrderRepository
             ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 
-    public function findWithItemsByIdOrFail(int $orderId): Order
+    public function getByIdWithItemsOrFail(int $orderId): Order
     {
         return Order::with('items')->find($orderId)
             ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 
-    public function findByIdOrFail(int $orderId): ?Order
+    public function getByIdOrFail(int $orderId): ?Order
     {
         return Order::find($orderId)
             ?? throw new BusinessException(ResponseCode::NOT_FOUND);

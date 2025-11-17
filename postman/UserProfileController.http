@@ -1,0 +1,27 @@
+# UserProfileController - authenticated user profile
+# Requires Authorization: Bearer {{token}}
+
+### Get my profile
+GET {{base_url}}/api/me
+Authorization: Bearer {{token}}
+
+### Update profile
+PUT {{base_url}}/api/me
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "phone": "0123456789"
+}
+
+### Update password
+PUT {{base_url}}/api/me/password
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "old_password": "oldpass",
+  "new_password": "newpass123"
+}

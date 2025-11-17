@@ -11,11 +11,8 @@ readonly class UpdateCategoryDTO
         public ?string $title,
         public ?string $metaTitle,
         public ?string $slug,
-        public ?string $desc,
-        public ?array  $children
-    )
-    {
-    }
+        public ?string $desc
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -26,8 +23,7 @@ readonly class UpdateCategoryDTO
             title: $data['title'] ?? null,
             metaTitle: $data['meta_title'] ?? null,
             slug: $data['slug'] ?? null,
-            desc: $data['desc'] ?? null,
-            children: $data['children'] ?? null
+            desc: $data['desc'] ?? null
         );
     }
 
@@ -39,8 +35,7 @@ readonly class UpdateCategoryDTO
             'title' => $this->title,
             'meta_title' => $this->metaTitle,
             'slug' => $this->slug,
-            'desc' => $this->desc,
-            'children' => $this->children,
+            'desc' => $this->desc
         ];
     }
 }

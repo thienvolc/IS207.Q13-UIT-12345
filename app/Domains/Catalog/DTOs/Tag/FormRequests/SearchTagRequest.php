@@ -16,7 +16,7 @@ class SearchTagRequest extends FormRequest
         return [
             'offset' => 'nullable|integer|min:0',
             'limit' => 'nullable|integer|min:1|max:100',
-            'sort' => 'nullable|string|regex:/^[a-z_]+:(asc|desc)$/',
+            'sort' => ['nullable', 'string', 'regex:/^[a-z_]+:(asc|desc)$/'],
         ];
     }
 

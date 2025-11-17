@@ -3,101 +3,60 @@
 namespace App\Domains\Catalog\Repositories;
 
 use App\Domains\Catalog\Entities\Category;
+use App\Domains\Common\Constants\ResponseCode;
+use App\Exceptions\BusinessException;
+use App\Infra\Utils\Pagination\Pageable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CategoryRepository
 {
-    public function findById(int $categoryId): ?Category
-    {
-        return Category::with('children')->find($categoryId);
-    }
-
-    public function findBySlug(string $slug): ?Category
-    {
-        return Category::where('slug', $slug)->with('children')->first();
-    }
-
-    public function findByIds(array $categoryIds): Collection
-    {
-        return Category::whereIn('category_id', $categoryIds)->get();
-    }
-
-    public function searchPublic(int $level, ?string $query, string $sortField, string $sortOrder, int $offset, int $limit): Collection
-    {
-        $queryBuilder = Category::query()->where('level', $level);
-
-        if ($query) {
-            $queryBuilder->where(function ($q) use ($query) {
-                $q->where('title', 'like', '%' . $query . '%')
-                    ->orWhere('desc', 'like', '%' . $query . '%');
-            });
-        }
-
-        return $queryBuilder->with('children')
-            ->orderBy($sortField, $sortOrder)
-            ->offset($offset)
-            ->limit($limit)
-            ->get();
-    }
-
-    public function countPublic(int $level, ?string $query): int
-    {
-        $queryBuilder = Category::query()->where('level', $level);
-
-        if ($query) {
-            $queryBuilder->where(function ($q) use ($query) {
-                $q->where('title', 'like', '%' . $query . '%')
-                    ->orWhere('desc', 'like', '%' . $query . '%');
-            });
-        }
-
-        return $queryBuilder->count();
-    }
-
-    public function searchAdmin(
-        int    $level,
-        string $sortField,
-        string $sortOrder,
-        int    $offset,
-        int    $limit
-    ): Collection
-    {
-        return Category::query()
-            ->where('level', $level)
-            ->with('children')
-            ->orderBy($sortField, $sortOrder)
-            ->offset($offset)
-            ->limit($limit)
-            ->get();
-    }
-
-    public function countAdmin(int $level): int
-    {
-        return Category::where('level', $level)->count();
-    }
-
     public function create(array $data): Category
     {
         return Category::create($data);
     }
 
-    public function update(Category $category, array $data): bool
+    public function getByIdWithChildrenOrFail(int $categoryId): Category
     {
-        return $category->update($data);
+        return Category::with('children')->find($categoryId)
+            ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 
-    public function delete(Category $category): bool
+    public function getBySlugWithChildrenOrFail(string $slug): Category
     {
-        return $category->delete();
+        return Category::where('slug', $slug)->with('children')
+            ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 
-    public function updateParentId(array $categoryIds, ?int $parentId, int $userId): int
+    public function getAllWithChildren(): Collection
     {
-        return Category::whereIn('category_id', $categoryIds)
-            ->update([
-                'parent_id' => $parentId,
-                'updated_by' => $userId,
-            ]);
+        // TODO: Add position for stable ordering
+
+        return Category::whereNull('parent_id')->with('children')->get();
+    }
+
+    public function search(Pageable $pageable, int $level, ?string $query): LengthAwarePaginator
+    {
+        return Category::query()
+            ->where('level', $level)
+            ->when($query, function ($q) use ($query) {
+                $q->where('title', 'like', '%' . $query . '%')
+                    ->orWhere('desc', 'like', '%' . $query . '%');
+            })
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+    }
+
+    public function searchPublic(Pageable $pageable, int $level, ?string $query): LengthAwarePaginator
+    {
+        return Category::query()
+            ->where('level', $level)
+            ->when($query, function ($q) use ($query) {
+                $q->where('title', 'like', '%' . $query . '%')
+                    ->orWhere('desc', 'like', '%' . $query . '%');
+            })
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 
     public function removeParent(int $parentId, int $userId): int
@@ -107,10 +66,5 @@ class CategoryRepository
                 'parent_id' => null,
                 'updated_by' => $userId,
             ]);
-    }
-
-    public function detachAllProducts(Category $category): void
-    {
-        $category->products()->detach();
     }
 }

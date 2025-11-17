@@ -1,0 +1,35 @@
+@base_url = http://127.0.0.1:8000
+
+### Search products
+GET {{base_url}}/api/products
+    ?query=logitech&category=1
+    &price_min=0&price_max=100000000
+    &offset=1&limit=20
+    &sort=created_at:desc
+Accept: application/json
+
+### Get product by id
+GET {{base_url}}/api/products/1
+Accept: application/json
+
+### Search related products
+GET {{base_url}}/api/products/1/related
+    ?limit=8&offset=0
+    &sort=created_at:desc
+Accept: application/json
+
+### Get product by slug
+GET {{base_url}}/api/products/chu%E1%BB%99t-logitech-model-557
+Accept: application/json
+
+### Search products by category slug
+GET {{base_url}}/api/categories/tai-nghe/products
+    ?offset=1&limit=20
+    &sort=created_at:desc
+Accept: application/json
+
+### Search products by tag
+GET {{base_url}}/api/tags/2/products
+    ?offset=1&limit=20
+    &sort=created_at:desc
+Accept: application/json

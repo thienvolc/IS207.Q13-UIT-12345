@@ -21,9 +21,7 @@ class UpdateCategoryRequest extends FormRequest
             'title' => 'sometimes|required|string|max:255',
             'meta_title' => 'nullable|string|max:255',
             'slug' => 'nullable|string|max:255|unique:categories,slug,' . $categoryId . ',category_id',
-            'desc' => 'nullable|string',
-            'children' => 'nullable|array',
-            'children.*' => 'integer|exists:categories,category_id',
+            'desc' => 'nullable|string'
         ];
     }
 }

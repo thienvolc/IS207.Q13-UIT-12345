@@ -17,7 +17,7 @@ class GetOrdersRequest extends FormRequest
             'status' => 'nullable|integer|in:1,2,3,4,5,6,7,8',
             'offset' => 'nullable|integer|min:0',
             'limit' => 'nullable|integer|min:1|max:100',
-            'sort' => 'nullable|string|regex:/^[a-z_]+:(asc|desc)$/',
+            'sort' => ['nullable', 'string', 'regex:/^[a-z_]+:(asc|desc)$/'],
         ];
     }
 

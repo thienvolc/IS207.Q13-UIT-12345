@@ -20,4 +20,13 @@ readonly class CreateMetaDTO
             content: $data['content']
         );
     }
+
+    public function toArray(): array
+    {
+        return [
+            'product_id' => $this->productId,
+            'key' => $this->key,
+            'content' => $this->content,
+        ];
+    }
 }

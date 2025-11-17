@@ -4,8 +4,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Catalog\CategoryController;
 use App\Http\Controllers\Api\Catalog\ProductController;
 use App\Http\Controllers\Api\Catalog\PublicCategoryController;
-use App\Http\Controllers\Api\Catalog\PublicProductController;
-use App\Http\Controllers\Api\Catalog\PublicTagController;
+use App\Http\Controllers\Api\Catalog\ProductPublicController;
 use App\Http\Controllers\Api\Catalog\TagController;
 use App\Http\Controllers\Api\Sales\OrderController;
 use App\Http\Controllers\Api\Sales\TransactionController;
@@ -19,20 +18,20 @@ use Illuminate\Support\Facades\Route;
 $auth = AuthMiddleware::class;
 
 Route::prefix('products')->group(function () {
-    Route::get('/', [PublicProductController::class, 'search']);
-    Route::get('/{product_id}/related', [PublicProductController::class, 'related'])->where('product_id', '[0-9]+');
-    Route::get('/{product_id}', [PublicProductController::class, 'show'])->where('product_id', '[0-9]+');
-    Route::get('/{slug}', [PublicProductController::class, 'showBySlug']);
+    Route::get('/', [ProductPublicController::class, 'search']);
+    Route::get('/{product_id}/related', [ProductPublicController::class, 'related'])->where('product_id', '[0-9]+');
+    Route::get('/{product_id}', [ProductPublicController::class, 'show'])->where('product_id', '[0-9]+');
+    Route::get('/{slug}', [ProductPublicController::class, 'showBySlug']);
 });
 
 Route::prefix('categories')->group(function () {
     Route::get('/', [PublicCategoryController::class, 'index']);
     Route::get('/{slug}', [PublicCategoryController::class, 'show']);
-    Route::get('/{slug}/products', [PublicCategoryController::class, 'products']);
+    Route::get('/{slug}/products', [ProductPublicController::class, 'searchByCategorySlug']);
 });
 
 Route::prefix('tags')->group(function () {
-    Route::get('/{tag_id}/products', [PublicTagController::class, 'products']);
+    Route::get('/{tag_id}/products', [ProductPublicController::class, 'searchByTagId']);
 });
 
 Route::prefix('users/auth')->group(function () use ($auth) {

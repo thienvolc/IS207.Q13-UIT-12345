@@ -1,0 +1,15 @@
+# TransactionController - admin transactions
+# Requires admin Authorization header
+
+### List transactions
+GET {{base_url}}/api/admin/transactions
+Authorization: Bearer {{admin_token}}
+
+### (Optional) Update transaction status
+PATCH {{base_url}}/api/admin/transactions/1/status
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "status": 1
+}

@@ -13,26 +13,28 @@ class CartItemRepository
 {
     public function create(array $data): CartItem
     {
-        return CartItem::create($data);
+        return CartItem::create($data)->load('product');
     }
 
-    public function findByCartIdAndProductId(int $cartId, int $productId): ?CartItem
+    public function findOneByCartIdAndProductId(int $cartId, int $productId): ?CartItem
     {
         return CartItem::where('cart_id', $cartId)
+            ->with('product')
             ->where('product_id', $productId)
             ->first();
     }
 
-    public function findInUserCartOrFail(int $userId, int $cartItemId): CartItem
+    public function getByIdAndUserOrFail(int $cartItemId, int $userId): CartItem
     {
         return CartItem::whereHas('cart', function ($query) use ($userId) {
             $query->where('user_id', $userId)
                   ->where('status', CartStatus::ACTIVE);})
+            ->with('product')
             ->find($cartItemId)
             ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 
-    public function findLockedByIdsWithProduct(int $cartId, array $itemIds): Collection
+    public function listByCartIdAndItemIds(int $cartId, array $itemIds): Collection
     {
         return CartItem::whereIn('cart_item_id', $itemIds)
             ->where('cart_id', $cartId)
@@ -42,7 +44,7 @@ class CartItemRepository
     }
 
     // order
-    public function deleteInActiveCartByUserIdAndProductIds(int $userId, array $productIds): void
+    public function deleteAllInActiveCartByUserIdAndProductIds(int $userId, array $productIds): void
     {
         CartItem::whereHas('cart', function ($query) use ($userId) {
             $query->where('user_id', $userId)

@@ -25,7 +25,22 @@ class ResponseDTO extends JsonResource
 
     public function toArray($request): array
     {
-        return $this->resource;
+        $resource = $this->resource;
+
+        if (is_null($resource)) {
+            $data = null;
+        } elseif ($resource instanceof JsonResource) {
+            $data = $resource->toArray($request);
+        } elseif (is_array($resource)) {
+            $data = $resource;
+        } elseif (is_object($resource) && method_exists($resource, 'toArray')) {
+            $data = $resource->toArray();
+        } else {
+            // scalar or object without toArray
+            $data = $resource;
+        }
+
+        return ['data' => $data];
     }
 
     public function with(Request $request): array

@@ -1,0 +1,43 @@
+# UserController - Admin user management
+# Requires admin Authorization header
+
+### List users
+GET {{base_url}}/api/admin/users
+Authorization: Bearer {{admin_token}}
+
+### Create user
+POST {{base_url}}/api/admin/users
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "email": "newuser@example.com",
+  "password": "password123",
+  "phone": "0123456789"
+}
+
+### Get user
+GET {{base_url}}/api/admin/users/1
+Authorization: Bearer {{admin_token}}
+
+### Update user status
+PATCH {{base_url}}/api/admin/users/1/status
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "status": 1
+}
+
+### Update user roles
+PATCH {{base_url}}/api/admin/users/1/roles
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "roles": ["admin"]
+}
+
+### Delete user
+DELETE {{base_url}}/api/admin/users/1
+Authorization: Bearer {{admin_token}}

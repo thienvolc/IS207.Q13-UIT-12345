@@ -1,0 +1,42 @@
+@base_url = http://127.0.0.1:8000
+
+### List my orders
+GET {{base_url}}/api/me/orders
+Authorization: Bearer {{token}}
+
+### Place order
+POST {{base_url}}/api/me/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "cart_id": 1,
+  "promo": null
+}
+
+### Get order details
+GET {{base_url}}/api/me/orders/1
+Authorization: Bearer {{token}}
+
+### Get order status
+GET {{base_url}}/api/me/orders/1/status
+Authorization: Bearer {{token}}
+
+### Update shipping
+PATCH {{base_url}}/api/me/orders/1/shipping
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "phone": "0123456789",
+  "line1": "123 Main St",
+  "city": "City",
+  "province": "Province",
+  "country": "Country"
+}
+
+### Cancel order
+DELETE {{base_url}}/api/me/orders/1/cancel
+Authorization: Bearer {{token}}

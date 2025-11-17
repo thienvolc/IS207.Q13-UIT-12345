@@ -26,7 +26,7 @@ class UserCartController extends AppController
      */
     public function index(): ResponseDTO
     {
-        $cart = $this->cartService->getOrCreateCart();
+        $cart = $this->cartService->getOrCreateActiveCart();
         return $this->success($cart);
     }
 
@@ -36,7 +36,7 @@ class UserCartController extends AppController
     public function addItem(AddCartItemRequest $request): ResponseDTO
     {
         $dto = AddCartItemDTO::fromArray($request->validated());
-        $item = $this->cartService->addItem($dto);
+        $item = $this->cartService->addOrIncrementQuantityCartItem($dto);
         return $this->success($item);
     }
 
@@ -55,7 +55,7 @@ class UserCartController extends AppController
      */
     public function deleteItem(int $cart_item_id): ResponseDTO
     {
-        $item = $this->cartService->deleteItem($cart_item_id);
+        $item = $this->cartService->removeItem($cart_item_id);
         return $this->success($item);
     }
 

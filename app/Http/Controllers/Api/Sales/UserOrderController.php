@@ -35,7 +35,7 @@ class UserOrderController extends AppController
             'sort_order' => $sortOrder,
         ]);
 
-        $orders = $this->orderService->getUserOrders($dto);
+        $orders = $this->orderService->searchUserOrders($dto);
 
         return $this->success($orders);
     }
@@ -55,7 +55,7 @@ class UserOrderController extends AppController
      */
     public function show(int $order_id): ResponseDTO
     {
-        $order = $this->orderService->getOrderDetails($order_id);
+        $order = $this->orderService->getOrderDetailsById($order_id);
         return $this->success($order);
     }
 
@@ -64,7 +64,7 @@ class UserOrderController extends AppController
      */
     public function status(int $order_id): ResponseDTO
     {
-        $status = $this->orderService->getOrderStatus($order_id);
+        $status = $this->orderService->getOrderStatusById($order_id);
         return $this->success($status);
     }
 

@@ -13,9 +13,7 @@ readonly class SearchProductsAdminDTO
         public int     $size,
         public string  $sortField,
         public string  $sortOrder
-    )
-    {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -31,13 +29,13 @@ readonly class SearchProductsAdminDTO
         );
     }
 
-    public function getFilters(): array
+    public function getFilters(): ProductAdminFilter
     {
-        return array_filter([
-            'query' => $this->query,
-            'category' => $this->category,
-            'price_min' => $this->priceMin,
-            'price_max' => $this->priceMax,
-        ], fn($value) => $value !== null);
+        return new ProductAdminFilter(
+            query: $this->query,
+            category: $this->category,
+            priceMin: $this->priceMin,
+            priceMax: $this->priceMax
+        );
     }
 }

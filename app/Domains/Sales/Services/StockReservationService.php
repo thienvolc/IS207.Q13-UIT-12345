@@ -27,7 +27,7 @@ readonly class StockReservationService
         }
     }
 
-    public function restoreAllProductStock(Order $order): void
+    public function restoreAllProductStockInOrder(Order $order): void
     {
         foreach ($order->items as $item) {
             $item->product->increment('quantity', $item->quantity);

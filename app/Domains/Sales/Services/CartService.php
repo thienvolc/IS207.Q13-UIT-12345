@@ -6,7 +6,6 @@ use App\Domains\Catalog\Entities\Product;
 use App\Domains\Catalog\Repositories\ProductRepository;
 use App\Domains\Sales\DTOs\Cart\Requests\AddCartItemDTO;
 use App\Domains\Sales\DTOs\Cart\Requests\UpdateCartItemDTO;
-use App\Domains\Sales\DTOs\Cart\Responses\AddItemResponseDTO;
 use App\Domains\Sales\DTOs\Cart\Responses\CartItemResponseDTO;
 use App\Domains\Sales\DTOs\Cart\Responses\CartResponseDTO;
 use App\Domains\Sales\Entities\Cart;
@@ -18,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 
 readonly class CartService
 {
-
     public function __construct(
         private ProductAvailabilityService $productAvailabilityService,
         private CartRepository             $cartRepository,
@@ -26,119 +24,95 @@ readonly class CartService
         private ProductRepository          $productRepository
     ) {}
 
-    public
-    function getOrCreateCart(): CartResponseDTO
+    public function getOrCreateActiveCart(): CartResponseDTO
     {
-        $cart = $this->cartRepository->findOrCreateActiveByUserId($this->userId());
+        $cart = $this->cartRepository->getActiveOrCreateForUser($this->userId());
         return CartResponseDTO::fromModel($cart);
     }
 
-    public
-    function addItem(AddCartItemDTO $dto): AddItemResponseDTO
+    public function addOrIncrementQuantityCartItem(AddCartItemDTO $dto): CartItemResponseDTO
     {
         $userId = $this->userId();
 
         return DB::transaction(function () use ($userId, $dto) {
-            $cart = $this->cartRepository->findOrCreateActiveByUserId($userId);
-            $product = $this->productRepository->findActiveOrFail($dto->productId);
-            $cartItem = $this->updateQuantityOrCreateCartItem($cart, $product, $dto);
-
-            return AddItemResponseDTO::fromModel($cartItem);
-        });
-    }
-
-    public
-    function updateItem(UpdateCartItemDTO $dto): CartItemResponseDTO
-    {
-        $userId = $this->userId();
-
-        return DB::transaction(function () use ($userId, $dto) {
-            $cartItem = $this->cartItemRepository->findInUserCartOrFail($userId, $dto->cartItemId);
-            $product = $this->productRepository->findActiveOrFail($cartItem->product_id);
+            $cart = $this->cartRepository->getActiveOrCreateForUser($userId);
+            $product = $this->productRepository->getActiveByIdOrFail($dto->productId);
 
             $this->productAvailabilityService->assertStockAvailable($product, $dto->quantity);
 
-            $cartItem = $this->updateCartItem($cartItem, $product, $dto->quantity);
+            $cartItem = $this->createOrIncrementQuantityCartItem($cart, $product, $dto);
 
             return CartItemResponseDTO::fromModel($cartItem);
         });
     }
 
-    public
-    function deleteItem(int $cartItemId): CartItemResponseDTO
+    public function removeItem(int $cartItemId): CartItemResponseDTO
     {
         $userId = $this->userId();
 
         return DB::transaction(function () use ($userId, $cartItemId) {
-            $cartItem = $this->cartItemRepository->findInUserCartOrFail($userId, $cartItemId);
-
-            $replicate = $cartItem->replicate();
-            $replicate->load('product');
+            $cartItem = $this->cartItemRepository->getByIdAndUserOrFail($cartItemId, $userId);
+            $replica = $cartItem->replicate();
 
             $cartItem->delete();
 
-            return CartItemResponseDTO::fromModel($replicate);
+            return CartItemResponseDTO::fromModel($replica);
         });
     }
 
-    public
-    function clear(): CartResponseDTO
+    public function clear(): CartResponseDTO
     {
         $userId = $this->userId();
 
         return DB::transaction(function () use ($userId) {
-            $cart = $this->cartRepository->clearCartByUserId($userId);
+            $emptyCart = $this->cartRepository->clearCartForUser($userId);
 
-            return CartResponseDTO::fromModel($cart);
+            return CartResponseDTO::fromModel($emptyCart);
         });
     }
 
-    private
-    function userId(): int
+    private function createOrIncrementQuantityCartItem(Cart $cart, Product $product, AddCartItemDTO $dto): CartItem
     {
-        return Auth::id();
+        $existingItem = $this->cartItemRepository->findOneByCartIdAndProductId($cart->cart_id, $dto->productId);
+
+        if ($existingItem) {
+            $totalQuantity = $dto->quantity + $existingItem->quantity;
+            $this->productAvailabilityService->assertSufficientStock(
+                $product,
+                $totalQuantity,
+                $existingItem->quantity
+            );
+
+            return $this->incrementQuantityCartItem($existingItem, $product, $totalQuantity);
+        }
+
+        return $this->createCartItem($cart, $product, $dto);
     }
 
-    private
-    function updateQuantityOrCreateCartItem(Cart $cart, Product $product, AddCartItemDTO $dto): CartItem
-    {
-        $existingItem = $this->cartItemRepository->findByCartIdAndProductId($cart->cart_id, $dto->productId);
-
-        $inCartQuantity = $existingItem->quantity ?? 0;
-        $newQuantity = $dto->quantity + $inCartQuantity;
-
-        $this->productAvailabilityService->assertSufficientStock($product, $newQuantity, $inCartQuantity);
-
-        return $existingItem
-            ? $this->updateCartItem($existingItem, $product, $newQuantity)
-            : $this->createCartItem($cart, $product, $dto);
-    }
-
-    private
-    function updateCartItem(CartItem $cartItem, Product $product, int $quantity): CartItem
+    private function incrementQuantityCartItem(CartItem $cartItem, Product $product, int $quantity): CartItem
     {
         $cartItem->update([
-            'quantity' => $quantity,
-            'price' => $product->price,
-            'discount' => $product->discount ?? 0,
+            'quantity'  => $quantity,
+            'price'     => $product->price,
+            'discount'  => $product->discount ?? 0,
         ]);
-        $cartItem->load('product');
 
         return $cartItem;
     }
 
-    private
-    function createCartItem(Cart $cart, Product $product, AddCartItemDTO $dto): CartItem
+    private function createCartItem(Cart $cart, Product $product, AddCartItemDTO $dto): CartItem
     {
-        $cartItem = $this->cartItemRepository->create([
-            'cart_id' => $cart->cart_id,
-            'product_id' => $product->product_id,
-            'price' => $product->price,
-            'discount' => $product->discount ?? 0,
-            'quantity' => $dto->quantity
+        return $this->cartItemRepository->create([
+            'cart_id'   => $cart->cart_id,
+            'product_id'=> $product->product_id,
+            'price'     => $product->price,
+            'discount'  => $product->discount ?? 0,
+            'quantity'  => $dto->quantity
         ]);
-        $cartItem->load('product');
+    }
 
-        return $cartItem;
+    private function userId(): int
+    {
+        return Auth::id();
     }
 }

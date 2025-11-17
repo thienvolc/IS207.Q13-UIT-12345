@@ -16,9 +16,7 @@ class CategoryController extends AppController
 {
     public function __construct(
         private readonly CategoryService $categoryService
-    )
-    {
-    }
+    ) {}
 
     public function index(SearchCategoryRequest $request): ResponseDTO
     {
@@ -32,14 +30,14 @@ class CategoryController extends AppController
             'sortOrder' => $sortOrder,
         ]);
 
-        $result = $this->categoryService->searchCategoriesAdmin($dto);
+        $result = $this->categoryService->search($dto);
 
         return $this->success($result);
     }
 
     public function show(int $category_id): ResponseDTO
     {
-        $category = $this->categoryService->getCategoryById($category_id);
+        $category = $this->categoryService->getById($category_id);
 
         return $this->success($category);
     }
@@ -47,8 +45,7 @@ class CategoryController extends AppController
     public function store(CreateCategoryRequest $request): ResponseDTO
     {
         $dto = CreateCategoryDTO::fromArray($request->validated());
-
-        $category = $this->categoryService->createCategory($dto);
+        $category = $this->categoryService->create($dto);
 
         return $this->created($category);
     }
@@ -60,14 +57,14 @@ class CategoryController extends AppController
             ...$request->validated()
         ]);
 
-        $category = $this->categoryService->updateCategory($dto);
+        $category = $this->categoryService->update($dto);
 
         return $this->success($category);
     }
 
     public function destroy(int $category_id): ResponseDTO
     {
-        $category = $this->categoryService->deleteCategory($category_id);
+        $category = $this->categoryService->delete($category_id);
 
         return $this->success($category);
     }

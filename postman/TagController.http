@@ -1,0 +1,31 @@
+# TagController - Admin tag endpoints
+# Requires admin Authorization header
+
+### List tags
+GET {{base_url}}/api/admin/tags
+Authorization: Bearer {{admin_token}}
+
+### Create tag
+POST {{base_url}}/api/admin/tags
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "title": "New Tag",
+  "meta_title": "New Tag",
+  "slug": "new-tag",
+  "desc": "Description"
+}
+
+### Update tag
+PUT {{base_url}}/api/admin/tags/1
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "title": "Updated Tag"
+}
+
+### Delete tag
+DELETE {{base_url}}/api/admin/tags/1
+Authorization: Bearer {{admin_token}}

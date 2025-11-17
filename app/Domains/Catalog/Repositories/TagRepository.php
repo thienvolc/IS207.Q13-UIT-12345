@@ -3,46 +3,27 @@
 namespace App\Domains\Catalog\Repositories;
 
 use App\Domains\Catalog\Entities\Tag;
-use Illuminate\Database\Eloquent\Collection;
+use App\Domains\Common\Constants\ResponseCode;
+use App\Exceptions\BusinessException;
+use App\Infra\Utils\Pagination\Pageable;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TagRepository
 {
-    public function findById(int $tagId): ?Tag
-    {
-        return Tag::find($tagId);
-    }
-
-    public function findAll(string $sortField, string $sortOrder, int $offset, int $limit): Collection
-    {
-        return Tag::query()
-            ->orderBy($sortField, $sortOrder)
-            ->offset($offset)
-            ->limit($limit)
-            ->get();
-    }
-
-    public function count(): int
-    {
-        return Tag::count();
-    }
-
     public function create(array $data): Tag
     {
         return Tag::create($data);
     }
 
-    public function update(Tag $tag, array $data): bool
+    public function getByIdOrFail(int $tagId): ?Tag
     {
-        return $tag->update($data);
+        return Tag::find($tagId)
+            ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 
-    public function delete(Tag $tag): bool
+    public function searchPublic(Pageable $pageable): LengthAwarePaginator
     {
-        return $tag->delete();
-    }
-
-    public function detachAllProducts(Tag $tag): void
-    {
-        $tag->products()->detach();
+        return Tag::query()
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 }

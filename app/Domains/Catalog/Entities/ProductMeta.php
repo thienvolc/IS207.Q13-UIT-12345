@@ -4,6 +4,10 @@ namespace App\Domains\Catalog\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static where(string $string, int $metaId)
+ * @method static create(array $data)
+ */
 class ProductMeta extends Model
 {
     protected $primaryKey = 'meta_id';

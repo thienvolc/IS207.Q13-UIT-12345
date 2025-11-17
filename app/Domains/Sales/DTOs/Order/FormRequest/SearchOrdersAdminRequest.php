@@ -23,7 +23,7 @@ class SearchOrdersAdminRequest extends FormRequest
             'max' => 'nullable|numeric|min:0|gte:min',
             'page' => 'nullable|integer|min:1',
             'size' => 'nullable|integer|min:1|max:100',
-            'sort' => 'nullable|string|regex:/^[a-z_]+:(asc|desc)$/',
+            'sort' => ['nullable', 'string', 'regex:/^[a-z_]+:(asc|desc)$/'],
         ];
     }
 

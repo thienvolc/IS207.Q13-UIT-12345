@@ -31,7 +31,7 @@ class TagController extends AppController
             'sortOrder' => $sortOrder,
         ]);
 
-        $result = $this->tagService->getAllTags($dto);
+        $result = $this->tagService->searchPublic($dto);
 
         return $this->success($result);
     }
@@ -40,7 +40,7 @@ class TagController extends AppController
     {
         $dto = CreateTagDTO::fromArray($request->validated());
 
-        $tag = $this->tagService->createTag($dto);
+        $tag = $this->tagService->create($dto);
 
         return $this->created($tag);
     }
@@ -52,14 +52,14 @@ class TagController extends AppController
             ...$request->validated()
         ]);
 
-        $tag = $this->tagService->updateTag($dto);
+        $tag = $this->tagService->update($dto);
 
         return $this->success($tag);
     }
 
     public function destroy(int $tag_id): ResponseDTO
     {
-        $tag = $this->tagService->deleteTag($tag_id);
+        $tag = $this->tagService->delete($tag_id);
 
         return $this->success($tag);
     }

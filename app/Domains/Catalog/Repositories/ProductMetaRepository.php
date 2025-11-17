@@ -3,28 +3,20 @@
 namespace App\Domains\Catalog\Repositories;
 
 use App\Domains\Catalog\Entities\ProductMeta;
+use App\Domains\Common\Constants\ResponseCode;
+use App\Exceptions\BusinessException;
 
 class ProductMetaRepository
 {
-    public function findByIdAndProductId(int $metaId, int $productId): ?ProductMeta
-    {
-        return ProductMeta::where('meta_id', $metaId)
-            ->where('product_id', $productId)
-            ->first();
-    }
-
     public function create(array $data): ProductMeta
     {
         return ProductMeta::create($data);
     }
 
-    public function update(ProductMeta $meta, array $data): bool
+    public function getByIdAndProductOrFail(int $metaId, int $productId): ?ProductMeta
     {
-        return $meta->update($data);
-    }
-
-    public function delete(ProductMeta $meta): bool
-    {
-        return $meta->delete();
+        return ProductMeta::where('meta_id', $metaId)
+            ->where('product_id', $productId)
+            ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 }

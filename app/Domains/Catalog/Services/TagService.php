@@ -2,18 +2,15 @@
 
 namespace App\Domains\Catalog\Services;
 
-use App\Domains\Catalog\Constants\ProductStatus;
-use App\Domains\Catalog\DTOs\Product\Responses\ProductPublicDTO;
+use App\Applications\DTOs\Responses\PageResponseDTO;
+use App\Domains\Catalog\DTOs\Product\Responses\ProductAdminResponseDTO;
 use App\Domains\Catalog\DTOs\Tag\Requests\CreateTagDTO;
 use App\Domains\Catalog\DTOs\Tag\Requests\GetAllTagsDTO;
-use App\Domains\Catalog\DTOs\Tag\Requests\GetProductsByTagDTO;
 use App\Domains\Catalog\DTOs\Tag\Requests\UpdateTagDTO;
-use App\Domains\Catalog\DTOs\Tag\Responses\TagDTO;
-use App\Domains\Catalog\Entities\Tag;
+use App\Domains\Catalog\DTOs\Tag\Responses\TagResponseDTO;
 use App\Domains\Catalog\Repositories\TagRepository;
-use App\Domains\Common\Constants\ResponseCode;
-use App\Exceptions\BusinessException;
 use App\Infra\Helpers\StringHelper;
+use App\Infra\Utils\Pagination\Pageable;
 use App\Infra\Utils\Pagination\PaginationUtil;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,92 +21,52 @@ readonly class TagService
         private TagRepository $tagRepository
     ) {}
 
-    public function getAllTags(GetAllTagsDTO $dto): array
+    /** @return PageResponseDTO<ProductAdminResponseDTO> */
+    public function searchPublic(GetAllTagsDTO $dto): PageResponseDTO
     {
-        $totalCount = $this->tagRepository->count();
-
-        $tags = $this->tagRepository->findAll(
-            $dto->sortField,
-            $dto->sortOrder,
-            $dto->offset,
-            $dto->limit
-        );
-
-        return PaginationUtil::offsetLimit(
-            TagDTO::collection($tags),
-            $dto->limit,
-            $dto->offset,
-            $totalCount
-        );
+        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
+        $size = $dto->limit;
+        $pageable = Pageable::of($page, $size);
+        $products = $this->tagRepository->searchPublic($pageable);
+        return PageResponseDTO::fromPaginator($products);
     }
 
-    public function createTag(CreateTagDTO $dto): array
+    public function create(CreateTagDTO $dto): TagResponseDTO
     {
-        $tag = DB::transaction(function () use ($dto) {
+        return DB::transaction(function () use ($dto) {
             $data = $this->prepareCreateData($dto);
             $tag = $this->tagRepository->create($data);
-            return $tag;
-        });
 
-        return TagDTO::transform($tag);
+            return TagResponseDTO::fromModel($tag);
+        });
     }
 
-    public function updateTag(UpdateTagDTO $dto): array
+    public function update(UpdateTagDTO $dto): TagResponseDTO
     {
-        $tag = $this->findTagById($dto->tagId);
+        $tag = $this->tagRepository->getByIdOrFail($dto->tagId);
 
-        $tag = DB::transaction(function () use ($tag, $dto) {
+        return DB::transaction(function () use ($tag, $dto) {
             $data = $this->prepareUpdateData($dto);
-            $this->tagRepository->update($tag, $data);
+            $tag->update($data);
             $tag->refresh();
-            return $tag;
+
+            return TagResponseDTO::fromModel($tag);
+        });
+    }
+
+    public function delete(int $tagId): array
+    {
+        $tag = $this->tagRepository->getByIdOrFail($tagId);
+
+        return DB::transaction(function () use ($tag) {
+            $replica = $tag->replicate();
+
+            $tag->products()->detach();
+            $tag->delete();
+
+            return TagResponseDTO::fromModel($replica);
         });
 
-        return TagDTO::transform($tag);
-    }
-
-    public function deleteTag(int $tagId): array
-    {
-        $tag = $this->findTagById($tagId);
-
-        $deletedTag = DB::transaction(function () use ($tag) {
-            $this->tagRepository->detachAllProducts($tag);
-            $deletedTag = $tag->replicate();
-            $this->tagRepository->delete($tag);
-            return $deletedTag;
-        });
-
-        return TagDTO::transform($deletedTag);
-    }
-
-    public function getProductsByTagId(GetProductsByTagDTO $dto): array
-    {
-        $tag = $this->findTagById($dto->tagId);
-        $query = $this->buildActiveProductsQuery($tag);
-        $totalCount = $query->count();
-
-        $products = $query->orderBy($dto->sortField, $dto->sortOrder)
-            ->offset($dto->offset)
-            ->limit($dto->limit)
-            ->get();
-
-        return PaginationUtil::offsetLimit(
-            ProductPublicDTO::collection($products),
-            $dto->limit,
-            $dto->offset,
-            $totalCount
-        );
-    }
-
-    private function findTagById(int $tagId): Tag
-    {
-        $tag = $this->tagRepository->findById($tagId);
-
-        if (!$tag) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
-
-        return $tag;
     }
 
     private function prepareCreateData(CreateTagDTO $dto): array
@@ -139,13 +96,6 @@ readonly class TagService
         $data['updated_by'] = $userId;
 
         return $data;
-    }
-
-    private function buildActiveProductsQuery(Tag $tag)
-    {
-        return $tag->products()
-            ->where('status', ProductStatus::ACTIVE)
-            ->with(['categories', 'tags', 'metas']);
     }
 
     private function getAuthUserId(): int

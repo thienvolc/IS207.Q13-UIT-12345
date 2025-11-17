@@ -20,7 +20,7 @@ class SearchCategoryRequest extends FormRequest
             'limit' => 'nullable|integer|min:1|max:100',
             'page' => 'nullable|integer|min:1',
             'size' => 'nullable|integer|min:1|max:100',
-            'sort' => 'nullable|string|regex:/^[a-z_]+:(asc|desc)$/',
+            'sort' => ['nullable', 'string', 'regex:/^[a-z_]+:(asc|desc)$/'],
         ];
     }
 

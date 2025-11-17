@@ -17,7 +17,7 @@ class TransactionRepository
         return Transaction::create($data);
     }
 
-    public function findFilters(Pageable $pageable, TransactionFilterDTO $filters): LengthAwarePaginator
+    public function search(Pageable $pageable, TransactionFilterDTO $filters): LengthAwarePaginator
     {
         $query = Transaction::query()->with(['order', 'order.user']);
         $this->applyFilters($query, $filters);
@@ -37,7 +37,7 @@ class TransactionRepository
         $query->when($f->type, fn($q, $v) => $q->where('type', $v));
     }
 
-    public function findByIdOrFail(int $transactionId): Transaction
+    public function getByIdOrFail(int $transactionId): Transaction
     {
         return Transaction::with(['order', 'order.user'])->find($transactionId)
             ?? throw new BusinessException(ResponseCode::NOT_FOUND);

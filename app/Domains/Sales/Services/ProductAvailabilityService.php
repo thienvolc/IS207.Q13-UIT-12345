@@ -15,7 +15,7 @@ readonly class ProductAvailabilityService
         private ProductRepository $productRepository
     ) {}
 
-    public function lockAndValidate(Collection $cartItems): void
+    public function lockStockAndValidateAvailability(Collection $cartItems): void
     {
         $productIds = $cartItems->pluck('product_id')->unique()->sort()->values()->all();
         $products = $this->productRepository->findLockedByIds($productIds);

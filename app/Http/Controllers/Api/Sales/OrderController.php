@@ -37,7 +37,7 @@ class OrderController extends AppController
             'sort_order' => $sortOrder,
         ]);
 
-        $orders = $this->orderService->searchOrdersAdmin($dto);
+        $orders = $this->orderService->search($dto);
 
         return $this->success($orders);
     }
@@ -47,7 +47,7 @@ class OrderController extends AppController
      */
     public function show(int $order_id): ResponseDTO
     {
-        $order = $this->orderService->getOrderDetailsAdmin($order_id);
+        $order = $this->orderService->getOrderAdminDetailsById($order_id);
         return $this->success($order);
     }
 
@@ -56,7 +56,7 @@ class OrderController extends AppController
      */
     public function status(int $order_id): ResponseDTO
     {
-        $order = $this->orderService->getOrderDetailsAdmin($order_id);
+        $order = $this->orderService->getOrderAdminDetailsById($order_id);
         return $this->success([
             'order_id' => $order['order_id'],
             'status' => $order['status'],

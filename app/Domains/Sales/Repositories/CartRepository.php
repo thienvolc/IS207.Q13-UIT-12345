@@ -11,33 +11,37 @@ use Illuminate\Database\Eloquent\Collection;
 
 class CartRepository
 {
-    public function findOrCreateActiveByUserId(int $userId): Cart
+    public function getActiveOrCreateForUser(int $userId): Cart
     {
-        $cart = Cart::where('user_id', $userId)
+        return $this->findActiveForUser($userId)
+            ?? $this->createActiveForUser($userId);
+    }
+
+    public function findActiveForUser(int $userId): ?Cart
+    {
+        return Cart::where('user_id', $userId)
             ->where('status', CartStatus::ACTIVE)
             ->with(['items.product'])
             ->first();
-
-        return $cart ?? $this->createActive($userId);
     }
 
-    public function createActive(int $userId): Cart
+    public function createActiveForUser(int $userId): Cart
     {
         return Cart::create([
             'user_id' => $userId,
-            'status' => CartStatus::ACTIVE,
+            'status'  => CartStatus::ACTIVE,
         ]);
     }
 
-    public function clearCartByUserId(int $userId): Cart
+    public function clearCartForUser(int $userId): Cart
     {
         return CartItem::whereHas('cart', function ($query) use ($userId) {
             $query->where('user_id', $userId)
-                ->where('status', CartStatus::ACTIVE);
-        })->delete();
+                  ->where('status', CartStatus::ACTIVE);})
+            ->delete();
     }
 
-    public function findAndLockActiveByUserIdOrFail(int $userId): Cart
+    public function getActiveCartForUserOrFail(int $userId): Cart
     {
         return Cart::where('user_id', $userId)
             ->where('status', CartStatus::ACTIVE)
@@ -46,7 +50,7 @@ class CartRepository
             ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 
-    public function createCheckoutFromItems(int $userId, Collection $items): Cart
+    public function createCheckoutCartForUser(int $userId, Collection $items): Cart
     {
         $cart = Cart::create([
             'user_id' => $userId,
@@ -67,9 +71,8 @@ class CartRepository
         return $cart;
     }
 
-
     // order
-    public function findCheckoutWithItemsOrFail(int $userId, int $cartId): Cart
+    public function getCheckoutCartByIdAndUserOrFail(int $cartId, int $userId): Cart
     {
         return Cart::where('cart_id', $cartId)
             ->where('user_id', $userId)

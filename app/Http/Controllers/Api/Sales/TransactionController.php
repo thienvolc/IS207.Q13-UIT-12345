@@ -29,7 +29,7 @@ class TransactionController extends AppController
             'sortOrder' => $sortOrder,
         ]);
 
-        $transactions = $this->transactionService->searchTransactions($dto);
+        $transactions = $this->transactionService->search($dto);
 
         return $this->success($transactions);
     }

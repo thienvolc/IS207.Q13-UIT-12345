@@ -19,9 +19,7 @@ class CreateCategoryRequest extends FormRequest
             'title' => 'required|string|max:255',
             'meta_title' => 'nullable|string|max:255',
             'slug' => 'nullable|string|max:255|unique:categories,slug',
-            'desc' => 'nullable|string',
-            'children' => 'nullable|array',
-            'children.*' => 'integer|exists:categories,category_id',
+            'desc' => 'nullable|string'
         ];
     }
 }

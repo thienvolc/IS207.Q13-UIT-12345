@@ -3,9 +3,9 @@
 namespace App\Exceptions;
 
 use App\Infra\Helpers\StringHelper;
-use RuntimeException;
+use Exception;
 
-class BusinessException extends RuntimeException
+class BusinessException extends Exception
 {
     protected array $responseCode;
     protected array $args;

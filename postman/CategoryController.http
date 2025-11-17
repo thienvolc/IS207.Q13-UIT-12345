@@ -1,0 +1,37 @@
+@base_url = http://127.0.0.1:8000
+
+
+### List categories
+GET {{base_url}}/api/admin/categories
+Authorization: Bearer {{admin_token}}
+Accept: application/json
+
+### Create category
+POST {{base_url}}/api/admin/categories
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "parent_id": null,
+  "title": "New Category",
+  "meta_title": "New Category",
+  "slug": "new-category",
+  "desc": "Description"
+}
+
+### Get category
+GET {{base_url}}/api/admin/categories/1
+Authorization: Bearer {{admin_token}}
+
+### Update category
+PUT {{base_url}}/api/admin/categories/1
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "title": "Updated Category"
+}
+
+### Delete category
+DELETE {{base_url}}/api/admin/categories/1
+Authorization: Bearer {{admin_token}}

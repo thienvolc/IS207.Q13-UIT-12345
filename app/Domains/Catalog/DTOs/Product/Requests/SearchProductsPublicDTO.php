@@ -31,13 +31,13 @@ readonly class SearchProductsPublicDTO
         );
     }
 
-    public function getFilters(): array
+    public function getFilters(): ProductPublicFilter
     {
-        return array_filter([
-            'query' => $this->query,
-            'category' => $this->category,
-            'price_min' => $this->priceMin,
-            'price_max' => $this->priceMax,
-        ], fn($value) => $value !== null);
+        return new ProductPublicFilter(
+            query: $this->query,
+            category: $this->category,
+            priceMin: $this->priceMin,
+            priceMax: $this->priceMax
+        );
     }
 }

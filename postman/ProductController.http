@@ -1,0 +1,66 @@
+@base_url =http://127.0.0.1:8080
+@admin_token =your_admin_jwt_token_here
+
+### List products (admin)
+GET {{base_url}}/api/admin/products
+Accept: application/json
+Authorization: Bearer {{admin_token}}
+
+### Create product
+POST {{base_url}}/api/admin/products
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "title": "New Product",
+  "meta_title": "New Product",
+  "slug": "new-product",
+  "price": 199.99,
+  "quantity": 10,
+  "status": 1
+}
+
+### Get product (admin)
+GET {{base_url}}/api/admin/products/1
+Authorization: Bearer {{admin_token}}
+
+### Update product
+PUT {{base_url}}/api/admin/products/1
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "title": "Updated Product Title"
+}
+
+### Delete product
+DELETE {{base_url}}/api/admin/products/1
+Authorization: Bearer {{admin_token}}
+
+### Update categories for product
+PUT {{base_url}}/api/admin/products/1/categories
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "category_ids": [1, 2]
+}
+
+### Update tags for product
+PATCH {{base_url}}/api/admin/products/1/tags
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "tag_ids": [2, 12]
+}
+
+### Adjust inventory
+PATCH {{base_url}}/api/admin/products/1/inventories
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "quantity": 5,
+  "reason": "stock correction"
+}

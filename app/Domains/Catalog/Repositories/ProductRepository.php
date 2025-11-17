@@ -3,189 +3,109 @@
 namespace App\Domains\Catalog\Repositories;
 
 use App\Domains\Catalog\Constants\ProductStatus;
+use App\Domains\Catalog\DTOs\Product\Requests\ProductAdminFilter;
+use App\Domains\Catalog\DTOs\Product\Requests\ProductFilter;
+use App\Domains\Catalog\DTOs\Product\Requests\ProductPublicFilter;
 use App\Domains\Catalog\Entities\Product;
 use App\Domains\Common\Constants\ResponseCode;
 use App\Exceptions\BusinessException;
+use App\Infra\Utils\Pagination\Pageable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductRepository
 {
-    public function findById(int $productId): ?Product
-    {
-        return Product::with(['categories', 'tags', 'metas'])->find($productId);
-    }
-
-    public function findActiveById(int $productId): ?Product
-    {
-        return Product::with(['categories', 'tags', 'metas'])
-            ->where('product_id', $productId)
-            ->where('status', ProductStatus::ACTIVE)
-            ->first();
-    }
-
-    public function findActiveBySlug(string $slug): ?Product
-    {
-        return Product::with(['categories', 'tags', 'metas'])
-            ->where('slug', $slug)
-            ->where('status', ProductStatus::ACTIVE)
-            ->first();
-    }
-
-    public function findActiveWithRelations(int $productId, array $relations = ['categories', 'tags']): ?Product
-    {
-        return Product::with($relations)
-            ->where('product_id', $productId)
-            ->where('status', ProductStatus::ACTIVE)
-            ->first();
-    }
-
-    public function searchWithFilters(
-        array  $filters,
-        string $sortField,
-        string $sortOrder,
-        int    $offset,
-        int    $limit
-    ): Collection
-    {
-        $query = Product::query()->with(['categories', 'tags', 'metas']);
-        $this->applyFilters($query, $filters);
-
-        return $query->orderBy($sortField, $sortOrder)
-            ->offset($offset)
-            ->limit($limit)
-            ->get();
-    }
-
-    public function countWithFilters(array $filters): int
-    {
-        $query = Product::query();
-        $this->applyFilters($query, $filters);
-        return $query->count();
-    }
-
-    public function searchActiveWithFilters(
-        array  $filters,
-        string $sortField,
-        string $sortOrder,
-        int    $offset,
-        int    $limit
-    ): Collection
-    {
-        $query = Product::query()
-            ->with(['categories', 'tags', 'metas'])
-            ->where('status', ProductStatus::ACTIVE);
-
-        $this->applyFilters($query, $filters);
-
-        return $query->orderBy($sortField, $sortOrder)
-            ->offset($offset)
-            ->limit($limit)
-            ->get();
-    }
-
-    public function countActiveWithFilters(array $filters): int
-    {
-        $query = Product::query()->where('status', ProductStatus::ACTIVE);
-        $this->applyFilters($query, $filters);
-        return $query->count();
-    }
-
-    public function searchRelatedProducts(
-        int    $excludeProductId,
-        array  $categoryIds,
-        array  $tagIds,
-        string $sortField,
-        string $sortOrder,
-        int    $offset,
-        int    $limit
-    ): Collection
-    {
-        $query = $this->buildRelatedProductsQuery($excludeProductId, $categoryIds, $tagIds);
-
-        return $query->orderBy($sortField, $sortOrder)
-            ->offset($offset)
-            ->limit($limit)
-            ->get();
-    }
-
-    public function countRelatedProducts(int $excludeProductId, array $categoryIds, array $tagIds): int
-    {
-        return $this->buildRelatedProductsQuery($excludeProductId, $categoryIds, $tagIds)->count();
-    }
-
     public function create(array $data): Product
     {
         return Product::create($data);
     }
 
-    private function applyFilters(Builder $query, array $filters): void
+    public function existsById($productId): bool
     {
-        if (!empty($filters['query'])) {
-            $searchTerm = '%' . $filters['query'] . '%';
-            $query->where(function (Builder $q) use ($searchTerm) {
-                $q->where('title', 'like', $searchTerm)
-                    ->orWhere('desc', 'like', $searchTerm)
-                    ->orWhere('summary', 'like', $searchTerm);
-            });
-        }
-
-        if (!empty($filters['category'])) {
-            $query->whereHas('categories', function (Builder $q) use ($filters) {
-                $q->where('category_id', $filters['category']);
-            });
-        }
-
-        if (isset($filters['price_min'])) {
-            $query->where('price', '>=', $filters['price_min']);
-        }
-
-        if (isset($filters['price_max'])) {
-            $query->where('price', '<=', $filters['price_max']);
-        }
+        return Product::where('product_id', $productId)->exists();
     }
 
-    private function buildRelatedProductsQuery(
-        int   $excludeProductId,
-        array $categoryIds,
-        array $tagIds
-    ): Builder
+    public function getByIdOrFail(int $productId): Product
+    {
+        return Product::with(['categories', 'tags', 'metas'])->find($productId)
+            ?? throw new BusinessException(ResponseCode::NOT_FOUND);
+    }
+
+    public function getActiveByIdWithRelationsOrFail(int $productId): Product
+    {
+        return Product::with(['categories', 'tags', 'metas'])
+            ->where('product_id', $productId)
+            ->where('status', ProductStatus::ACTIVE)
+            ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
+    }
+
+    public function getActiveBySlugWithRelationsOrFail(string $slug): ?Product
+    {
+        return Product::with(['categories', 'tags', 'metas'])
+            ->where('slug', $slug)
+            ->where('status', ProductStatus::ACTIVE)
+            ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
+    }
+
+    public function searchPublicByCategorySlug(Pageable $pageable, string $slug): LengthAwarePaginator
+    {
+        return Product::query()->with(['categories', 'tags', 'metas'])
+            ->whereHas('categories', fn($q) => $q->where('categories.slug', $slug))
+            ->where('status', ProductStatus::ACTIVE)
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+    }
+
+    public function searchPublicByTagId(Pageable $pageable, int $tagId): LengthAwarePaginator
+    {
+        return Product::query()->with(['categories', 'tags', 'metas'])
+            ->whereHas('tags', fn($q) => $q->where('tags.tag_id', $tagId))
+            ->where('status', ProductStatus::ACTIVE)
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+    }
+
+    public function search(Pageable $pageable, ProductAdminFilter $filters): LengthAwarePaginator
+    {
+        $query = Product::query()->with(['categories', 'tags', 'metas']);
+        $this->applyFilters($query, $filters);
+
+        return $query
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+    }
+
+    public function searchPublic(Pageable $pageable, ProductPublicFilter $filters): LengthAwarePaginator
+    {
+        $query = Product::query()->with(['categories', 'tags', 'metas']);
+        $this->applyFilters($query, $filters);
+
+        return $query
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+    }
+
+    public function searchRelated(
+        Pageable $pageable,
+        int      $excludeProductId,
+        array    $categoryIds,
+        array    $tagIds
+    ): LengthAwarePaginator
     {
         $query = Product::query()
             ->with(['categories', 'tags', 'metas'])
             ->where('product_id', '!=', $excludeProductId)
             ->where('status', ProductStatus::ACTIVE);
 
-        $hasCategoryFilter = !empty($categoryIds);
-        $hasTagFilter = !empty($tagIds);
+        $this->applyRelated($query, $categoryIds, $tagIds);
 
-        if ($hasCategoryFilter || $hasTagFilter) {
-            $query->where(function (Builder $q) use ($hasTagFilter, $hasCategoryFilter, $categoryIds, $tagIds) {
-                if ($hasCategoryFilter) {
-                    $q->whereHas('categories', function (Builder $subQ) use ($categoryIds) {
-                        $subQ->whereIn('category_id', $categoryIds);
-                    });
-                }
-
-                if ($hasTagFilter) {
-                    if ($hasCategoryFilter) {
-                        $q->orWhereHas('tags', function (Builder $subQ) use ($tagIds) {
-                            $subQ->whereIn('tag_id', $tagIds);
-                        });
-                    } else {
-                        $q->whereHas('tags', function (Builder $subQ) use ($tagIds) {
-                            $subQ->whereIn('tag_id', $tagIds);
-                        });
-                    }
-                }
-            });
-        }
-
-        return $query;
+        return $query
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 
     // cart
-    public function findActiveOrFail(int $productId): Product
+    public function getActiveByIdOrFail(int $productId): Product
     {
         return Product::where('product_id', $productId)
             ->where('status', ProductStatus::ACTIVE)
@@ -202,11 +122,51 @@ class ProductRepository
             ->keyBy('product_id');
     }
 
-    // order
+    // order, stock
     public function decrementStock(int $productId, int $requestedQuantity)
     {
         return Product::where('product_id', $productId)
             ->where('quantity', '>=', $requestedQuantity)
             ->decrement('quantity', $requestedQuantity);
+    }
+
+    // helpers
+    private function applyFilters(Builder $query, ProductFilter $f): void
+    {
+        $query->when($f->query, function (Builder $q, $v) {
+            $searchTerm = '%' . $v . '%';
+
+            $q->where(function (Builder $sq) use ($searchTerm) {
+                $sq->where('title', 'like', $searchTerm)
+                    ->orWhere('desc', 'like', $searchTerm)
+                    ->orWhere('summary', 'like', $searchTerm);
+            });
+        });
+
+        $query->when($f->category, fn($q, $v) => $query->whereHas('categories', fn($q) => $q->where('categories.category_id', $f->category))
+        );
+        $query->when($f->priceMin, fn($q, $v) => $q->where('price', '>=', $v));
+        $query->when($f->priceMax, fn($q, $v) => $q->where('price', '<=', $v));
+    }
+
+    private function applyRelated(Builder $query, array $categoryIds, array $tagIds): void
+    {
+        $hasCategory = !empty($categoryIds);
+        $hasTag = !empty($tagIds);
+
+        if (!$hasCategory && !$hasTag) {
+            return;
+        }
+
+        $query->where(function (Builder $q) use ($hasCategory, $hasTag, $categoryIds, $tagIds) {
+            if ($hasCategory) {
+                $q->whereHas('categories', fn($c) => $c->whereIn('categories.category_id', $categoryIds));
+            }
+
+            if ($hasTag) {
+                $method = $hasCategory ? 'orWhereHas' : 'whereHas';
+                $q->{$method}('tags', fn($t) => $t->whereIn('tags.tag_id', $tagIds));
+            }
+        });
     }
 }

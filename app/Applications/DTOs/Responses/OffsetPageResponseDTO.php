@@ -2,12 +2,13 @@
 
 namespace App\Applications\DTOs\Responses;
 
+use App\Domains\Common\DTOs\BaseDTO;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * @template T
  */
-class OffsetPageResponseDTO
+class OffsetPageResponseDTO implements BaseDTO
 {
     /**
      * @param T[] $data
@@ -20,14 +21,30 @@ class OffsetPageResponseDTO
         public bool  $hasMore
     ) {}
 
-    static public function fromPaginator(LengthAwarePaginator $paginator): self
+    static public function fromPaginator(LengthAwarePaginator $paginator, callable $transform = null): self
     {
         $data = $paginator->items();
+
+        if ($transform) {
+            $data = array_map($transform, $data);
+        }
+
         $limit = $paginator->perPage();
         $offset = ($paginator->currentPage() - 1) * $limit;
         $total = $paginator->total();
         $hasMore = $paginator->hasMorePages();
 
         return new self($data, $limit, $offset, $total, $hasMore);
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'data' => $this->data,
+            'limit' => $this->limit,
+            'offset' => $this->offset,
+            'total' => $this->total,
+            'has_more' => $this->hasMore,
+        ];
     }
 }
