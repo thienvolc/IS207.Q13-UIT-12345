@@ -604,3 +604,34 @@ INSERT INTO user_roles (user_id, role_id) VALUES
 (298, 2),
 (299, 2),
 (300, 2);
+
+INSERT INTO users (
+    user_id,
+    email,
+    phone,
+    password,
+    salt,
+    is_admin,
+    status,
+    created_at,
+    updated_at,
+    created_by,
+    updated_by
+)
+SELECT
+    up.user_id,
+    CONCAT('user', up.user_id, '@example.com')        AS email,
+    NULL                                              AS phone,
+    '$2y$10$exampleexampleexampleexampleexampleexam'  AS password,
+    NULL                                              AS salt,
+    CASE
+        WHEN ur.role_id = 1 THEN 1
+        ELSE 0
+        END                                           AS is_admin,
+    1                                                 AS status,
+    up.registered_at                                  AS created_at,
+    COALESCE(up.last_login, up.registered_at)         AS updated_at,
+    NULL                                              AS created_by,
+    NULL                                              AS updated_by
+FROM user_profiles up
+         LEFT JOIN user_roles ur ON ur.user_id = up.user_id;

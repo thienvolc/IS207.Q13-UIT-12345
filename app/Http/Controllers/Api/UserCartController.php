@@ -41,16 +41,6 @@ class UserCartController extends AppController
     }
 
     /**
-     * [PATCH] /me/carts/items/{cart_item_id}
-     */
-    public function updateItem(UpdateCartItemRequest $request, int $cart_item_id): ResponseDTO
-    {
-        $dto = UpdateCartItemDTO::fromArray($request->validated(), $cart_item_id);
-        $item = $this->cartService->updateItem($dto);
-        return $this->success($item);
-    }
-
-    /**
      * [DELETE] /me/carts/items/{cart_item_id}
      */
     public function deleteItem(int $cart_item_id): ResponseDTO

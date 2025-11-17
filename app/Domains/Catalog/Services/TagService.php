@@ -2,6 +2,7 @@
 
 namespace App\Domains\Catalog\Services;
 
+use App\Applications\DTOs\Responses\OffsetPageResponseDTO;
 use App\Applications\DTOs\Responses\PageResponseDTO;
 use App\Domains\Catalog\DTOs\Product\Responses\ProductAdminResponseDTO;
 use App\Domains\Catalog\DTOs\Tag\Requests\CreateTagDTO;
@@ -21,8 +22,18 @@ readonly class TagService
         private TagRepository $tagRepository
     ) {}
 
+    /** @return OffsetPageResponseDTO<ProductAdminResponseDTO> */
+    public function searchPublic(GetAllTagsDTO $dto): OffsetPageResponseDTO
+    {
+        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
+        $size = $dto->limit;
+        $pageable = Pageable::of($page, $size);
+        $products = $this->tagRepository->searchPublic($pageable);
+        return OffsetPageResponseDTO::fromPaginator($products);
+    }
+
     /** @return PageResponseDTO<ProductAdminResponseDTO> */
-    public function searchPublic(GetAllTagsDTO $dto): PageResponseDTO
+    public function search(GetAllTagsDTO $dto): PageResponseDTO
     {
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
         $size = $dto->limit;

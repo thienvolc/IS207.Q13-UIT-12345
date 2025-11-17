@@ -1,8 +1,13 @@
-@base_url =http://127.0.0.1:8080
-@admin_token =your_admin_jwt_token_here
+@base_url = http://127.0.0.1:8000
+@admin_token = admin-1
+@user_token = user-2
 
-### List products (admin)
+### search products (admin)
 GET {{base_url}}/api/admin/products
+    ?query=logitech&category=1
+    &price_min=0&price_max=100000000
+    &page=1&size=20
+    &sort=created_at:desc
 Accept: application/json
 Authorization: Bearer {{admin_token}}
 
@@ -34,8 +39,8 @@ Authorization: Bearer {{admin_token}}
 }
 
 ### Delete product
-DELETE {{base_url}}/api/admin/products/1
-Authorization: Bearer {{admin_token}}
+#DELETE {{base_url}}/api/admin/products/1
+#Authorization: Bearer {{admin_token}}
 
 ### Update categories for product
 PUT {{base_url}}/api/admin/products/1/categories
@@ -61,6 +66,7 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {
-  "quantity": 5,
+  "amount": 5,
+  "operationType": "increase",
   "reason": "stock correction"
 }

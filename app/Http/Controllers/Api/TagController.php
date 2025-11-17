@@ -36,6 +36,22 @@ class TagController extends AppController
         return $this->success($result);
     }
 
+    public function searchAdmin(SearchTagRequest $request): ResponseDTO
+    {
+        [$sortField, $sortOrder] = $request->getSort();
+
+        $dto = GetAllTagsDTO::fromArray([
+            'offset' => $request->getOffset(),
+            'limit' => $request->getLimit(),
+            'sortField' => $sortField,
+            'sortOrder' => $sortOrder,
+        ]);
+
+        $result = $this->tagService->search($dto);
+
+        return $this->success($result);
+    }
+
     public function store(CreateTagRequest $request): ResponseDTO
     {
         $dto = CreateTagDTO::fromArray($request->validated());
@@ -48,7 +64,7 @@ class TagController extends AppController
     public function update(UpdateTagRequest $request, int $tag_id): ResponseDTO
     {
         $dto = UpdateTagDTO::fromArray([
-            'tagId' => $tag_id,
+            'tag_id' => $tag_id,
             ...$request->validated()
         ]);
 

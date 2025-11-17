@@ -1,4 +1,5 @@
 @base_url = http://127.0.0.1:8000
+@user_token = user-2
 
 ### List my orders
 GET {{base_url}}/api/me/orders

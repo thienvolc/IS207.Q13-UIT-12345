@@ -1,7 +1,18 @@
 @base_url = http://127.0.0.1:8000
+@admin_token = admin-1
+@user_token = user-2
 
-### List orders
+### Search orders
 GET {{base_url}}/api/admin/orders
+    ?query=
+    &status=4
+    &user_id=
+    &start=2025-01-01
+    &end=2025-10-15
+    &min=1000000
+    &max=5000000
+    &page=1&size=10
+    &sort=orders_at:desc
 Authorization: Bearer {{admin_token}}
 
 ### Get order details

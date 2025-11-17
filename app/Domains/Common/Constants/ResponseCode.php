@@ -29,7 +29,7 @@ class ResponseCode
     // ==========================================
     // Error Responses (from OpenAPI)
     // ==========================================
-    public const USER_INACTIVE = [
+    public const USER_NON_ACTIVE = [
         'statusCode' => 401,
         'code' => '400031',
         'type' => 'UNAUTHORIZED',

@@ -1,5 +1,5 @@
-# UserProfileController - authenticated user profile
-# Requires Authorization: Bearer {{token}}
+@base_url = http://127.0.0.1:8000
+@user_token = user-2
 
 ### Get my profile
 GET {{base_url}}/api/me

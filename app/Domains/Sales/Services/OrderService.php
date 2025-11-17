@@ -142,10 +142,10 @@ readonly class OrderService
         return PageResponseDTO::fromPaginator($orders);
     }
 
-    public function getOrderAdminDetailsById(int $orderId): OrderResponseDTO
+    public function getOrderAdminDetailsById(int $orderId): OrderStatusResponseDTO
     {
         $order = $this->orderRepository->getByIdWithItemsOrFail($orderId);
-        return OrderResponseDTO::fromModel($order);
+        return OrderStatusResponseDTO::fromModel($order);
     }
 
     public function updateOrderStatus(UpdateOrderStatusDTO $dto): OrderStatusResponseDTO

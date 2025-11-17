@@ -32,7 +32,7 @@ readonly class CartResponseDTO implements BaseDTO
             totalQuantity: $totalQuantity,
             totalPrice: $totalPrice,
             status: $cart->status ?? null,
-            items: $items->isNotEmpty() ? $items->map(fn($i) => new CartItemResponseDTO($i))->all() : [],
+            items: $items->isNotEmpty() ? $items->map(fn($i) => CartItemResponseDTO::fromModel($i))->all() : [],
             updatedAt: optional($cart->updated_at)?->toDateTimeString(),
         );
     }

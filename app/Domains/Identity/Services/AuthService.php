@@ -151,7 +151,7 @@ readonly class AuthService
     private function assertUserIsActive(User $user): void
     {
         if ($user->status !== UserStatus::ACTIVE) {
-            throw new BusinessException(ResponseCode::USER_INACTIVE);
+            throw new BusinessException(ResponseCode::USER_NON_ACTIVE);
         }
     }
 

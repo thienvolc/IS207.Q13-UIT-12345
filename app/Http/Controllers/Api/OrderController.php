@@ -56,11 +56,8 @@ class OrderController extends AppController
      */
     public function status(int $order_id): ResponseDTO
     {
-        $order = $this->orderService->getOrderAdminDetailsById($order_id);
-        return $this->success([
-            'order_id' => $order['order_id'],
-            'status' => $order['status'],
-        ]);
+        $result = $this->orderService->getOrderAdminDetailsById($order_id);
+        return $this->success($result);
     }
 
     /**

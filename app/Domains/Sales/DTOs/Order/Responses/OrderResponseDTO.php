@@ -15,7 +15,8 @@ readonly class OrderResponseDTO implements BaseDTO
         public ?float  $shipping = null,
         /** @var OrderItemDTO[] */
         public array   $items = [],
-        public ?string $createdAt = null
+        public ?string $createdAt = null,
+        public ?string $updatedAt = null
     ) {}
 
     public static function fromModel(Order $order): self
@@ -28,6 +29,7 @@ readonly class OrderResponseDTO implements BaseDTO
             shipping: $order->shipping,
             items: self::loadItems($order),
             createdAt: optional($order->created_at)?->toDateTimeString(),
+            updatedAt: optional($order->updated_at)?->toDateTimeString(),
         );
     }
 
@@ -48,6 +50,7 @@ readonly class OrderResponseDTO implements BaseDTO
             'shipping' => $this->shipping,
             'items' => array_map(fn($it) => $it->toArray(), $this->items),
             'created_at' => $this->createdAt,
+            'updated_at' => $this->updatedAt,
         ];
     }
 }

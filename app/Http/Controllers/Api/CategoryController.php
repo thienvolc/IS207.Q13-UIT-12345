@@ -53,7 +53,7 @@ class CategoryController extends AppController
     public function update(UpdateCategoryRequest $request, int $category_id): ResponseDTO
     {
         $dto = UpdateCategoryDTO::fromArray([
-            'categoryId' => $category_id,
+            'category_id' => $category_id,
             ...$request->validated()
         ]);
 

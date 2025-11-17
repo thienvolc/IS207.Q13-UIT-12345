@@ -1,8 +1,15 @@
-# TagController - Admin tag endpoints
-# Requires admin Authorization header
+@base_url = http://127.0.0.1:8000
+@admin_token = admin-1
 
-### List tags
+### search tags
+GET {{base_url}}/api/tags
+    ?offset=1&limit=20
+    &sort=created_at:desc
+
+### search admin tags
 GET {{base_url}}/api/admin/tags
+    ?offset=1&limit=20
+    &sort=created_at:desc
 Authorization: Bearer {{admin_token}}
 
 ### Create tag
@@ -27,5 +34,5 @@ Authorization: Bearer {{admin_token}}
 }
 
 ### Delete tag
-DELETE {{base_url}}/api/admin/tags/1
-Authorization: Bearer {{admin_token}}
+#DELETE {{base_url}}/api/admin/tags/1
+#Authorization: Bearer {{admin_token}}

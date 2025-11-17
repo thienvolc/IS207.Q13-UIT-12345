@@ -31,6 +31,7 @@ Route::prefix('categories')->group(function () {
 });
 
 Route::prefix('tags')->group(function () {
+    Route::get('/', [TagController::class, 'index']);
     Route::get('/{tag_id}/products', [ProductPublicController::class, 'searchByTagId']);
 });
 
@@ -49,7 +50,6 @@ Route::middleware($auth)->prefix('me')->group(function () {
 
     Route::get('carts', [UserCartController::class, 'index']);
     Route::post('carts/items', [UserCartController::class, 'addItem']);
-    Route::patch('carts/items/{cart_item_id}', [UserCartController::class, 'updateItem']);
     Route::delete('carts/items/{cart_item_id}', [UserCartController::class, 'deleteItem']);
     Route::delete('carts/clear', [UserCartController::class, 'clearCart']);
     Route::patch('carts/checkout', [UserCartController::class, 'checkout']);
@@ -105,7 +105,7 @@ Route::middleware($auth . ':admin')->prefix('admin')->group(function () {
     });
 
     Route::prefix('tags')->group(function () {
-        Route::get('/', [TagController::class, 'index']);
+        Route::get('/', [TagController::class, 'searchAdmin']);
         Route::post('/', [TagController::class, 'store']);
         Route::put('/{tag_id}', [TagController::class, 'update']);
         Route::delete('/{tag_id}', [TagController::class, 'destroy']);

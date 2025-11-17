@@ -17,7 +17,7 @@ class AuthMiddleware
         $token = $this->getBearerToken($request);
         [$tokenRole, $userId] = $this->parseToken($token);
 
-        $user = $this->findUser($userId);
+        $user = $this->findUserOrFail($userId);
         $this->assertUserIsActive($user);
         $this->assertRoleAllowed($role, $tokenRole);
 
@@ -52,25 +52,19 @@ class AuthMiddleware
             throw new BusinessException(ResponseCode::INVALID_TOKEN_FORMAT);
         }
 
-        // $matches[2] = [<role>, <id>]
         return [$matches[1], (int)$matches[2]];
     }
 
-    private function findUser(int $userId): User
+    private function findUserOrFail(int $userId): User
     {
-        $user = User::find($userId);
-
-        if (!$user) {
-            throw new BusinessException(ResponseCode::NOT_FOUND);
-        }
-
-        return $user;
+        return User::find($userId)
+            ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 
     private function assertUserIsActive(User $user): void
     {
         if ($user->status !== UserStatus::ACTIVE) {
-            throw new BusinessException(ResponseCode::USER_INACTIVE);
+            throw new BusinessException(ResponseCode::USER_NON_ACTIVE);
         }
     }
 

@@ -1,8 +1,13 @@
 @base_url = http://127.0.0.1:8000
-
+@admin_token = admin-1
+@user_token = user-2
 
 ### List categories
 GET {{base_url}}/api/admin/categories
+    ?level=1
+    &query=electronics
+    &page=1&size=20
+    &sort=created_at:desc
 Authorization: Bearer {{admin_token}}
 Accept: application/json
 
@@ -33,5 +38,5 @@ Authorization: Bearer {{admin_token}}
 }
 
 ### Delete category
-DELETE {{base_url}}/api/admin/categories/1
-Authorization: Bearer {{admin_token}}
+#DELETE {{base_url}}/api/admin/categories/1
+#Authorization: Bearer {{admin_token}}

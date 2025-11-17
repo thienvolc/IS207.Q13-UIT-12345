@@ -133,7 +133,7 @@ readonly class CategoryService
     private function prepareUpdateData(UpdateCategoryDTO $dto): array
     {
         $userId = $this->userId();
-        $data = $dto->toArray();
+        $data = array_filter($dto->toArray(), fn($value) => $value !== null);
 
         if (isset($data['title']) && empty($data['slug'])) {
             $data['slug'] = StringHelper::slugify($dto->title);
