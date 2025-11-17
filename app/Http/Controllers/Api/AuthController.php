@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
 use App\Domains\Identity\DTOs\Auth\FormRequests\ForgotPasswordRequest;

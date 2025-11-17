@@ -1,17 +1,17 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\Catalog\CategoryController;
-use App\Http\Controllers\Api\Catalog\ProductController;
-use App\Http\Controllers\Api\Catalog\PublicCategoryController;
-use App\Http\Controllers\Api\Catalog\ProductPublicController;
-use App\Http\Controllers\Api\Catalog\TagController;
-use App\Http\Controllers\Api\Sales\OrderController;
-use App\Http\Controllers\Api\Sales\TransactionController;
-use App\Http\Controllers\Api\Sales\UserCartController;
-use App\Http\Controllers\Api\Sales\UserOrderController;
-use App\Http\Controllers\Api\User\UserController;
-use App\Http\Controllers\Api\User\UserProfileController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProductPublicController;
+use App\Http\Controllers\Api\PublicCategoryController;
+use App\Http\Controllers\Api\TagController;
+use App\Http\Controllers\Api\TransactionController;
+use App\Http\Controllers\Api\UserCartController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserOrderController;
+use App\Http\Controllers\Api\UserProfileController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Route;
 

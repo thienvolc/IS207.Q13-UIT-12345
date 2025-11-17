@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\API\Sales;
+namespace App\Http\Controllers\Api;
 
-use App\Applications\DTOs\Responses\OffsetPageResponseDTO;
 use App\Applications\DTOs\Responses\ResponseDTO;
 use App\Domains\Sales\DTOs\Order\FormRequest\GetOrdersRequest;
 use App\Domains\Sales\DTOs\Order\FormRequest\PlaceOrderRequest;
@@ -10,7 +9,6 @@ use App\Domains\Sales\DTOs\Order\FormRequest\UpdateOrderShippingRequest;
 use App\Domains\Sales\DTOs\Order\Requests\GetUserOrdersDTO;
 use App\Domains\Sales\DTOs\Order\Requests\PlaceOrderDTO;
 use App\Domains\Sales\DTOs\Order\Requests\UpdateOrderShippingDTO;
-use App\Domains\Sales\DTOs\Order\Responses\OrderResponseDTO;
 use App\Domains\Sales\Services\OrderService;
 use App\Http\Controllers\AppController;
 

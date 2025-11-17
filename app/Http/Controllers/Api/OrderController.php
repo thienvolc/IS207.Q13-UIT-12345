@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Sales;
+namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
 use App\Domains\Sales\DTOs\Order\FormRequest\SearchOrdersAdminRequest;

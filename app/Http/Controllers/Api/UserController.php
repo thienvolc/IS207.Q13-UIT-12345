@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Api\User;
+namespace App\Http\Controllers\Api;
 
+use App\Applications\DTOs\Responses\ResponseDTO;
 use App\Domains\Identity\DTOs\User\FormRequests\AssignRolesRequest;
 use App\Domains\Identity\DTOs\User\FormRequests\CreateUserRequest;
 use App\Domains\Identity\DTOs\User\FormRequests\SearchUsersRequest;
@@ -12,7 +13,6 @@ use App\Domains\Identity\DTOs\User\Requests\SearchUsersDTO;
 use App\Domains\Identity\DTOs\User\Requests\UpdateUserStatusDTO;
 use App\Domains\Identity\Services\UserService;
 use App\Http\Controllers\AppController;
-use App\Applications\DTOs\Responses\ResponseDTO;
 
 class UserController extends AppController
 {

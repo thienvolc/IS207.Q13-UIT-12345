@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Api\Catalog;
+namespace App\Http\Controllers\Api;
 
+use App\Applications\DTOs\Responses\ResponseDTO;
 use App\Domains\Catalog\DTOs\Tag\FormRequests\CreateTagRequest;
 use App\Domains\Catalog\DTOs\Tag\FormRequests\SearchTagRequest;
 use App\Domains\Catalog\DTOs\Tag\FormRequests\UpdateTagRequest;
@@ -10,7 +11,6 @@ use App\Domains\Catalog\DTOs\Tag\Requests\GetAllTagsDTO;
 use App\Domains\Catalog\DTOs\Tag\Requests\UpdateTagDTO;
 use App\Domains\Catalog\Services\TagService;
 use App\Http\Controllers\AppController;
-use App\Applications\DTOs\Responses\ResponseDTO;
 
 class TagController extends AppController
 {

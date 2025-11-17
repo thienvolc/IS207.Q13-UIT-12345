@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api\Catalog;
+namespace App\Http\Controllers\Api;
 
 use App\Applications\DTOs\Responses\ResponseDTO;
 use App\Domains\Catalog\DTOs\Category\FormRequests\SearchCategoryRequest;
-use App\Domains\Catalog\DTOs\Category\Requests\GetProductsByCategoryDTO;
 use App\Domains\Catalog\DTOs\Category\Requests\SearchCategoriesPublicDTO;
-use App\Domains\Catalog\DTOs\Product\FormRequests\SearchProductRequest;
 use App\Domains\Catalog\Services\CategoryService;
 use App\Http\Controllers\AppController;
 use Cache;
