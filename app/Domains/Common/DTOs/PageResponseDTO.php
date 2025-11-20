@@ -39,7 +39,7 @@ class PageResponseDTO implements BaseDTO
     public function toArray(): array
     {
         return [
-            'data' => $this->data,
+            'data' => array_map(fn($item) => $item instanceof BaseDTO ? $item->toArray() : $item, $this->data),
             'page' => $this->page,
             'size' => $this->size,
             'total' => $this->total,

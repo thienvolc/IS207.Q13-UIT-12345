@@ -69,7 +69,7 @@ readonly class UserService
     /**
      * @return PageResponseDTO<UserDTO>
      */
-    public function searchUsers(SearchUsersDTO $dto): PageResponseDTO
+    public function search(SearchUsersDTO $dto): PageResponseDTO
     {
         $filters = $dto->getFilters();
         $sort = Sort::of($dto->sortField, $dto->sortOrder);
@@ -78,7 +78,7 @@ readonly class UserService
         $users = $this->userRepository->searchUsers($pageable, $filters);
 
         return PageResponseDTO::fromPaginator($users,
-            fn($user) => $this->userMapper->toDTOs($user));
+            fn($user) => $this->userMapper->toDTO($user));
     }
 
     public function create(CreateUserDTO $dto): UserDTO
@@ -108,12 +108,10 @@ readonly class UserService
 
             $this->assertNotDeletingOwnAccount($user);
 
-            $replica = $user->replicate();
-            $replica->load(['profile', 'roles']);
-
+            $dto = $this->userMapper->toDTO($user);
             $this->deleteUserData($user);
 
-            return $this->userMapper->toDTO($replica);
+            return $dto;
         });
     }
 
@@ -186,7 +184,8 @@ readonly class UserService
             'password' => Hash::make($dto->password),
             'is_admin' => $dto->isAdmin,
             'status' => UserStatus::ACTIVE,
-            'registered_at' => now(),
+            'created_by' => $this->userId(),
+            'updated_by' => $this->userId(),
         ]);
     }
 
@@ -197,6 +196,7 @@ readonly class UserService
             'first_name' => $dto->firstName,
             'middle_name' => $dto->middleName,
             'last_name' => $dto->lastName,
+            'registered_at' => now(),
         ]);
     }
 
@@ -217,7 +217,7 @@ readonly class UserService
 
     private function deleteUserData(User $user): void
     {
-        $user->profile->delete();
+        $user->profile()->delete();
         $user->roles()->detach();
         $user->delete();
     }

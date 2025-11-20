@@ -43,6 +43,7 @@ class CartMapper
             itemId: $cartItem->cart_item_id,
             productId: $cartItem->product_id,
             quantity: $cartItem->quantity,
+            price: (float)$cartItem->product->price,
         );
     }
 }

@@ -7,16 +7,10 @@ use App\Domains\Transaction\DTOs\Queries\TransactionFilter;
 use App\Domains\Transaction\Entities\Transaction;
 use App\Exceptions\BusinessException;
 use App\Infra\Utils\Pagination\Pageable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class TransactionRepository
 {
-    public function create(array $data): Transaction
-    {
-        return Transaction::create($data);
-    }
-
     public function search(Pageable $pageable, TransactionFilter $filters): LengthAwarePaginator
     {
         $query = Transaction::query()->with(['order', 'order.user']);
@@ -27,7 +21,7 @@ class TransactionRepository
             ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 
-    private function applyFilters(Builder $query, TransactionFilter $f): void
+    private function applyFilters($query, TransactionFilter $f): void
     {
         $query->when($f->userId, fn($q, $v) =>
             $q->whereHas('order', fn($o) => $o->where('user_id', $v))
@@ -35,6 +29,12 @@ class TransactionRepository
         $query->when($f->orderId, fn($q, $v) => $q->where('order_id', $v));
         $query->when($f->status, fn($q, $v) => $q->where('status', $v));
         $query->when($f->type, fn($q, $v) => $q->where('type', $v));
+
+        $query->when($f->start, fn($q, $v) => $q->whereDate('updated_at', '>=', $v));
+        $query->when($f->end, fn($q, $v) => $q->whereDate('updated_at', '<=', $v));
+
+        $query->when($f->min, fn($q, $v) => $q->where('amount', '>=', $v));
+        $query->when($f->max, fn($q, $v) => $q->where('amount', '<=', $v));
     }
 
     public function getByIdOrFail(int $transactionId): Transaction

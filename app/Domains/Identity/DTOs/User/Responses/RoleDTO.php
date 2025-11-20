@@ -14,7 +14,7 @@ class RoleDTO implements BaseDTO
     public function toArray(): array
     {
         return [
-            'role_id' => $this->role_id,
+            'role_id' => $this->roleId,
             'name' => $this->name,
         ];
     }

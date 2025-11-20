@@ -1,15 +1,16 @@
 @base_url = http://127.0.0.1:8000
-@admin_token = admin-1
-@user_token = user-2
+@token = user-306
 
 ### Register
 POST {{base_url}}/api/users/auth/register
 Content-Type: application/json
 
-{
-  "email": "user@example.com",
-  "password": "password123",
-  "phone": "0123456789"
+{ "first_name": "Thien",
+  "last_name": "Chi",
+  "middle_name": "Vo",
+  "email": "23521489@gm.uit.edu.vn",
+  "password": "admin123456",
+  "phone": "0123456781"
 }
 
 ### Login
@@ -17,8 +18,8 @@ POST {{base_url}}/api/users/auth/login
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
-  "password": "password123"
+  "email": "23521489@gm.uit.edu.vn",
+  "password": "newpassword123"
 }
 
 ### Logout (requires token)
@@ -30,7 +31,7 @@ POST {{base_url}}/api/users/auth/forgot-password
 Content-Type: application/json
 
 {
-  "email": "user@example.com"
+  "email": "23521489@gm.uit.edu.vn"
 }
 
 ### Reset password
@@ -38,6 +39,8 @@ POST {{base_url}}/api/users/auth/reset-password
 Content-Type: application/json
 
 {
-  "token": "reset-token",
-  "password": "new-password"
+    "email": "23521489@gm.uit.edu.vn",
+    "token": "GwWKRI2YSfd65KXMCaGnvl8SHfcjbAXqbtNjMWy4RbHwtCl9BiNYNoGHXkPPF3NI",
+    "new_password": "newpassword123",
+    "password_confirmation": "newpassword123"
 }

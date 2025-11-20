@@ -32,11 +32,11 @@ class SearchUsersRequest extends FormRequest
         [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
         return new SearchUsersDTO(
-            query: string_or_null($v['query'] ?? null),
-            isAdmin: bool_or_null($v['is_admin'] ?? null),
-            status: int_or_null($v['status'] ?? null),
-            page: int_or_null($v['page']) ?? 1,
-            size: int_or_null($v['size']) ?? 10,
+            query: get_string($v, 'query'),
+            isAdmin: get_bool($v, 'is_admin'),
+            status: get_int($v, 'status'),
+            page: get_int($v, 'page') ?? 1,
+            size: get_int($v, 'size') ?? 10,
             sortField: $sortField,
             sortOrder: $sortOrder,
         );

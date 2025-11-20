@@ -29,12 +29,12 @@ class CreateCategoryRequest extends FormRequest
         $v = $this->validated();
 
         return new CreateCategoryDTO(
-            parentId: int_or_null($v['parent_id'] ?? null),
+            parentId: get_int($v, 'parent_id'),
             level: $v['level'],
             title: $v['title'],
-            metaTitle: string_or_null($v['meta_title'] ?? null),
-            slug: string_or_null($v['slug'] ?? null),
-            desc: string_or_null($v['desc'] ?? null),
+            metaTitle: get_string($v, 'meta_title'),
+            slug: get_string($v, 'slug'),
+            desc: get_string($v, 'desc'),
         );
     }
 }

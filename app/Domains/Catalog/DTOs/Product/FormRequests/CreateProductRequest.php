@@ -38,19 +38,19 @@ class CreateProductRequest extends FormRequest
 
         return new CreateProductDTO(
             title: $v['title'],
-            meta_title: string_or_null($v['meta_title'] ?? null),
-            slug: string_or_null($v['slug'] ?? null),
-            thumb: string_or_null($v['thumb'] ?? null),
-            desc: string_or_null($v['desc'] ?? null),
-            summary: string_or_null($v['summary'] ?? null),
-            type: string_or_null($v['type'] ?? null),
-            sku: string_or_null($v['sku'] ?? null),
+            meta_title: get_string($v, 'meta_title'),
+            slug: get_string($v, 'slug'),
+            thumb: get_string($v, 'thumb'),
+            desc: get_string($v, 'desc'),
+            summary: get_string($v, 'summary'),
+            type: get_string($v, 'type'),
+            sku: get_string($v, 'sku'),
             price: (float)$v['price'],
-            discount: int_or_null($v['discount'] ?? null),
-            quantity: int_or_null($v['quantity'] ?? null) ?? 0,
-            status: int_or_null($v['status'] ?? null) ?? 1,
-            starts_at: string_or_null($v['starts_at'] ?? null),
-            ends_at: string_or_null($v['ends_at'] ?? null),
+            discount: get_int($v, 'discount'),
+            quantity: get_int($v, 'quantity') ?? 0,
+            status: get_int($v, 'status') ?? 1,
+            starts_at: get_string($v, 'starts_at'),
+            ends_at: get_string($v, 'ends_at'),
         );
     }
 }

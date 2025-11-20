@@ -6,7 +6,8 @@ class ProductFilter
 {
     public function __construct(
         public ?string $query,
-        public ?string $category,
+        public ?string $categoryIdOrSlug,
+        public ?string $tagId,
         public ?string $priceMin,
         public ?string $priceMax,
     ) {}

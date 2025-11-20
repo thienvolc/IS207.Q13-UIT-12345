@@ -45,10 +45,10 @@ class UpdateProfileRequest extends FormRequest
         $v = $this->validated();
 
         return new UpdateUserProfileDTO(
-            firstName: string_or_null($v['first_name'] ?? null),
-            middleName: string_or_null($v['middle_name'] ?? null),
-            lastName: string_or_null($v['last_name'] ?? null),
-            phone: string_or_null($v['phone'] ?? null),
+            firstName: get_string($v, 'first_name'),
+            middleName: get_string($v, 'middle_name'),
+            lastName: get_string($v, 'last_name'),
+            phone: get_string($v, 'phone'),
         );
     }
 }

@@ -23,20 +23,18 @@ class AuthController extends AppController
     /**
      * POST /users/auth/register
      */
-    public function register(RegisterRequest $request): ResponseDTO
+    public function register(RegisterRequest $req): ResponseDTO
     {
-        $dto = RegisterDTO::fromArray($request->validated());
-        $result = $this->authService->register($dto);
+        $result = $this->authService->register($req->toDTO());
         return $this->success($result);
     }
 
     /**
      * POST /users/auth/login
      */
-    public function login(LoginRequest $request): ResponseDTO
+    public function login(LoginRequest $req): ResponseDTO
     {
-        $dto = LoginDTO::fromArray($request->validated());
-        $result = $this->authService->login($dto);
+        $result = $this->authService->login($req->toDTO());
         return $this->success($result);
     }
 
@@ -52,20 +50,18 @@ class AuthController extends AppController
     /**
      * POST /users/auth/forgot-password
      */
-    public function forgotPassword(ForgotPasswordRequest $request): ResponseDTO
+    public function forgotPassword(ForgotPasswordRequest $req): ResponseDTO
     {
-        $dto = \App\Domains\Identity\DTOs\Auth\Commands\SendPasswordResetDTO::fromArray($request->validated());
-        $this->authService->sendPasswordResetEmail($dto);
+        $this->authService->sendPasswordResetEmail($req->toDTO());
         return $this->noContent();
     }
 
     /**
      * POST /users/auth/reset-password
      */
-    public function resetPassword(ResetPasswordRequest $request): ResponseDTO
+    public function resetPassword(ResetPasswordRequest $req): ResponseDTO
     {
-        $dto = \App\Domains\Identity\DTOs\Auth\Commands\ResetPasswordDTO::fromArray($request->validated());
-        $this->authService->resetPassword($dto);
+        $this->authService->resetPassword($req->toDTO());
         return $this->noContent();
     }
 }

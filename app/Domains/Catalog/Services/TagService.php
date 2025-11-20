@@ -2,12 +2,10 @@
 
 namespace App\Domains\Catalog\Services;
 
-use App\Domains\Catalog\DTOs\Product\Responses\ProductDTO;
 use App\Domains\Catalog\DTOs\Tag\Commands\CreateTagDTO;
 use App\Domains\Catalog\DTOs\Tag\Commands\UpdateTagDTO;
 use App\Domains\Catalog\DTOs\Tag\Queries\SearchTagsDTO;
 use App\Domains\Catalog\DTOs\Tag\Responses\TagDTO;
-use App\Domains\Catalog\Mappers\ProductMapper;
 use App\Domains\Catalog\Mappers\TagMapper;
 use App\Domains\Catalog\Repositories\TagRepository;
 use App\Domains\Common\DTOs\OffsetPageResponseDTO;
@@ -15,6 +13,7 @@ use App\Domains\Common\DTOs\PageResponseDTO;
 use App\Infra\Helpers\StringHelper;
 use App\Infra\Utils\Pagination\Pageable;
 use App\Infra\Utils\Pagination\PaginationUtil;
+use App\Infra\Utils\Pagination\Sort;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -23,35 +22,36 @@ readonly class TagService
     public function __construct(
         private TagRepository $tagRepository,
         private TagMapper     $tagMapper,
-        private ProductMapper $productMapper,
     ) {}
 
     /**
-     * @return OffsetPageResponseDTO<ProductDTO>
+     * @return OffsetPageResponseDTO<TagDTO>
      */
     public function searchPublic(SearchTagsDTO $dto): OffsetPageResponseDTO
     {
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
         $size = $dto->limit;
-        $pageable = Pageable::of($page, $size);
-        $products = $this->tagRepository->searchPublic($pageable);
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $pageable = Pageable::of($page, $size, $sort);
+        $tags = $this->tagRepository->search($pageable);
 
-        return OffsetPageResponseDTO::fromPaginator($products,
-            fn($p) => $this->productMapper->toPublicDTO($p));
+        return OffsetPageResponseDTO::fromPaginator($tags,
+            fn($t) => $this->tagMapper->toPublicDTO($t));
     }
 
     /**
-     * @return PageResponseDTO<ProductDTO>
+     * @return PageResponseDTO<TagDTO>
      */
     public function search(SearchTagsDTO $dto): PageResponseDTO
     {
         $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
         $size = $dto->limit;
-        $pageable = Pageable::of($page, $size);
-        $products = $this->tagRepository->searchPublic($pageable);
+        $sort = Sort::of($dto->sortField, $dto->sortOrder);
+        $pageable = Pageable::of($page, $size, $sort);
+        $tags = $this->tagRepository->search($pageable);
 
-        return PageResponseDTO::fromPaginator($products,
-            fn($p) => $this->productMapper->toDTO($p));
+        return PageResponseDTO::fromPaginator($tags,
+            fn($t) => $this->tagMapper->toDTO($t));
     }
 
     public function create(CreateTagDTO $dto): TagDTO

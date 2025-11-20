@@ -12,13 +12,7 @@ readonly class CurrentUserDTO implements BaseDTO
         public ?string $phone,
         public bool $isAdmin,
         public int $status,
-        public ?string $firstName = null,
-        public ?string $middleName = null,
-        public ?string $lastName = null,
-        public ?string $avatar = null,
         public ?array $profile = null,
-        public ?string $registeredAt = null,
-        public ?string $lastLogin = null,
     ) {}
 
     public function toArray(): array
@@ -29,13 +23,7 @@ readonly class CurrentUserDTO implements BaseDTO
             'phone' => $this->phone,
             'is_admin' => $this->isAdmin,
             'status' => $this->status,
-            'first_name' => $this->firstName,
-            'middle_name' => $this->middleName,
-            'last_name' => $this->lastName,
-            'avatar' => $this->avatar,
             'profile' => $this->profile,
-            'registered_at' => $this->registeredAt,
-            'last_login' => $this->lastLogin,
         ];
     }
 }

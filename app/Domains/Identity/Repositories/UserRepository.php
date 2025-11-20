@@ -65,46 +65,18 @@ class UserRepository
             ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 
-    public function searchWithFilters(array $filters, string $sortField, string $sortOrder, int $offset, int $limit): Collection
+    private function applyFilters($query, UserFilter $f): void
     {
-        $query = User::query()->with(['profile', 'roles']);
-
-        $this->applyFilters($query, $filters);
-
-        return $query->orderBy($sortField, $sortOrder)
-            ->offset($offset)
-            ->limit($limit)
-            ->get();
-    }
-
-    public function countWithFilters(array $filters): int
-    {
-        $query = User::query();
-
-        $this->applyFilters($query, $filters);
-
-        return $query->count();
-    }
-
-    private function applyFilters($query, array $filters): void
-    {
-        if (!empty($filters['query'])) {
-            $query->where(function ($q) use ($filters) {
-                $q->where('email', 'like', '%' . $filters['query'] . '%')
-                    ->orWhere('phone', 'like', '%' . $filters['query'] . '%')
-                    ->orWhereHas('profile', function ($subQ) use ($filters) {
-                        $subQ->where('first_name', 'like', '%' . $filters['query'] . '%')
-                            ->orWhere('last_name', 'like', '%' . $filters['query'] . '%');
-                    });
-            });
-        }
-
-        if (isset($filters['is_admin'])) {
-            $query->where('is_admin', $filters['is_admin']);
-        }
-
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
+        $query->when($f->query,
+            fn($q, $v) =>
+            $q->where('email', 'like', '%' . $v . '%')
+            ->orWhere('phone', 'like', '%' . $v . '%')
+            ->orWhereHas('profile',
+                fn($subQ) =>
+                $subQ->where('first_name', 'like', '%' . $v . '%')
+                ->orWhere('last_name', 'like', '%' . $v . '%'))
+        );
+        $query->when($f->isAdmin, fn($q, $v) => $q->where('is_admin', $v));
+        $query->when($f->status, fn($q, $v) => $q->where('status', $v));
     }
 }

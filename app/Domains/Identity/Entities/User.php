@@ -2,10 +2,8 @@
 
 namespace App\Domains\Identity\Entities;
 
-use App\Models\Cart;
-use App\Models\Order;
-use App\Models\Role;
-use App\Models\UserProfile;
+use App\Domains\Cart\Entities\Cart;
+use App\Domains\Order\Entities\Order;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -62,8 +60,6 @@ class User extends Authenticatable
         'salt',
         'is_admin',
         'status',
-        'registered_at',
-        'last_login',
         'created_by',
         'updated_by',
     ];

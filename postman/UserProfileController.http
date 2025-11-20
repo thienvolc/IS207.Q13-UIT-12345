@@ -1,5 +1,5 @@
 @base_url = http://127.0.0.1:8000
-@user_token = user-2
+@token = user-305
 
 ### Get my profile
 GET {{base_url}}/api/me
@@ -13,7 +13,7 @@ Authorization: Bearer {{token}}
 {
   "first_name": "John",
   "last_name": "Doe",
-  "phone": "0123456789"
+  "phone": "0123456780"
 }
 
 ### Update password
@@ -22,6 +22,6 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "old_password": "oldpass",
-  "new_password": "newpass123"
+  "old_password": "password1234",
+  "new_password": "password12345"
 }

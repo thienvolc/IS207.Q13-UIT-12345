@@ -39,7 +39,7 @@ class OffsetPageResponseDTO implements BaseDTO
     public function toArray(): array
     {
         return [
-            'data' => $this->data,
+            'data' => array_map(fn($item) => $item instanceof BaseDTO ? $item->toArray() : $item, $this->data),
             'limit' => $this->limit,
             'offset' => $this->offset,
             'total' => $this->total,

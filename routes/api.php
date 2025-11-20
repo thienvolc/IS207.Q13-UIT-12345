@@ -77,7 +77,10 @@ Route::middleware($auth . ':admin')->prefix('admin')->group(function () {
     Route::patch('orders/{order_id}/status', [OrderController::class, 'updateStatus']);
     Route::delete('orders/{order_id}/cancel', [OrderController::class, 'cancel']);
 
-    Route::get('transactions', [TransactionController::class, 'index']);
+    Route::prefix('transactions')->group(function () {
+        Route::get('/', [TransactionController::class, 'index']);
+        Route::get('/{trans_id}', [TransactionController::class, 'show']);
+    });
 
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index']);

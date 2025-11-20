@@ -21,9 +21,10 @@ class TagRepository
             ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 
-    public function searchPublic(Pageable $pageable): LengthAwarePaginator
+    public function search(Pageable $pageable): LengthAwarePaginator
     {
         return Tag::query()
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
             ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 }

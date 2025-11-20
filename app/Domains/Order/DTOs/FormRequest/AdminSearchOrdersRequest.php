@@ -36,15 +36,15 @@ class AdminSearchOrdersRequest extends FormRequest
         [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
         return new AdminSearchOrdersDTO(
-            query: string_or_null($v['query']),
-            status: int_or_null($v['status']),
-            userId: int_or_null($v['user_id']),
-            start: int_or_null($v['start']),
-            end: int_or_null($v['end']),
-            min: int_or_null($v['min']),
-            max: int_or_null($v['max']),
-            page: int_or_null($v['page']) ?? 1,
-            size: int_or_null($v['size']) ?? 10,
+            query: get_string($v, 'query'),
+            status: get_int($v, 'status'),
+            userId: get_int($v, 'user_id'),
+            start: get_int($v, 'start'),
+            end: get_int($v, 'end'),
+            min: get_int($v, 'min'),
+            max: get_int($v, 'max'),
+            page: get_int($v, 'page') ?? 1,
+            size: get_int($v, 'size') ?? 10,
             sortField: $sortField,
             sortOrder: $sortOrder
         );

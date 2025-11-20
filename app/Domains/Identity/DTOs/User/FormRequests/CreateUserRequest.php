@@ -34,11 +34,11 @@ class CreateUserRequest extends FormRequest
         return new CreateUserDTO(
             email: $v['email'],
             password: $v['password'],
-            phone: string_or_null($v['phone'] ?? null),
-            firstName: string_or_null($v['first_name'] ?? null),
-            middleName: string_or_null($v['middle_name'] ?? null),
-            lastName: string_or_null($v['last_name'] ?? null),
-            isAdmin: (bool)($v['is_admin']),
+            phone: get_string($v, 'phone'),
+            firstName: get_string($v, 'first_name'),
+            middleName: get_string($v, 'middle_name'),
+            lastName: get_string($v, 'last_name'),
+            isAdmin: get_bool($v, 'is_admin') ?? false,
             roles: $v['roles'] ?? [],
         );
     }

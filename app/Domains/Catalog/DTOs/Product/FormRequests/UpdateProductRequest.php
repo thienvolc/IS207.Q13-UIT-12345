@@ -40,19 +40,19 @@ class UpdateProductRequest extends FormRequest
 
         return new UpdateProductDTO(
             productId: $productId,
-            title: string_or_null($v['title'] ?? null),
-            metaTitle: string_or_null($v['meta_title'] ?? null),
-            slug: string_or_null($v['slug'] ?? null),
-            thumb: string_or_null($v['thumb'] ?? null),
-            desc: string_or_null($v['desc'] ?? null),
-            summary: string_or_null($v['summary'] ?? null),
-            type: string_or_null($v['type'] ?? null),
-            sku: string_or_null($v['sku'] ?? null),
-            price: float_or_null($v['price'] ?? null),
-            discount: int_or_null($v['discount'] ?? null),
-            status: int_or_null($v['status'] ?? null) ?? 1,
-            startsAt: string_or_null($v['starts_at'] ?? null),
-            endsAt: string_or_null($v['ends_at'] ?? null),
+            title: get_string($v, 'title'),
+            metaTitle: get_string($v, 'meta_title'),
+            slug: get_string($v, 'slug'),
+            thumb: get_string($v, 'thumb'),
+            desc: get_string($v, 'desc'),
+            summary: get_string($v, 'summary'),
+            type: get_string($v, 'type'),
+            sku: get_string($v, 'sku'),
+            price: get_float($v, 'price'),
+            discount: get_int($v, 'discount'),
+            status: get_int($v, 'status') ?? 1,
+            startsAt: get_string($v, 'starts_at'),
+            endsAt: get_string($v, 'ends_at'),
         );
     }
 }

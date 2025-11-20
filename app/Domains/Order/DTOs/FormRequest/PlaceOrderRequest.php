@@ -27,7 +27,7 @@ class PlaceOrderRequest extends FormRequest
 
         return new PlaceOrderDTO(
             cartId: (int)$v['cart_id'],
-            promo: string_or_null($v['promo']),
+            promo: get_string($v, 'promo'),
         );
     }
 }

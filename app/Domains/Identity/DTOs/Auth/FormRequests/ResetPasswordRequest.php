@@ -16,8 +16,9 @@ class ResetPasswordRequest extends FormRequest
     {
         return [
             'email' => 'required|email|max:100',
-            'password_reset_token' => 'required|string',
+            'token' => 'required|string',
             'new_password' => 'required|string|min:8|max:255',
+            'password_confirmation' => 'required|string|same:new_password',
         ];
     }
 
@@ -27,7 +28,7 @@ class ResetPasswordRequest extends FormRequest
 
         return new ResetPasswordDTO(
             email: $v['email'],
-            passwordResetToken: $v['password_reset_token'],
+            passwordResetToken: $v['token'],
             newPassword: $v['new_password'],
         );
     }

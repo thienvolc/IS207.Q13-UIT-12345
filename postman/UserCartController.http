@@ -1,5 +1,5 @@
 @base_url = http://127.0.0.1:8000
-@token = user-20
+@token = user-2
 
 ### List my carts
 GET {{base_url}}/api/me/carts
@@ -16,12 +16,12 @@ Authorization: Bearer {{token}}
 }
 
 ### Delete cart item
-#DELETE {{base_url}}/api/me/carts/items/1
-#Authorization: Bearer {{token}}
+DELETE {{base_url}}/api/me/carts/items/638
+Authorization: Bearer {{token}}
 
 ### Clear cart
-#DELETE {{base_url}}/api/me/carts/clear
-#Authorization: Bearer {{token}}
+DELETE {{base_url}}/api/me/carts/clear
+Authorization: Bearer {{token}}
 
 ### Checkout
 PATCH {{base_url}}/api/me/carts/checkout

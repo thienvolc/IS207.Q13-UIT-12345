@@ -15,6 +15,7 @@ use App\Domains\Catalog\DTOs\Product\FormRequests\AssignProductCategoriesRequest
 use App\Domains\Catalog\DTOs\Product\FormRequests\AssignProductTagsRequest;
 use App\Domains\Catalog\DTOs\Product\FormRequests\CreateProductMetaRequest;
 use App\Domains\Catalog\DTOs\Product\FormRequests\CreateProductRequest;
+use App\Domains\Catalog\DTOs\Product\FormRequests\SearchProductsRequest;
 use App\Domains\Catalog\DTOs\Product\FormRequests\UpdateProductMetaRequest;
 use App\Domains\Catalog\DTOs\Product\FormRequests\UpdateProductRequest;
 use App\Domains\Catalog\DTOs\Product\FormRequests\UpdateProductStatusRequest;

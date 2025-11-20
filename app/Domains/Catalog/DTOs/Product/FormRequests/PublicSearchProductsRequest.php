@@ -2,10 +2,8 @@
 
 namespace App\Domains\Catalog\DTOs\Product\FormRequests;
 
-use App\Domains\Catalog\DTOs\Category\Queries\SearchProductsByCategorySlugDTO;
 use App\Domains\Catalog\DTOs\Product\Queries\PublicSearchProductsDTO;
 use App\Domains\Catalog\DTOs\Product\Queries\SearchRelatedProductsDTO;
-use App\Domains\Catalog\DTOs\Tag\Queries\SearchProductsByTagDTO;
 use App\Infra\Utils\Pagination\PaginationUtil;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -20,7 +18,8 @@ class PublicSearchProductsRequest extends FormRequest
     {
         return [
             'query' => 'nullable|string|max:255',
-            'category' => 'nullable|integer|exists:categories,category_id',
+            'category' => 'nullable|string',
+            'tag_id' => 'nullable|integer|min:1',
             'price_min' => 'nullable|integer|min:0',
             'price_max' => 'nullable|integer|min:0|gte:price_min',
             'offset' => 'nullable|integer|min:0',
@@ -36,45 +35,28 @@ class PublicSearchProductsRequest extends FormRequest
         [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
         return new PublicSearchProductsDTO(
-            query: $v['query'],
-            category: $this->input('category'),
-            priceMin: float_or_null($v['price_min'] ?? null),
-            priceMax: float_or_null($v['price_max'] ?? null),
-            offset: int_or_null($v['offset']) ?? 1,
-            limit: int_or_null($v['limit']) ?? 10,
+            query: get_string($v, 'query'),
+            categoryIdOrSlug: get_string($v, 'category'),
+            tagId: get_int($v, 'tag_id'),
+            priceMin: get_float($v, 'price_min'),
+            priceMax: get_float($v, 'price_max'),
+            offset: get_int($v, 'offset') ?? 1,
+            limit: get_int($v, 'limit') ?? 10,
             sortField: $sortField,
-            sortOrder: $sortOrder,
+            sortOrder: $sortOrder
         );
     }
 
-    public function toProductsByCategoryDTO(string $slug): SearchProductsByCategorySlugDTO
+    public function toDTOByCategorySlug(string $slug): PublicSearchProductsDTO
     {
-        $v = $this->validated();
-        $sort = $v['sort'] ?? 'created_at:desc';
-        [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
-
-        return new SearchProductsByCategorySlugDTO(
-            slug: $slug,
-            offset: int_or_null($v['offset']) ?? 1,
-            limit: int_or_null($v['limit']) ?? 10,
-            sortField: $sortField,
-            sortOrder: $sortOrder,
-        );
+        $this->merge(['category' => $slug]);
+        return $this->toDTO();
     }
 
-    public function toProductsByTagDTO(int $tagId): SearchProductsByTagDTO
+    public function toDTOByTag(int $tagId): PublicSearchProductsDTO
     {
-        $v = $this->validated();
-        $sort = $v['sort'] ?? 'created_at:desc';
-        [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
-
-        return new SearchProductsByTagDTO(
-            tagId: $tagId,
-            offset: int_or_null($v['offset']) ?? 1,
-            limit: int_or_null($v['limit']) ?? 10,
-            sortField: $sortField,
-            sortOrder: $sortOrder,
-        );
+        $this->merge(['tag_id' => $tagId]);
+        return $this->toDTO();
     }
 
     public function toRelatedDTO(int $productId): SearchRelatedProductsDTO
@@ -85,8 +67,8 @@ class PublicSearchProductsRequest extends FormRequest
 
         return new SearchRelatedProductsDTO(
             productId: $productId,
-            offset: int_or_null($v['offset']) ?? 1,
-            limit: int_or_null($v['limit']) ?? 10,
+            offset: get_int($v, 'offset') ?? 1,
+            limit: get_int($v, 'limit') ?? 10,
             sortField: $sortField,
             sortOrder: $sortOrder,
         );

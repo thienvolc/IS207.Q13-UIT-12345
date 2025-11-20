@@ -3,6 +3,7 @@
 namespace App\Domains\Catalog\DTOs\Tag\FormRequests;
 
 use App\Domains\Catalog\DTOs\Tag\Queries\SearchTagsDTO;
+use App\Infra\Utils\Pagination\PaginationUtil;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SearchTagsRequest extends FormRequest
@@ -24,10 +25,14 @@ class SearchTagsRequest extends FormRequest
     public function toDTO(): SearchTagsDTO
     {
         $v = $this->validated();
+        $sort = $v['sort'] ?? 'created_at:desc';
+        [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
         return new SearchTagsDTO(
-            offset: int_or_null($v['offset']) ?? 1,
-            limit: int_or_null($v['limit']) ?? 10,
+            offset: get_int($v, 'offset') ?? 1,
+            limit: get_int($v, 'limit') ?? 10,
+            sortField: $sortField,
+            sortOrder: $sortOrder,
         );
     }
 }

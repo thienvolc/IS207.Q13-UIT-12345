@@ -30,9 +30,9 @@ class UserSearchOrdersRequest extends FormRequest
         [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
         return new UserSearchOrdersDTO(
-            status: int_or_null($v['status']),
-            offset: int_or_null($v['offset']) ?? 1,
-            limit: int_or_null($v['limit']) ?? 10,
+            status: get_int($v, 'status'),
+            offset: get_int($v, 'offset') ?? 1,
+            limit: get_int($v, 'limit') ?? 10,
             sortField: $sortField,
             sortOrder: $sortOrder,
         );

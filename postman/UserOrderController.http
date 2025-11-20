@@ -1,5 +1,5 @@
 @base_url = http://127.0.0.1:8000
-@user_token = user-2
+@token = user-2
 
 ### List my orders
 GET {{base_url}}/api/me/orders
@@ -16,15 +16,15 @@ Authorization: Bearer {{token}}
 }
 
 ### Get order details
-GET {{base_url}}/api/me/orders/1
+GET {{base_url}}/api/me/orders/145
 Authorization: Bearer {{token}}
 
 ### Get order status
-GET {{base_url}}/api/me/orders/1/status
+GET {{base_url}}/api/me/orders/145/status
 Authorization: Bearer {{token}}
 
 ### Update shipping
-PATCH {{base_url}}/api/me/orders/1/shipping
+PATCH {{base_url}}/api/me/orders/145/shipping
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -39,5 +39,5 @@ Authorization: Bearer {{token}}
 }
 
 ### Cancel order
-DELETE {{base_url}}/api/me/orders/1/cancel
+DELETE {{base_url}}/api/me/orders/145/cancel
 Authorization: Bearer {{token}}

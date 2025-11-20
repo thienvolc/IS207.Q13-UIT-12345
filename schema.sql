@@ -16,6 +16,7 @@ CREATE TABLE users
     is_admin BOOLEAN DEFAULT FALSE,
     status   TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 4),
 # active,inactive,suspend,banned
+
     created_at   DATETIME NOT NULL,
     updated_at   DATETIME NOT NULL,
     created_by   INT NULL,

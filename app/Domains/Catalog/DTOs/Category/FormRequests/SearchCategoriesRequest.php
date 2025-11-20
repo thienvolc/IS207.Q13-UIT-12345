@@ -34,10 +34,10 @@ class SearchCategoriesRequest extends FormRequest
         [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
         return new AdminSearchCategoriesDTO(
-            query: string_or_null($v['query'] ?? null),
-            level: int_or_null($v['level']) ?? 0,
-            page: int_or_null($v['page']) ?? 1,
-            size: int_or_null($v['size']) ?? 10,
+            query: get_string($v, 'query'),
+            level: get_int($v, 'level') ?? 0,
+            page: get_int($v, 'page') ?? 1,
+            size: get_int($v, 'size') ?? 10,
             sortField: $sortField,
             sortOrder: $sortOrder,
         );
@@ -50,10 +50,10 @@ class SearchCategoriesRequest extends FormRequest
         [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
         return new PublicSearchCategoriesDTO(
-            query: string_or_null($v['query']),
-            level: int_or_null($v['level']) ?? 0,
-            offset: int_or_null($v['offset']) ?? 1,
-            limit: int_or_null($v['limit']) ?? 10,
+            query: get_string($v, 'query'),
+            level: get_int($v, 'level') ?? 0,
+            offset: get_int($v, 'offset') ?? 1,
+            limit: get_int($v, 'limit') ?? 10,
             sortField: $sortField,
             sortOrder: $sortOrder,
         );

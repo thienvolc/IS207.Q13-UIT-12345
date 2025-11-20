@@ -25,32 +25,18 @@ class UserController extends AppController
     /**
      * GET /admin/users
      */
-    public function index(SearchUsersRequest $request): ResponseDTO
+    public function index(SearchUsersRequest $req): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = SearchUsersDTO::fromArray([
-            'query' => $request->input('query'),
-            'is_admin' => $request->input('is_admin'),
-            'status' => $request->input('status'),
-            'page' => $request->getPage(),
-            'size' => $request->getSize(),
-            'sort_field' => $sortField,
-            'sort_order' => $sortOrder,
-        ]);
-
-        $users = $this->userService->searchUsers($dto);
-
+        $users = $this->userService->search($req->toDTO());
         return $this->success($users);
     }
 
     /**
      * POST /admin/users
      */
-    public function store(CreateUserRequest $request): ResponseDTO
+    public function store(CreateUserRequest $req): ResponseDTO
     {
-        $dto = CreateUserDTO::fromArray($request->validated());
-        $user = $this->userService->create($dto);
+        $user = $this->userService->create($req->toDTO());
         return $this->created($user);
     }
 
@@ -75,20 +61,18 @@ class UserController extends AppController
     /**
      * PATCH /admin/users/{user_id}/status
      */
-    public function updateStatus(UpdateUserStatusRequest $request, int $user_id): ResponseDTO
+    public function updateStatus(UpdateUserStatusRequest $req, int $user_id): ResponseDTO
     {
-        $dto = UpdateUserStatusDTO::fromArray($request->validated(), $user_id);
-        $result = $this->userService->updateUserStatus($dto);
+        $result = $this->userService->updateUserStatus($req->toDTO($user_id));
         return $this->success($result);
     }
 
     /**
      * PATCH /admin/users/{user_id}/roles
      */
-    public function updateRoles(AssignRolesRequest $request, int $user_id): ResponseDTO
+    public function updateRoles(AssignRolesRequest $req, int $user_id): ResponseDTO
     {
-        $dto = AssignRolesDTO::fromArray($request->validated(), $user_id);
-        $roles = $this->userService->assignRoles($dto);
+        $roles = $this->userService->assignRoles($req->toDTO($user_id));
         return $this->success($roles);
     }
 }

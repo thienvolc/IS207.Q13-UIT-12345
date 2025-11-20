@@ -11,6 +11,7 @@ readonly class CartItemDTO implements BaseDTO
         public int $itemId,
         public int $productId,
         public int $quantity,
+        public float $price,
     ) {}
 
     public function toArray(): array
@@ -19,6 +20,7 @@ readonly class CartItemDTO implements BaseDTO
             'item_id' => $this->itemId,
             'product_id' => $this->productId,
             'quantity' => $this->quantity,
+            'price' => $this->price,
         ];
     }
 }

@@ -3,9 +3,7 @@
 namespace App\Domains\Catalog\Repositories;
 
 use App\Domains\Catalog\Constants\ProductStatus;
-use App\Domains\Catalog\DTOs\Product\Queries\AdminProductFilter;
 use App\Domains\Catalog\DTOs\Product\Queries\ProductFilter;
-use App\Domains\Catalog\DTOs\Product\Queries\PublicProductFilter;
 use App\Domains\Catalog\Entities\Product;
 use App\Domains\Common\Constants\ResponseCode;
 use App\Exceptions\BusinessException;
@@ -47,42 +45,19 @@ class ProductRepository
             ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 
-    public function searchPublicByCategorySlug(Pageable $pageable, string $slug): LengthAwarePaginator
-    {
-        return Product::query()->with(['categories', 'tags', 'metas'])
-            ->whereHas('categories', fn($q) => $q->where('categories.slug', $slug))
-            ->where('status', ProductStatus::ACTIVE)
-            ->orderBy($pageable->sort->by, $pageable->sort->order)
-            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
-    }
-
-    public function searchPublicByTagId(Pageable $pageable, int $tagId): LengthAwarePaginator
-    {
-        return Product::query()->with(['categories', 'tags', 'metas'])
-            ->whereHas('tags', fn($q) => $q->where('tags.tag_id', $tagId))
-            ->where('status', ProductStatus::ACTIVE)
-            ->orderBy($pageable->sort->by, $pageable->sort->order)
-            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
-    }
-
-    public function search(Pageable $pageable, AdminProductFilter $filters): LengthAwarePaginator
+    public function search(Pageable $pageable, ProductFilter $filters): LengthAwarePaginator
     {
         $query = Product::query()->with(['categories', 'tags', 'metas']);
         $this->applyFilters($query, $filters);
-
-        return $query
-            ->orderBy($pageable->sort->by, $pageable->sort->order)
-            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+        return $this->queryWithPagination($query, $pageable);
     }
 
-    public function searchPublic(Pageable $pageable, PublicProductFilter $filters): LengthAwarePaginator
+    public function searchPublic(Pageable $pageable, ProductFilter $filters): LengthAwarePaginator
     {
         $query = Product::query()->with(['categories', 'tags', 'metas']);
         $this->applyFilters($query, $filters);
-
-        return $query
-            ->orderBy($pageable->sort->by, $pageable->sort->order)
-            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+        $query->where('status', ProductStatus::ACTIVE);
+        return $this->queryWithPagination($query, $pageable);
     }
 
     public function searchRelated(
@@ -99,9 +74,7 @@ class ProductRepository
 
         $this->applyRelated($query, $categoryIds, $tagIds);
 
-        return $query
-            ->orderBy($pageable->sort->by, $pageable->sort->order)
-            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+        return $this->queryWithPagination($query, $pageable);
     }
 
     // cart
@@ -143,8 +116,16 @@ class ProductRepository
             });
         });
 
-        $query->when($f->category, fn($q, $v) => $query->whereHas('categories', fn($q) => $q->where('categories.category_id', $f->category))
+        $isCategoryId = ctype_digit($f->categoryIdOrSlug);
+
+        $query->when($f->categoryIdOrSlug,
+            fn($q, $v) => $isCategoryId
+                ? $query->whereHas('categories', fn($q) => $q->where('categories.category_id', $f->categoryIdOrSlug))
+                : $query->whereHas('categories', fn($q) => $q->where('categories.slug', $f->categoryIdOrSlug))
         );
+        $query->when($f->tagId,
+            fn($q, $v) => $query->whereHas('tags',
+                fn($q) => $q->where('tags.tag_id', $f->tagId)));
         $query->when($f->priceMin, fn($q, $v) => $q->where('price', '>=', $v));
         $query->when($f->priceMax, fn($q, $v) => $q->where('price', '<=', $v));
     }
@@ -168,5 +149,12 @@ class ProductRepository
                 $q->{$method}('tags', fn($t) => $t->whereIn('tags.tag_id', $tagIds));
             }
         });
+    }
+
+    private function queryWithPagination($query, $pageable): LengthAwarePaginator
+    {
+        return $query
+            ->orderBy($pageable->sort->by, $pageable->sort->order)
+            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 }

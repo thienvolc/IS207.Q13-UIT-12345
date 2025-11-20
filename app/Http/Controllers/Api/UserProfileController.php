@@ -32,8 +32,7 @@ class UserProfileController extends AppController
      */
     public function update(UpdateProfileRequest $request): ResponseDTO
     {
-        $dto = UpdateUserProfileDTO::fromArray($request->validated());
-        $user = $this->userService->updateCurrent($dto);
+        $user = $this->userService->updateCurrent($request->toDTO());
         return $this->success($user);
     }
 
@@ -42,8 +41,7 @@ class UserProfileController extends AppController
      */
     public function updatePassword(UpdatePasswordRequest $request): ResponseDTO
     {
-        $dto = UpdatePasswordDTO::fromArray($request->validated());
-        $result = $this->userService->updatePassword($dto);
+        $result = $this->userService->updatePassword($request->toDTO());
         return $this->success($result);
     }
 }

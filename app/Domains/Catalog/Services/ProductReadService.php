@@ -2,13 +2,11 @@
 
 namespace App\Domains\Catalog\Services;
 
-use App\Domains\Catalog\DTOs\Category\Queries\SearchProductsByCategorySlugDTO;
-use App\Domains\Catalog\DTOs\Product\Queries\SearchRelatedProductsDTO;
 use App\Domains\Catalog\DTOs\Product\Queries\AdminSearchProductsDTO;
 use App\Domains\Catalog\DTOs\Product\Queries\PublicSearchProductsDTO;
+use App\Domains\Catalog\DTOs\Product\Queries\SearchRelatedProductsDTO;
 use App\Domains\Catalog\DTOs\Product\Responses\ProductDTO;
 use App\Domains\Catalog\DTOs\Product\Responses\PublicProductDTO;
-use App\Domains\Catalog\DTOs\Tag\Queries\SearchProductsByTagDTO;
 use App\Domains\Catalog\Mappers\ProductMapper;
 use App\Domains\Catalog\Repositories\ProductRepository;
 use App\Domains\Common\DTOs\OffsetPageResponseDTO;
@@ -40,38 +38,6 @@ readonly class ProductReadService
     {
         $product = $this->productRepository->getActiveBySlugWithRelationsOrFail($slug);
         return $this->productMapper->toPublicDTO($product);
-    }
-
-    /**
-     * @return OffsetPageResponseDTO<PublicProductDTO>
-     */
-    public function searchPublicByCategorySlug(SearchProductsByCategorySlugDTO $dto): OffsetPageResponseDTO
-    {
-        $sort = Sort::of($dto->sortField, $dto->sortOrder);
-        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
-        $size = $dto->limit;
-        $pageable = Pageable::of($page, $size, $sort);
-
-        $products = $this->productRepository->searchPublicByCategorySlug($pageable, $dto->slug);
-
-        return OffsetPageResponseDTO::fromPaginator($products,
-            fn($p) => $this->productMapper->toPublicDTO($p));
-    }
-
-    /**
-     * @return OffsetPageResponseDTO<PublicProductDTO>
-     */
-    public function searchPublicByTagId(SearchProductsByTagDTO $dto): OffsetPageResponseDTO
-    {
-        $sort = Sort::of($dto->sortField, $dto->sortOrder);
-        $page = PaginationUtil::offsetToPage($dto->offset, $dto->limit);
-        $size = $dto->limit;
-        $pageable = Pageable::of($page, $size, $sort);
-
-        $products = $this->productRepository->searchPublicByTagId($pageable, $dto->tagId);
-
-        return OffsetPageResponseDTO::fromPaginator($products,
-            fn($p) => $this->productMapper->toPublicDTO($p));
     }
 
     /**

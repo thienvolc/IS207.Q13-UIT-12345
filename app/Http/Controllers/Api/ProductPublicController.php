@@ -27,7 +27,7 @@ class ProductPublicController extends AppController
      */
     public function searchByCategorySlug(string $slug, PublicSearchProductsRequest $req): ResponseDTO
     {
-        $result = $this->readService->searchPublicByCategorySlug($req->toProductsByCategoryDTO($slug));
+        $result = $this->readService->searchPublic($req->toDTOByCategorySlug($slug));
         return $this->success($result);
     }
 
@@ -36,7 +36,7 @@ class ProductPublicController extends AppController
      */
     public function searchByTagId(int $tag_id, PublicSearchProductsRequest $req): ResponseDTO
     {
-        $result = $this->readService->searchPublicByTagId($req->toProductsByTagDTO($tag_id));
+        $result = $this->readService->searchPublic($req->toDTOByTag($tag_id));
         return $this->success($result);
     }
 

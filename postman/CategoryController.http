@@ -4,8 +4,8 @@
 
 ### List categories
 GET {{base_url}}/api/admin/categories
-    ?level=1
-    &query=electronics
+    ?level=2
+    &query=
     &page=1&size=20
     &sort=created_at:desc
 Authorization: Bearer {{admin_token}}

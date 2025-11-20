@@ -3,7 +3,8 @@
 
 ### search tags
 GET {{base_url}}/api/tags
-    ?offset=1&limit=20
+    ?offset=1
+    &limit=20
     &sort=created_at:desc
 
 ### search admin tags

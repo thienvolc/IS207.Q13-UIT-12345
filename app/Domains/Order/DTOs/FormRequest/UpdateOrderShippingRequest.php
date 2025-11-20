@@ -15,6 +15,9 @@ class UpdateOrderShippingRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'first_name' => 'nullable|string|max:100',
+            'middle_name' => 'nullable|string|max:100',
+            'last_name' => 'nullable|string|max:100',
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:100',
             'line1' => 'nullable|string|max:255',
@@ -32,16 +35,16 @@ class UpdateOrderShippingRequest extends FormRequest
 
         return new UpdateOrderShippingDTO(
             orderId: $orderId,
-            firstName: string_or_null($v['first_name']),
-            middleName: string_or_null($v['middle_name']),
-            lastName: string_or_null($v['last_name']),
-            phone: string_or_null($v['phone']),
-            email: string_or_null($v['email']),
-            line1: string_or_null($v['line1']),
-            line2: string_or_null($v['line2']),
-            city: string_or_null($v['city']),
-            province: string_or_null($v['province']),
-            country: string_or_null($v['country']),
+            firstName: get_string($v, 'first_name'),
+            middleName: get_string($v, 'middle_name'),
+            lastName: get_string($v, 'last_name'),
+            phone: get_string($v, 'phone'),
+            email: get_string($v, 'email'),
+            line1: get_string($v, 'line1'),
+            line2: get_string($v, 'line2'),
+            city: get_string($v, 'city'),
+            province: get_string($v, 'province'),
+            country: get_string($v, 'country'),
         );
     }
 }

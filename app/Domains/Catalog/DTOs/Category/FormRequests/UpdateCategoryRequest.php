@@ -32,12 +32,12 @@ class UpdateCategoryRequest extends FormRequest
 
         return new UpdateCategoryDTO(
             categoryId: $categoryId,
-            parentId: int_or_null($v['parent_id'] ?? null),
-            level: int_or_null($v['level'] ?? null),
-            title: string_or_null($v['title'] ?? null),
-            metaTitle: string_or_null($v['meta_title'] ?? null),
-            slug: string_or_null($v['slug'] ?? null),
-            desc: string_or_null($v['desc'] ?? null),
+            parentId: get_int($v, 'parent_id'),
+            level: get_int($v, 'level'),
+            title: get_string($v, 'title'),
+            metaTitle: get_string($v, 'meta_title'),
+            slug: get_string($v, 'slug'),
+            desc: get_string($v, 'desc'),
         );
     }
 }

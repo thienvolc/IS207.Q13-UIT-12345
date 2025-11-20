@@ -27,18 +27,24 @@ class CartRepository
 
     public function createActiveForUser(int $userId): Cart
     {
-        return Cart::create([
+        $cart = Cart::create([
             'user_id' => $userId,
             'status'  => CartStatus::ACTIVE,
         ]);
+
+        $cart->load(['items.product']);
+
+        return $cart;
     }
 
     public function clearCartForUser(int $userId): Cart
     {
-        return CartItem::whereHas('cart', function ($query) use ($userId) {
+        CartItem::whereHas('cart', function ($query) use ($userId) {
             $query->where('user_id', $userId)
                   ->where('status', CartStatus::ACTIVE);})
             ->delete();
+
+        return $this->createActiveForUser($userId);
     }
 
     public function getActiveCartForUserOrFail(int $userId): Cart

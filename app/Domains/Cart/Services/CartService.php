@@ -54,11 +54,12 @@ readonly class CartService
 
         return DB::transaction(function () use ($userId, $cartItemId) {
             $cartItem = $this->cartItemRepository->getByIdAndUserOrFail($cartItemId, $userId);
-            $replica = $cartItem->replicate();
+
+            $itemDTO = $this->cartMapper->toItemDTO($cartItem);
 
             $cartItem->delete();
 
-            return $this->cartMapper->toItemDTO($replica);
+            return $itemDTO;
         });
     }
 

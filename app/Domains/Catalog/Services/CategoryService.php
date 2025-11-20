@@ -48,7 +48,7 @@ readonly class CategoryService
         $categories = $this->categoryRepository->searchPublic($pageable, $dto->level, $dto->query);
 
         return OffsetPageResponseDTO::fromPaginator($categories,
-            fn($c) => $this->categoryMapper->toPublicDTOs($c));
+            fn($c) => $this->categoryMapper->toPublicDTO($c));
     }
 
     public function getBySlug(string $slug): PublicCategoryDTO
@@ -68,7 +68,7 @@ readonly class CategoryService
         $categories = $this->categoryRepository->search($pageable, $dto->level, $dto->query);
 
         return PageResponseDTO::fromPaginator($categories,
-            fn($c) => $this->categoryMapper->toDTOs($c));
+            fn($c) => $this->categoryMapper->toDTO($c));
     }
 
     public function getById(int $categoryId): CategoryDTO

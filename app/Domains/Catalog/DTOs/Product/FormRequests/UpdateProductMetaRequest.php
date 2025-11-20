@@ -27,8 +27,8 @@ class UpdateProductMetaRequest extends FormRequest
         return new UpdateProductMetaDTO(
             productId: $productId,
             metaId: $metaId,
-            key: string_or_null($v['key'] ?? null),
-            content: string_or_null($v['content'] ?? null),
+            key: get_string($v, 'key'),
+            content: get_string($v, 'content'),
         );
     }
 }

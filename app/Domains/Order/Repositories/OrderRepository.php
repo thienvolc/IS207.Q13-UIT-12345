@@ -70,7 +70,7 @@ class OrderRepository
             ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 
-    public function getLockedByIdAndUserWithProductsOrFail(int $userId, int $orderId): Order
+    public function getLockedByIdAndUserWithProductsOrFail(int $orderId, int $userId): Order
     {
         return Order::where('order_id', $orderId)
             ->where('user_id', $userId)

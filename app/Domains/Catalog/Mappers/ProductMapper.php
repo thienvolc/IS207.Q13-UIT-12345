@@ -129,33 +129,6 @@ readonly class ProductMapper
         );
     }
 
-    /**
-     * @param Collection<int, Product> $products
-     * @return ProductDTO[]
-     */
-    public function toDTOs(Collection $products): array
-    {
-        return $products->map(fn($product) => $this->toDTO($product))->all();
-    }
-
-    /**
-     * @param Collection<int, Product> $products
-     * @return PublicProductDTO[]
-     */
-    public function toPublicDTOs(Collection $products): array
-    {
-        return $products->map(fn($product) => $this->toPublicDTO($product))->all();
-    }
-
-    /**
-     * @param Collection $metas
-     * @return ProductMetaDTO[]
-     */
-    public function toMetaDTOs(Collection $metas): array
-    {
-        return $metas->map(fn($meta) => $this->toMetaDTO($meta))->all();
-    }
-
     public function toStatusDTO(Product $product): ProductStatusDTO
     {
         return new ProductStatusDTO(

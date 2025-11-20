@@ -3,8 +3,6 @@
 namespace App\Domains\Transaction\DTOs\Responses;
 
 use App\Domains\Common\DTOs\BaseDTO;
-use App\Domains\Order\Entities\Order;
-use App\Domains\Transaction\Entities\Transaction;
 
 readonly class TransactionDTO implements BaseDTO
 {
@@ -21,53 +19,6 @@ readonly class TransactionDTO implements BaseDTO
         public ?string $updatedAt = null,
         public ?array  $order = null,
     ) {}
-
-    public static function fromModel(Transaction $trans): self
-    {
-        return new self(
-            transactionId: $trans->transaction_id,
-            orderId: $trans->order_id,
-            amount: (float)$trans->amount,
-            content: $trans->content,
-            code: $trans->code,
-            type: $trans->type,
-            mode: $trans->mode,
-            status: $trans->status,
-            createdAt: $trans->created_at?->toIso8601String(),
-            updatedAt: $trans->updated_at?->toIso8601String(),
-            order: self::loadOrder($trans)
-        );
-    }
-
-    private static function loadOrder(Transaction $trans): ?array
-    {
-        if (!$trans->relationLoaded('order') || !$trans->order) {
-            return null;
-        }
-        $ord = $trans->order;
-        return [
-            'orderId' => $ord->order_id,
-            'userId' => $ord->user_id,
-            'grandTotal' => (float)$ord->grand_total,
-            'status' => $ord->status,
-            'ordersAt' => $ord->orders_at?->toIso8601String(),
-            'user' => self::loadUser($ord),
-        ];
-    }
-
-    private static function loadUser(Order $order): ?array
-    {
-        if (!$order->relationLoaded('user') || !$order->user) {
-            return null;
-        }
-        $u = $order->user;
-        return [
-            'userId' => $u->user_id,
-            'firstName' => $u->first_name,
-            'lastName' => $u->last_name,
-            'email' => $u->email,
-        ];
-    }
 
     public function toArray(): array
     {

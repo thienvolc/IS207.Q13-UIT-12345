@@ -14,9 +14,11 @@ use App\Domains\Identity\Repositories\AuthRepository;
 use App\Domains\Identity\Repositories\UserProfileRepository;
 use App\Domains\Identity\Repositories\UserRepository;
 use App\Exceptions\BusinessException;
+use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 readonly class AuthService
@@ -51,7 +53,10 @@ readonly class AuthService
         $this->assertUserIsActive($user);
 
         $token = $this->generateTokenForUser($user);
-        $user->update(['last_login' => now()]);
+
+        if ($user->profile) {
+            $user->profile->update(['last_login' => now()]);
+        }
 
         return $this->mapper->toLoginResponse($user, 'Bearer', $token);
     }
@@ -63,8 +68,9 @@ readonly class AuthService
 
     public function sendPasswordResetEmail(SendPasswordResetDTO $dto): void
     {
-        $user = $this->userRepository->findByEmail($dto->email);
+        $user = $this->userRepository->findByEmailWithProfile($dto->email);
         if (!$user) {
+            throw new BusinessException(ResponseCode::NOT_FOUND);
             return;
         }
 
@@ -75,12 +81,15 @@ readonly class AuthService
             Hash::make($token)
         );
 
-        // TODO: send email with token
+        $userName = $user->profile?->first_name ?? $user->email;
+        $resetUrl = config('app.frontend_url') . '/reset-password?token=' . $token . '&email=' . urlencode($dto->email);
+
+        Mail::to($user->email)->send(new ResetPasswordMail($userName, $token, $resetUrl));
     }
 
-    public function resetPassword(ResetPasswordDTO $dto): array
+    public function resetPassword(ResetPasswordDTO $dto): void
     {
-        return DB::transaction(function () use ($dto) {
+        DB::transaction(function () use ($dto) {
             $this->validatePasswordResetToken($dto);
 
             $this->userRepository->updatePasswordByEmail(
@@ -114,7 +123,6 @@ readonly class AuthService
             'password' => Hash::make($dto->password),
             'is_admin' => false,
             'status' => UserStatus::ACTIVE,
-            'registered_at' => now(),
         ]);
     }
 
@@ -125,6 +133,7 @@ readonly class AuthService
             'first_name' => $dto->firstName,
             'middle_name' => $dto->middleName,
             'last_name' => $dto->lastName,
+            'registered_at' => now(),
         ]);
     }
 

@@ -17,7 +17,8 @@ class AdminSearchProductsRequest extends FormRequest
     {
         return [
             'query' => 'nullable|string|max:255',
-            'category' => 'nullable|integer|exists:categories,category_id',
+            'category' => 'nullable|string',
+            'tag_id' => 'nullable|integer|min:1',
             'price_min' => 'nullable|integer|min:0',
             'price_max' => 'nullable|integer|min:0|gte:price_min',
             'page' => 'nullable|integer|min:1',
@@ -33,14 +34,15 @@ class AdminSearchProductsRequest extends FormRequest
         [$sortField, $sortOrder] = PaginationUtil::getSortFieldAndOrder($sort);
 
         return new AdminSearchProductsDTO(
-            query: $v['query'],
-            category: $v['category'],
-            priceMin: float_or_null($v['price_min'] ?? null),
-            priceMax: float_or_null($v['price_max'] ?? null),
-            page: int_or_null($v['page']) ?? 1,
-            size: int_or_null($v['size']) ?? 10,
+            query: get_string($v, 'query'),
+            categoryIdOrSlug: get_string($v, 'category'),
+            tagId: get_int($v, 'tag_id'),
+            priceMin: get_float($v, 'price_min'),
+            priceMax: get_float($v, 'price_max'),
+            page: get_int($v, 'page') ?? 1,
+            size: get_int($v, 'size') ?? 10,
             sortField: $sortField,
-            sortOrder: $sortOrder,
+            sortOrder: $sortOrder
         );
     }
 }

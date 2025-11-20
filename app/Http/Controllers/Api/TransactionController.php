@@ -16,28 +16,13 @@ class TransactionController extends AppController
 
     public function index(SearchTransactionsRequest $request): ResponseDTO
     {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = SearchTransactionsDTO::fromArray([
-            'userId' => $request->input('user_id'),
-            'orderId' => $request->input('order_id'),
-            'status' => $request->input('status'),
-            'type' => $request->input('type'),
-            'page' => $request->getPage(),
-            'size' => $request->getSize(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $transactions = $this->transactionService->search($dto);
-
+        $transactions = $this->transactionService->search($request->toDTO());
         return $this->success($transactions);
     }
 
-    public function show(int $transactionId): ResponseDTO
+    public function show(int $trans_id): ResponseDTO
     {
-        $transaction = $this->transactionService->getById($transactionId);
-
+        $transaction = $this->transactionService->getById($trans_id);
         return $this->success($transaction);
     }
 }
