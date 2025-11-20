@@ -4,37 +4,40 @@
 @section('title', 'Giới thiệu - PinkCapyStore')
 
 @section('content')
-<div class="container py-5">
-    <!-- Breadcrumb -->
-    <div class="mb-4">
-        @include('partials.breadcrumb', [
-            'items' => [
-                ['name' => 'Trang chủ', 'url' => route('home')],
-            ],
-            'current' => 'Giới thiệu'
-        ])
-    </div>
+<!-- Breadcrumb -->
+<div class="grid mb-4">
+    @include('partials.breadcrumb', [
+    'items' => [],
+    'current' => 'Giới thiệu'
+    ])
+</div>
 
+<div class="grid pb-5">
     <!-- Hero Section -->
-    <section class="text-center mb-5">
-        <h1 class="display-5 fw-bold text-primary mb-3">PinkCapyStore - Phụ kiện công nghệ chính hãng</h1>
-        <p class="lead text-muted col-lg-8 mx-auto">
-            Chúng tôi chuyên cung cấp <strong>tai nghe, đồng hồ thông minh và phụ kiện</strong> cho điện thoại, laptop – 
-            <span class="text-primary">chính hãng 100%</span>, giá tốt, giao nhanh.
-        </p>
+    <section class="about-hero">
+        <div class="about-hero-content text-center">
+            <div class="hero-img mb-3">
+                <img src="{{ asset('img/logo.svg') }}" alt="PinkCapyStore Logo">
+            </div>
+            <h1>PinkCapyStore</h1>
+            <p class="col-lg-10 mx-auto">
+                Chuyên cung cấp <strong>tai nghe, đồng hồ thông minh và phụ kiện</strong> công nghệ<br>
+                chính hãng 100% - Giá tốt nhất thị trường
+            </p>
+        </div>
     </section>
 
     <!-- Tầm nhìn & Sứ mệnh -->
-    <section class="row g-5 mb-5">
+    <section class="row g-4 mb-5">
         <div class="col-lg-6">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fa-solid fa-eye text-primary fa-2x me-3"></i>
-                        <h3 class="h4 fw-bold mb-0">Tầm nhìn</h3>
+            <div class="vision-mission-card">
+                <div class="card-body">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-eye"></i>
                     </div>
-                    <p class="text-muted">
-                        Trở thành kênh bán lẻ điện tử trực tuyến <strong>uy tín hàng đầu</strong> tại Việt Nam, 
+                    <h3>Tầm nhìn</h3>
+                    <p>
+                        Trở thành kênh bán lẻ điện tử trực tuyến <strong>uy tín hàng đầu</strong> tại Việt Nam,
                         mang đến sản phẩm công nghệ chất lượng, giá cạnh tranh và trải nghiệm mua sắm hiện đại.
                     </p>
                 </div>
@@ -42,16 +45,16 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fa-solid fa-flag text-success fa-2x me-3"></i>
-                        <h3 class="h4 fw-bold mb-0">Sứ mệnh</h3>
+            <div class="vision-mission-card mission">
+                <div class="card-body">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-flag"></i>
                     </div>
-                    <ul class="list-unstyled text-muted mb-0">
-                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Cung cấp sản phẩm công nghệ <strong>chính hãng</strong> với thông tin minh bạch.</li>
-                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Đem đến trải nghiệm mua sắm <strong>tiện lợi, nhanh chóng và an toàn</strong>.</li>
-                        <li><i class="fa-solid fa-check text-success me-2"></i> Góp phần thúc đẩy <strong>chuyển đổi số</strong> trong bán lẻ điện tử.</li>
+                    <h3>Sứ mệnh</h3>
+                    <ul class="list-unstyled mb-0">
+                        <li><i class="fa-solid fa-check text-success"></i> Cung cấp sản phẩm công nghệ <strong>chính hãng</strong> với thông tin minh bạch</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Đem đến trải nghiệm mua sắm <strong>tiện lợi, nhanh chóng và an toàn</strong></li>
+                        <li><i class="fa-solid fa-check text-success"></i> Góp phần thúc đẩy <strong>chuyển đổi số</strong> trong bán lẻ điện tử</li>
                     </ul>
                 </div>
             </div>
@@ -59,67 +62,197 @@
     </section>
 
     <!-- Giá trị cốt lõi -->
-    <section class="mb-5">
-        <h2 class="h3 fw-bold text-center mb-4">Giá trị cốt lõi</h2>
+    <section class="core-values-section">
+        <div class="text-center mb-4">
+            <div class="section-icon">
+                <i class="fa-solid fa-star"></i>
+            </div>
+            <h2 class="core-values-title">Giá trị cốt lõi</h2>
+        </div>
         <div class="row g-4">
             <div class="col-md-6 col-lg-3">
-                <div class="text-center p-4 bg-light rounded h-100">
-                    <i class="fa-solid fa-shield-halved text-primary fa-3x mb-3"></i>
-                    <h5 class="fw-bold">Uy tín</h5>
-                    <p class="small text-muted">Cam kết hàng chính hãng, minh bạch thông tin</p>
+                <div class="core-value-card">
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h5>Uy tín</h5>
+                    <p>Cam kết hàng chính hãng, minh bạch thông tin</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="text-center p-4 bg-light rounded h-100">
-                    <i class="fa-solid fa-gem text-success fa-3x mb-3"></i>
-                    <h5 class="fw-bold">Chất lượng</h5>
-                    <p class="small text-muted">Sản phẩm đạt chuẩn, bảo hành chính hãng</p>
+                <div class="core-value-card">
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-gem"></i>
+                    </div>
+                    <h5>Chất lượng</h5>
+                    <p>Sản phẩm đạt chuẩn, bảo hành chính hãng</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="text-center p-4 bg-light rounded h-100">
-                    <i class="fa-solid fa-heart text-danger fa-3x mb-3"></i>
-                    <h5 class="fw-bold">Khách hàng là trung tâm</h5>
-                    <p class="small text-muted">Trải nghiệm tối ưu, hỗ trợ tận tâm</p>
+                <div class="core-value-card">
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <h5>Khách hàng là trung tâm</h5>
+                    <p>Trải nghiệm tối ưu, hỗ trợ tận tâm</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="text-center p-4 bg-light rounded h-100">
-                    <i class="fa-solid fa-lightbulb text-warning fa-3x mb-3"></i>
-                    <h5 class="fw-bold">Đổi mới</h5>
-                    <p class="small text-muted">Cập nhật công nghệ, AI gợi ý sản phẩm</p>
+                <div class="core-value-card">
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <h5>Đổi mới</h5>
+                    <p>Cập nhật công nghệ, AI gợi ý sản phẩm</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Sản phẩm chúng tôi bán -->
-    <section class="bg-light py-5 rounded">
+    <section class="products-section mb-5">
+        <div class="text-center">
+            <div class="section-icon">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+            <h2 class="products-section-title">Chúng tôi chuyên cung cấp</h2>
+            <p class="products-section-subtitle">Phụ kiện công nghệ chính hãng, chất lượng cao</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="product-category">
+                    <div class="icon-box">
+                        <i class="fa-solid fa-headphones"></i>
+                    </div>
+                    <h5>Tai nghe</h5>
+                    <p>AirPods, Sony, Bose, JBL, Samsung...</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="product-category">
+                    <div class="icon-box">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <h5>Đồng hồ thông minh</h5>
+                    <p>Apple Watch, Samsung Galaxy Watch, Xiaomi...</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="product-category">
+                    <div class="icon-box">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <h5>Phụ kiện</h5>
+                    <p>Ốp lưng, sạc, cáp, pin dự phòng, kính cường lực...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="why-us-section mb-5">
         <div class="text-center mb-4">
-            <h2 class="h3 fw-bold">Chúng tôi chuyên cung cấp</h2>
-            <p class="text-muted">Phụ kiện công nghệ chính hãng, chất lượng cao</p>
+            <div class="section-icon">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h2 class="section-title">Tại sao chọn PinkCapyStore?</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon bg-light-pink">
+                        <i class="fa-solid fa-certificate"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Sản phẩm chính hãng 100%</h4>
+                        <p>Cam kết mọi sản phẩm đều có nguồn gốc xuất xứ rõ ràng, tem phiếu đầy đủ. Hỗ trợ kiểm tra trước khi thanh toán.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon bg-light-pink">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Giao hàng nhanh chóng</h4>
+                        <p>Giao hàng toàn quốc, nhanh trong 24h tại nội thành. Hỗ trợ giao hàng COD, kiểm tra hàng trước khi nhận.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon bg-light-pink">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Bảo hành chính hãng</h4>
+                        <p>Đầy đủ chế độ bảo hành theo nhà sản xuất. Hỗ trợ đổi trả trong 7 ngày nếu có lỗi từ nhà sản xuất.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon bg-light-pink">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Hỗ trợ 24/7</h4>
+                        <p>Đội ngũ tư vấn nhiệt tình, am hiểu sản phẩm. Sẵn sàng hỗ trợ khách hàng mọi lúc, mọi nơi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section mb-5">
+        <div class="text-center mb-4">
+            <div class="section-icon">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <h2 class="section-title">Con số ấn tượng</h2>
         </div>
         <div class="row g-4 text-center">
-            <div class="col-md-4">
-                <div class="p-4">
-                    <i class="fa-solid fa-headphones fa-4x text-primary mb-3"></i>
-                    <h5>Tai nghe</h5>
-                    <p class="small text-muted">AirPods, Sony, Bose, JBL...</p>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Khách hàng</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="p-4">
-                    <i class="fa-solid fa-clock fa-4x text-success mb-3"></i>
-                    <h5>Đồng hồ thông minh</h5>
-                    <p class="small text-muted">Apple Watch, Samsung, Xiaomi...</p>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number">240+</div>
+                    <div class="stat-label">Sản phẩm</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="p-4">
-                    <i class="fa-solid fa-mobile-screen-button fa-4x text-warning mb-3"></i>
-                    <h5>Phụ kiện</h5>
-                    <p class="small text-muted">Ốp lưng, sạc, cáp, pin dự phòng...</p>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">Hài lòng</div>
                 </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Hỗ trợ</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="cta-section">
+        <div class="cta-content text-center">
+            <h2 class="cta-title">Bạn cần tư vấn thêm?</h2>
+            <p class="cta-subtitle">Đội ngũ chúng tôi luôn sẵn sàng hỗ trợ bạn tìm sản phẩm phù hợp nhất</p>
+            <div class="cta-buttons">
+                <a href="{{ route('contact') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fa-solid fa-envelope me-2"></i>Liên hệ ngay
+                </a>
+                <a href="{{ route('products.index') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="fa-solid fa-shopping-bag me-2"></i>Xem sản phẩm
+                </a>
             </div>
         </div>
     </section>

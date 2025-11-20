@@ -4,60 +4,143 @@
 @section('title', 'Tất cả sản phẩm')
 
 @section('content')
-<div class="container py-4">
+<div class="grid">
     <!-- Breadcrumb -->
     <div class="mb-4">
         @include('partials.breadcrumb', [
-            'items' => [
-                ['name' => 'Trang chủ', 'url' => route('home')],
-            ],
-            'current' => 'Sản phẩm'
+        'items' => [],
+        'current' => 'Sản phẩm'
         ])
     </div>
 
-    <div class="row g-4">
-        <!-- Sidebar -->
-        <div class="col-lg-3">
-            <div class="card border-0 shadow-sm sticky-top" style="top: 80px;">
-                <div class="card-body">
-                    <h5 class="fw-bold mb-3">Bộ lọc</h5>
-                    <div class="mb-3">
-                        <h6 class="small fw-bold text-uppercase text-muted">Giá</h6>
-                        <a href="#" class="btn btn-outline-secondary btn-sm me-1 mb-1">Dưới 10tr</a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm me-1 mb-1">10-20tr</a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm mb-1">Trên 20tr</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Header & Filter Bar -->
+    <div class="products-header-wrapper mb-4">
+        @if(isset($searchQuery) && $searchQuery)
+            <h1 class="title-lg fw-bold mb-3">
+                Kết quả tìm kiếm cho: <span class="text-primary">"{{ $searchQuery }}"</span>
+            </h1>
+            <p class="text-muted">Tìm thấy {{ count($products) }} sản phẩm</p>
+        @else
+            <h1 class="title-lg fw-bold mb-3">Tất cả sản phẩm</h1>
+        @endif
 
-        <!-- Danh sách -->
-        <div class="col-lg-9">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h4 fw-bold mb-0">Tất cả sản phẩm</h1>
-                <select class="form-select w-auto form-select-sm">
-                    <option>Mới nhất</option>
-                    <option>Giá: Thấp → Cao</option>
-                    <option>Giá: Cao → Thấp</option>
-                </select>
-            </div>
-
-            @if($products->count())
-                <div class="row g-3 g-md-4">
-                    @foreach($products as $product)
-                        <div class="col-6 col-md-4 col-lg-4">
-                            @include('components.product-card', ['product' => $product])
+        <!-- Filter Bar -->
+        <div class="filter-bar card border-0 shadow-sm">
+            <div class="card-body p-3">
+                <form method="GET" action="{{ route('products.index') }}" id="filter-form">
+                    <!-- Hidden inputs to preserve filters -->
+                    @if(isset($searchQuery) && $searchQuery)
+                        <input type="hidden" name="search" value="{{ $searchQuery }}">
+                    @endif
+                    @if(request('category'))
+                        <input type="hidden" name="category" value="{{ request('category') }}">
+                    @endif
+                    
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <!-- Filter Label -->
+                        <div class="filter-bar__label fw-bold text-muted">
+                            <i class="fa-solid fa-filter me-2"></i>Bộ lọc:
                         </div>
-                    @endforeach
-                </div>
 
-                <div class="mt-5">
-                    {{ $products->links('components.pagination') }}
-                </div>
-            @else
-                <p class="text-center text-muted py-5">Không có sản phẩm nào.</p>
-            @endif
+                        <!-- Price Filter -->
+                        <div class="filter-bar__group d-flex align-items-center gap-2">
+                            <span class="fw-bold text-muted">Giá:</span>
+                            <button type="button"
+                                onclick="setPriceFilter('', '1000000')"
+                                class="btn btn-outline-secondary btn-sm {{ request('price_max') == '1000000' && !request('price_min') ? 'active' : '' }}">
+                                Dưới 1tr
+                            </button>
+                            <button type="button"
+                                onclick="setPriceFilter('1000000', '3000000')"
+                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '1000000' && request('price_max') == '3000000' ? 'active' : '' }}">
+                                1-3tr
+                            </button>
+                            <button type="button"
+                                onclick="setPriceFilter('3000000', '5000000')"
+                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '3000000' && request('price_max') == '5000000' ? 'active' : '' }}">
+                                3-5tr
+                            </button>
+                            <button type="button"
+                                onclick="setPriceFilter('5000000', '')"
+                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '5000000' && !request('price_max') ? 'active' : '' }}">
+                                Trên 5tr
+                            </button>
+                            <input type="hidden" id="price_min_input" name="price_min" value="{{ request('price_min') }}">
+                            <input type="hidden" id="price_max_input" name="price_max" value="{{ request('price_max') }}">
+                        </div>
+                        
+                        <script>
+                        function setPriceFilter(min, max) {
+                            document.getElementById('price_min_input').value = min;
+                            document.getElementById('price_max_input').value = max;
+                            document.getElementById('filter-form').submit();
+                        }
+                        </script>
+
+                        <!-- Divider -->
+                        <div class="vr d-none d-md-block"></div>
+
+                        <!-- Sort Filter -->
+                        <div class="filter-bar__group d-flex align-items-center gap-2">
+                            <span class="small fw-bold text-muted">Sắp xếp:</span>
+                            <select class="form-select form-select-sm" name="sort" onchange="this.form.submit()" style="width: auto; min-width: 150px;">
+                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
+                                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá: Thấp → Cao</option>
+                                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá: Cao → Thấp</option>
+                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Tên A-Z</option>
+                            </select>
+                        </div>
+
+                        <!-- Product Count -->
+                        <div class="ms-auto text-muted">
+                            <i class="fa-solid fa-box"></i>
+                            <strong>
+                                {{ count($products) }}
+                            </strong> sản phẩm
+                        </div>
+
+                        <!-- Clear Filter -->
+                        @if(request()->hasAny(['category', 'price_min', 'price_max', 'sort']))
+                        <div>
+                            <a href="{{ route('products.index') }}" class="btn btn-link btn-sm text-danger text-decoration-none">
+                                <i class="fa-solid fa-rotate-left me-1"></i>Xóa bộ lọc
+                            </a>
+                        </div>
+                        @endif
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
+    <!-- Products Grid -->
+    @if(count($products))
+    <div class="grid-row">
+        @foreach($products as $product)
+        <div class="grid__col-2-4 product-col">
+            @include('components.product-card', ['product' => $product])
+        </div>
+        @endforeach
+    </div>
+
+    <!-- Nút Xem thêm nếu còn sản phẩm -->
+    @if(isset($hasMore) && $hasMore)
+    <div class="text-center my-4">
+        <form method="GET" action="{{ route('products.index') }}">
+            @foreach(request()->except(['offset']) as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endforeach
+            <input type="hidden" name="offset" value="{{ $offset + $limit }}">
+            <input type="hidden" name="limit" value="{{ $limit }}">
+            <button type="submit" class="btn-pagination">Xem thêm</button>
+        </form>
+    </div>
+    @endif
+    @else
+    <p class="text-center text-uppercase py-5">Không có sản phẩm nào.</p>
+    @endif
 </div>
+
+@push('styles')
+@endpush
 @endsection

@@ -1,0 +1,707 @@
+/* ==========================================================================
+   About Page Styles
+   ========================================================================== */
+
+/* Hero Section */
+.about-hero {
+    background: linear-gradient(135deg, #f6244e 0%, #d91c43 100%);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 4rem;
+    border-radius: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.about-hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.about-hero h1 {
+    font-size: 3.6rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.about-hero p {
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.6;
+    opacity: 0.95;
+}
+
+.about-hero strong {
+    font-weight: 600;
+}
+
+.hero-img {
+    display: inline-block;
+    width: 10rem;
+    height: 10rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.hero-img img {
+    width: 5rem;
+    height: 5rem;
+    object-fit: contain;
+}
+
+/* Section Icons */
+.section-icon {
+    display: inline-block;
+    width: 6rem;
+    height: 6rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #ff6b9d 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.section-icon i {
+    font-size: 2.8rem;
+    color: white;
+}
+
+/* Vision & Mission Cards */
+.vision-mission-card {
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    background: white;
+    height: 100%;
+}
+
+.vision-mission-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.vision-mission-card .card-body {
+    padding: 2.5rem;
+}
+
+.vision-mission-card .icon-wrapper {
+    width: 6rem;
+    height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1.2rem;
+    margin-bottom: 1.5rem;
+    background: var(--primary);
+}
+
+.vision-mission-card.mission .icon-wrapper {
+    background: linear-gradient(135deg, #f6244e 0%, #ff6b9d 100%);
+}
+
+.vision-mission-card i {
+    color: white;
+    font-size: 3rem;
+}
+
+.vision-mission-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    color: #2d3748;
+}
+
+.vision-mission-card p,
+.vision-mission-card ul {
+    font-size: 1.5rem;
+    line-height: 1.7;
+    color: #4a5568;
+}
+
+.vision-mission-card ul li {
+    margin-bottom: 1rem;
+    padding-left: 0.8rem;
+}
+
+.vision-mission-card ul li i {
+    font-size: 1.5rem;
+    margin-right: 0.8rem;
+}
+
+/* Core Values */
+.core-values-section {
+    padding: 4rem 0;
+    background: linear-gradient(to bottom, #f7fafc 0%, #edf2f7 100%);
+    border-radius: 1.5rem;
+    margin-bottom: 4rem;
+}
+
+.core-values-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 0;
+    color: #2d3748;
+}
+
+.core-value-card {
+    background: white;
+    border-radius: 1.2rem;
+    padding: 2.5rem 2rem;
+    height: 100%;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.core-value-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+}
+
+.core-value-card .icon-circle {
+    width: 7.5rem;
+    height: 7.5rem;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary);
+    position: relative;
+}
+
+.core-value-card:nth-child(2) .icon-circle {
+    background: linear-gradient(135deg, #ff6b9d 0%, #f6244e 100%);
+}
+
+.core-value-card:nth-child(3) .icon-circle {
+    background: linear-gradient(135deg, #ff8fab 0%, #ff6b9d 100%);
+}
+
+.core-value-card:nth-child(4) .icon-circle {
+    background: linear-gradient(135deg, #ffa5ba 0%, #ff8fab 100%);
+}
+
+.core-value-card .icon-circle::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    opacity: 0.2;
+}
+
+.core-value-card i {
+    color: white;
+    font-size: 3.5rem;
+}
+
+.core-value-card h5 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #2d3748;
+}
+
+.core-value-card p {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: #718096;
+    margin-bottom: 0;
+}
+
+/* Products Section */
+.products-section {
+    background: white;
+    padding: 4rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.products-section-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #2d3748;
+}
+
+.products-section-subtitle {
+    font-size: 1.6rem;
+    color: #718096;
+    margin-bottom: 3rem;
+}
+
+.product-category {
+    padding: 2.5rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.product-category:hover {
+    transform: translateY(-3px);
+}
+
+.product-category .icon-box {
+    width: 8.5rem;
+    height: 8.5rem;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1.5rem;
+    background: rgba(246, 36, 78, 0.1);
+    transition: all 0.3s ease;
+}
+
+.product-category:hover .icon-box {
+    transform: rotate(3deg) scale(1.05);
+}
+
+.product-category:nth-child(1) .icon-box {
+    background: rgba(246, 36, 78, 0.1);
+}
+
+.product-category:nth-child(2) .icon-box {
+    background: rgba(255, 107, 157, 0.1);
+}
+
+.product-category:nth-child(3) .icon-box {
+    background: rgba(255, 143, 171, 0.1);
+}
+
+.product-category i {
+    font-size: 4.5rem;
+}
+
+.product-category:nth-child(1) i {
+    color: var(--primary);
+}
+
+.product-category:nth-child(2) i {
+    color: #ff6b9d;
+}
+
+.product-category:nth-child(3) i {
+    color: #ff8fab;
+}
+
+.product-category h5 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    color: #2d3748;
+}
+
+.product-category p {
+    font-size: 1.4rem;
+    color: #718096;
+    margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .about-hero {
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+    }
+
+    .about-hero h1 {
+        font-size: 3.2rem;
+    }
+
+    .about-hero p {
+        font-size: 1.6rem;
+    }
+
+    .vision-mission-card .card-body {
+        padding: 2rem;
+    }
+
+    .vision-mission-card h3 {
+        font-size: 2rem;
+    }
+
+    .core-values-title,
+    .products-section-title {
+        font-size: 2.8rem;
+    }
+
+    .products-section {
+        padding: 3rem 2rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .about-hero {
+        padding: 3rem 0;
+        border-radius: 1rem;
+    }
+
+    .about-hero h1 {
+        font-size: 2.4rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .about-hero p {
+        font-size: 1.4rem;
+    }
+
+    .hero-icon {
+        width: 6rem;
+        height: 6rem;
+    }
+
+    .hero-icon i {
+        font-size: 3rem;
+    }
+
+    .section-icon {
+        width: 5rem;
+        height: 5rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .section-icon i {
+        font-size: 2.4rem;
+    }
+
+    .vision-mission-card .icon-wrapper {
+        width: 6rem;
+        height: 6rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .vision-mission-card i {
+        font-size: 2.5rem;
+    }
+
+    .core-value-card .icon-circle {
+        width: 7rem;
+        height: 7rem;
+    }
+
+    .core-value-card i {
+        font-size: 3rem;
+    }
+
+    .product-category .icon-box {
+        width: 8rem;
+        height: 8rem;
+    }
+
+    .product-category i {
+        font-size: 4rem;
+    }
+}
+
+/* ==========================================================================
+   Why Choose Us Section
+   ========================================================================== */
+
+.why-us-section {
+    padding: 4rem 0;
+}
+
+.why-us-section .section-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0;
+}
+
+.feature-card {
+    display: flex;
+    gap: 2rem;
+    padding: 2.5rem;
+    background: white;
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 2px solid transparent;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-color: var(--primary);
+}
+
+.feature-icon {
+    flex-shrink: 0;
+    width: 6rem;
+    height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+        135deg,
+        rgba(246, 36, 78, 0.1) 0%,
+        rgba(246, 36, 78, 0.05) 100%
+    );
+    border-radius: 1rem;
+}
+
+.feature-icon i {
+    font-size: 3rem;
+    color: var(--primary);
+}
+
+.feature-icon.bg-light-pink {
+    background: linear-gradient(
+        135deg,
+        rgba(246, 36, 78, 0.15) 0%,
+        rgba(255, 107, 157, 0.1) 100%
+    );
+}
+
+.feature-content h4 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+.feature-content p {
+    font-size: 1.5rem;
+    line-height: 1.7;
+    color: #718096;
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Stats Section
+   ========================================================================== */
+
+.stats-section {
+    padding: 5rem 0;
+    background: linear-gradient(
+        135deg,
+        rgba(246, 36, 78, 0.05) 0%,
+        rgba(255, 107, 157, 0.05) 100%
+    );
+    border-radius: 2rem;
+}
+
+.stat-box {
+    padding: 2rem;
+}
+
+.stat-number {
+    font-size: 4.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 1.6rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   CTA Section
+   ========================================================================== */
+
+.cta-section {
+    background: linear-gradient(135deg, var(--primary) 0%, #d91c43 100%);
+    padding: 6rem 4rem;
+    border-radius: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+    opacity: 0.4;
+}
+
+.cta-content {
+    position: relative;
+    z-index: 1;
+}
+
+.cta-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 1.2rem;
+}
+
+.cta-subtitle {
+    font-size: 1.6rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2.5rem;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .btn {
+    padding: 1.1rem 2.8rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-radius: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.cta-buttons .btn-primary {
+    background: white;
+    color: var(--primary);
+    border: none;
+}
+
+.cta-buttons .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.cta-buttons .btn-outline-primary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.cta-buttons .btn-outline-primary:hover {
+    background: white;
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Responsive Updates
+   ========================================================================== */
+
+@media (max-width: 991px) {
+    .why-us-section .section-title {
+        font-size: 2.8rem;
+        margin-bottom: 3rem;
+    }
+
+    .feature-card {
+        padding: 2rem;
+        gap: 1.5rem;
+    }
+
+    .feature-icon {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .feature-icon i {
+        font-size: 2.5rem;
+    }
+
+    .feature-content h4 {
+        font-size: 1.8rem;
+    }
+
+    .stat-number {
+        font-size: 3.5rem;
+    }
+
+    .cta-section {
+        padding: 4rem 3rem;
+    }
+
+    .cta-title {
+        font-size: 2.8rem;
+    }
+
+    .cta-subtitle {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .why-us-section .section-title {
+        font-size: 2.4rem;
+    }
+
+    .feature-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem 1.5rem;
+    }
+
+    .feature-icon {
+        width: 5rem;
+        height: 5rem;
+        margin: 0 auto;
+    }
+
+    .feature-content h4 {
+        font-size: 1.7rem;
+    }
+
+    .feature-content p {
+        font-size: 1.4rem;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+    }
+
+    .stat-label {
+        font-size: 1.4rem;
+    }
+
+    .cta-section {
+        padding: 3rem 2rem;
+    }
+
+    .cta-title {
+        font-size: 2.4rem;
+    }
+
+    .cta-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+    }
+
+    .cta-buttons .btn {
+        width: 100%;
+        padding: 1rem 2rem;
+        font-size: 1.5rem;
+    }
+}
