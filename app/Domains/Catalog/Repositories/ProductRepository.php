@@ -116,13 +116,15 @@ class ProductRepository
             });
         });
 
-        $isCategoryId = ctype_digit($f->categoryIdOrSlug);
-
-        $query->when($f->categoryIdOrSlug,
-            fn($q, $v) => $isCategoryId
-                ? $query->whereHas('categories', fn($q) => $q->where('categories.category_id', $f->categoryIdOrSlug))
-                : $query->whereHas('categories', fn($q) => $q->where('categories.slug', $f->categoryIdOrSlug))
-        );
+        $query->when($f->categoryIdOrSlug, function($q) use ($f) {
+            $isCategoryId = is_int($f->categoryIdOrSlug) || ctype_digit($f->categoryIdOrSlug);
+            
+            if ($isCategoryId) {
+                $q->whereHas('categories', fn($subQ) => $subQ->where('categories.category_id', $f->categoryIdOrSlug));
+            } else {
+                $q->whereHas('categories', fn($subQ) => $subQ->where('categories.slug', $f->categoryIdOrSlug));
+            }
+        });
         $query->when($f->tagId,
             fn($q, $v) => $query->whereHas('tags',
                 fn($q) => $q->where('tags.tag_id', $f->tagId)));

@@ -45,37 +45,26 @@
                         <!-- Price Filter -->
                         <div class="filter-bar__group d-flex align-items-center gap-2">
                             <span class="fw-bold text-muted">Giá:</span>
-                            <button type="button"
-                                onclick="setPriceFilter('', '1000000')"
-                                class="btn btn-outline-secondary btn-sm {{ request('price_max') == '1000000' && !request('price_min') ? 'active' : '' }}">
-                                Dưới 1tr
-                            </button>
-                            <button type="button"
-                                onclick="setPriceFilter('1000000', '3000000')"
-                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '1000000' && request('price_max') == '3000000' ? 'active' : '' }}">
-                                1-3tr
-                            </button>
-                            <button type="button"
-                                onclick="setPriceFilter('3000000', '5000000')"
-                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '3000000' && request('price_max') == '5000000' ? 'active' : '' }}">
-                                3-5tr
-                            </button>
-                            <button type="button"
-                                onclick="setPriceFilter('5000000', '')"
-                                class="btn btn-outline-secondary btn-sm {{ request('price_min') == '5000000' && !request('price_max') ? 'active' : '' }}">
-                                Trên 5tr
-                            </button>
+                            @php
+                                $priceRanges = [
+                                    ['', '1000000', 'Dưới 1tr'],
+                                    ['1000000', '3000000', '1-3tr'],
+                                    ['3000000', '5000000', '3-5tr'],
+                                    ['5000000', '', 'Trên 5tr']
+                                ];
+                            @endphp
+                            @foreach($priceRanges as [$min, $max, $label])
+                                @php
+                                    $isActive = request('price_min') == $min && request('price_max') == $max;
+                                @endphp
+                                <button type="button" onclick="setPriceFilter('{{ $min }}', '{{ $max }}')" 
+                                    class="btn btn-outline-secondary btn-sm {{ $isActive ? 'active' : '' }}">
+                                    {{ $label }}
+                                </button>
+                            @endforeach
                             <input type="hidden" id="price_min_input" name="price_min" value="{{ request('price_min') }}">
                             <input type="hidden" id="price_max_input" name="price_max" value="{{ request('price_max') }}">
                         </div>
-                        
-                        <script>
-                        function setPriceFilter(min, max) {
-                            document.getElementById('price_min_input').value = min;
-                            document.getElementById('price_max_input').value = max;
-                            document.getElementById('filter-form').submit();
-                        }
-                        </script>
 
                         <!-- Divider -->
                         <div class="vr d-none d-md-block"></div>
@@ -141,6 +130,13 @@
     @endif
 </div>
 
-@push('styles')
+@push('scripts')
+<script>
+function setPriceFilter(min, max) {
+    document.getElementById('price_min_input').value = min;
+    document.getElementById('price_max_input').value = max;
+    document.getElementById('filter-form').submit();
+}
+</script>
 @endpush
 @endsection

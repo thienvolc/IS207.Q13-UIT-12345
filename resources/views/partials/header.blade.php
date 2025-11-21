@@ -57,9 +57,9 @@
         </button>
         <ul class="dropdown-menu header-search-category-menu">
           <li><a class="dropdown-item" href="{{ route('products.index') }}">Tất cả</a></li>
-          <li><a class="dropdown-item" href="{{ route('products.index') }}?category=laptops">Laptops</a></li>
-          <li><a class="dropdown-item" href="{{ route('products.index') }}?category=dong-ho">Đồng hồ</a></li>
-          <li><a class="dropdown-item" href="{{ route('products.index') }}?category=phu-kien">Phụ kiện</a></li>
+          @foreach($globalCategories ?? [] as $cat)
+          <li><a class="dropdown-item" href="{{ route('products.index') }}?category={{ $cat->slug }}">{{ $cat->title }}</a></li>
+          @endforeach
         </ul>
       </div>
       <button type="submit" class="header-search-button"><i class="fa-solid fa-magnifying-glass"></i></button>
@@ -97,16 +97,9 @@
           <i class="fa-solid fa-bars"></i> Danh mục sản phẩm
         </button>
         <ul class="dropdown-menu">
-          <li><a href="/san-pham" class="dropdown-item">Laptops</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Đồng hồ</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Tai nghe</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Loa</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Webcam</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Chuột máy tính</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Bàn phím</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Sạc</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Ổ cứng</a></li>
-          <li><a href="/san-pham" class="dropdown-item">Thiết bị mạng</a></li>
+          @foreach($globalCategories ?? [] as $cat)
+          <li><a href="{{ route('products.index') }}?category={{ $cat->slug }}" class="dropdown-item">{{ $cat->title }}</a></li>
+          @endforeach
         </ul>
       </div>
 
@@ -116,10 +109,6 @@
       <a href="/gioi-thieu" class="under-nav-item {{ request()->routeIs('about') ? 'active' : '' }}">Giới thiệu</a>
       <a href="{{ route('blog.index') }}" class="under-nav-item {{ request()->routeIs('blog.*') ? 'active' : '' }}">Tin tức</a>
       <a href="/lien-he" class="under-nav-item {{ request()->routeIs('contact') ? 'active' : '' }}">Liên hệ</a>
-    </div>
-
-    <div class="under-nav-right">
-      <!-- Đã loại bỏ nút so sánh và yêu thích -->
     </div>
   </nav>
 
@@ -136,17 +125,13 @@
       <a href="{{ route('products.index') }}" class="off-link">Sản phẩm</a>
       <a href="{{ route('super-deal') }}" class="off-link">Khuyến mãi</a>
       <a href="{{ route('about') }}" class="off-link">Giới thiệu</a>
-      <a href="{{ route('blog.index') }}" class="off-link">Blog</a>
+      <a href="{{ route('blog.index') }}" class="off-link">Tin tức</a>
       <a href="{{ route('contact') }}" class="off-link">Liên hệ</a>
       <hr>
       <h6 class="px-2 text-muted">Danh mục sản phẩm</h6>
-      <a href="/san-pham" class="off-link">Laptops</a>
-      <a href="/san-pham" class="off-link">Đồng hồ</a>
-      <a href="/san-pham" class="off-link">Tai nghe</a>
-      <a href="/san-pham" class="off-link">Loa</a>
-      <a href="/san-pham" class="off-link">Webcam</a>
-      <a href="/san-pham" class="off-link">Chuột máy tính</a>
-      <a href="/san-pham" class="off-link">Bàn phím</a>
+      @foreach($globalCategories ?? [] as $cat)
+      <a href="{{ route('products.index') }}?category={{ $cat->slug }}" class="off-link">{{ $cat->title }}</a>
+      @endforeach
     </nav>
   </div>
 </div>
