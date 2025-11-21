@@ -35,22 +35,15 @@ class CategoryRepository
         return Category::whereNull('parent_id')->with('children')->get();
     }
 
-    public function search(Pageable $pageable, int $level, ?string $query): LengthAwarePaginator
+    public function search(Pageable $pageable, ?int $level, ?string $query): LengthAwarePaginator
     {
-        return Category::query()
-            ->where('level', $level)
-            ->when($query, function ($q) use ($query) {
-                $q->where('title', 'like', '%' . $query . '%')
-                    ->orWhere('desc', 'like', '%' . $query . '%');
-            })
-            ->orderBy($pageable->sort->by, $pageable->sort->order)
-            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+        return $this->searchPublic($pageable, $level, $query);
     }
 
-    public function searchPublic(Pageable $pageable, int $level, ?string $query): LengthAwarePaginator
+    public function searchPublic(Pageable $pageable, ?int $level, ?string $query): LengthAwarePaginator
     {
         return Category::query()
-            ->where('level', $level)
+            ->when($level, fn($q, $v) => $q->where('level', $v))
             ->when($query, function ($q) use ($query) {
                 $q->where('title', 'like', '%' . $query . '%')
                     ->orWhere('desc', 'like', '%' . $query . '%');

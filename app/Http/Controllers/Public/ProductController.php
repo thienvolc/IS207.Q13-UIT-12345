@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Public;
 
 use App\Domains\Catalog\Services\ProductReadService;
-use App\Http\Controllers\AppController;
+use App\Domains\Catalog\DTOs\Product\Queries\SearchRelatedProductsDTO;
+use App\Domains\Catalog\DTOs\Product\Queries\PublicSearchProductsDTO;
+use Illuminate\Http\Request;
 
-class ProductController extends AppController
+use Illuminate\Routing\Controller;
+
+class ProductController extends Controller
 {
     public function __construct(
         private ProductReadService $readService
@@ -16,113 +20,74 @@ class ProductController extends AppController
      */
     public function index()
     {
-        // Sử dụng service để lấy danh sách sản phẩm
         $limit = (int)request('limit', 20);
         $offset = (int)request('offset', 0);
-        $searchQuery = request('search');
-
-        $filters = [
-            'category' => request('category'),
-            'price_min' => is_numeric(request('price_min')) ? (int)request('price_min') : null,
-            'price_max' => is_numeric(request('price_max')) ? (int)request('price_max') : null,
-        ];
-
-        // Thêm search query vào filters nếu có (key phải là 'query' theo repository)
-        if ($searchQuery) {
-            $filters['query'] = $searchQuery;
-        }
-
-        $sortField = match(request('sort')) {
-            'price_asc' => 'price',
-            'price_desc' => 'price',
-            'name' => 'name',
-            default => 'created_at',
-        };
-        $sortOrder = match(request('sort')) {
-            'price_asc' => 'asc',
-            'price_desc' => 'desc',
-            default => 'desc',
+        
+        [$sortField, $sortOrder] = match (request('sort')) {
+            'price_asc' => ['price', 'asc'],
+            'price_desc' => ['price', 'desc'],
+            'name' => ['name', 'asc'],
+            default => ['created_at', 'desc'],
         };
 
-        $products = $this->readService->getAllWithOffset($limit, $offset, $filters, $sortField, $sortOrder);
-        $hasMore = count($products) === $limit;
+        $dto = new PublicSearchProductsDTO(
+            query: request('search'),
+            categoryIdOrSlug: request('category'),
+            tagId: null,
+            priceMin: is_numeric(request('price_min')) ? (float)request('price_min') : null,
+            priceMax: is_numeric(request('price_max')) ? (float)request('price_max') : null,
+            offset: $offset,
+            limit: $limit,
+            sortField: $sortField,
+            sortOrder: $sortOrder
+        );
+
+        $result = $this->readService->searchPublic($dto);
 
         return view('pages.products.index', [
-            'products' => $products,
+            'products' => array_map(fn($p) => $p->toArray(), $result->data),
             'limit' => $limit,
             'offset' => $offset,
-            'hasMore' => $hasMore,
-            'searchQuery' => $searchQuery
+            'hasMore' => $result->hasMore,
+            'searchQuery' => request('search')
         ]);
     }
-    public function search(SearchProductRequest $request): JsonResponse
+    // Nếu cần search qua API thì dùng hàm index hoặc tạo hàm mới dùng PublicSearchProductsDTO và searchPublic
+
+    public function show(int $product_id)
     {
-        $filters = $request->only(['query', 'category', 'price_min', 'price_max']);
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = SearchProductsPublicDto::fromArray([
-            ...$filters,
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->readService->searchForPublic($dto);
-
-        return $this->success($result);
-    }
-
-    public function show(int $product_id): JsonResponse
-    {
-        $product = $this->readService->getByIdForPublic($product_id);
-
-        return $this->success($product);
+        $productDTO = $this->readService->getPublicById($product_id);
+        $product = $productDTO->toArray();
+        return view('pages.products.detail', compact('product'));
     }
 
     public function showBySlugView(string $slug)
     {
-        /** @var ProductPublicResource $product */
-        $product = $this->readService->getBySlugForPublic($slug);
-
-        $productId = $product['product_id'];
-        [$sortField, $sortOrder] = ['created_at', 'desc'];
-
-        //        $dto = GetRelatedProductsDto::fromArray([
-        //            'productId' => $productId,
-        //            'offset' => 0,
-        //            'limit' => 4,
-        //            'sortField' => $sortField,
-        //            'sortOrder' => $sortOrder,
-        //        ]);
-        //
-        //        $related = $this->readService->getRelatedProductsById($dto);
+        $productDTO = $this->readService->getPublicBySlug($slug);
+        $product = $productDTO->toArray();
+        // Lấy sản phẩm liên quan nếu cần
         $related = null;
-
         return view('pages.products.detail', compact('product', 'related'));
     }
 
-    public function showBySlug(string $slug): JsonResponse
+    // Nếu cần trả về JSON thì tạo hàm mới dùng getPublicBySlug
+
+    public function related(int $product_id, Request $request)
     {
-        $product = $this->readService->getBySlugForPublic($slug);
+        $offset = (int)$request->input('offset', 0);
+        $limit = (int)$request->input('limit', 4);
+        $sortField = $request->input('sortField', 'created_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
 
-        return $this->success($product);
-    }
-
-    public function related(int $product_id, SearchProductRequest $request): JsonResponse
-    {
-        [$sortField, $sortOrder] = $request->getSort();
-
-        $dto = GetRelatedProductsDto::fromArray([
-            'productId' => $product_id,
-            'offset' => $request->getOffset(),
-            'limit' => $request->getLimit(),
-            'sortField' => $sortField,
-            'sortOrder' => $sortOrder,
-        ]);
-
-        $result = $this->readService->getRelatedProductsById($dto);
-
-        return $this->success($result);
+        $dto = new SearchRelatedProductsDTO(
+            productId: $product_id,
+            offset: $offset,
+            limit: $limit,
+            sortField: $sortField,
+            sortOrder: $sortOrder
+        );
+        $result = $this->readService->searchRelated($dto);
+        $related = array_map(fn($p) => $p->toArray(), $result->data);
+        return view('pages.products.related', compact('related'));
     }
 }

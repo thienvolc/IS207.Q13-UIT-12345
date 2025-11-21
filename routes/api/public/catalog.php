@@ -13,14 +13,14 @@ Route::prefix('products')->controller(ProductPublicController::class)->group(fun
 });
 
 Route::controller(ProductPublicController::class)->group(function () {
-    Route::get('categories/{slug}/products', 'searchByCategorySlug');
+    Route::get('categories/{slug}/products', 'searchByCategorySlug')->where('slug', '^(?![0-9]+$)[a-zA-Z0-9\-]+$');
     Route::get('tags/{tag_id}/products', 'searchByTagId')->whereNumber('tag_id');
 });
 
 Route::prefix('categories')->controller(CategoryPublicController::class)->group(function () {
     Route::get('/', 'search');
     Route::get('all', 'all');
-    Route::get('{slug}', 'showBySlug');
+    Route::get('{slug}', 'showBySlug')->where("slug", '^(?![0-9]+$)[a-zA-Z0-9\-]+$');
 });
 
 Route::prefix('tags')->controller(TagPublicController::class)->group(function () {

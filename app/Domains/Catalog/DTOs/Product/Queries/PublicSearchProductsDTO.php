@@ -8,7 +8,7 @@ readonly class PublicSearchProductsDTO
 
     public function __construct(
         public ?string $query,
-        public ?int    $categoryIdOrSlug,
+        public int|string|null $categoryIdOrSlug,
         public ?int    $tagId,
         public ?float  $priceMin,
         public ?float  $priceMax,

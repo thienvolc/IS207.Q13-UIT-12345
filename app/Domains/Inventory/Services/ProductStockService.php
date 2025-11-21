@@ -4,6 +4,7 @@ namespace App\Domains\Inventory\Services;
 
 use App\Domains\Catalog\DTOs\Product\Responses\ProductDTO;
 use App\Domains\Catalog\Entities\Product;
+use App\Domains\Catalog\Mappers\ProductMapper;
 use App\Domains\Catalog\Repositories\ProductRepository;
 use App\Domains\Common\Constants\ResponseCode;
 use App\Domains\Inventory\Constants\StockOperationType;
@@ -15,7 +16,8 @@ use Illuminate\Support\Facades\DB;
 readonly class ProductStockService
 {
     public function __construct(
-        private ProductRepository $productRepository
+        private ProductRepository $productRepository,
+        private ProductMapper     $productMapper,
     ) {}
 
     public function adjustInventory(AdjustInventoryDTO $dto): ProductDTO
@@ -31,7 +33,7 @@ readonly class ProductStockService
 
             $this->markAsUpdated($product);
 
-            return ProductDTO::fromModel($product->fresh());
+            return $this->productMapper->toDTO($product->fresh());
         });
     }
 

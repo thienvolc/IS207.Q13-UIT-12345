@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 readonly class ProductMapper
 {
+    private const THUMBNAIL_PREFIX = "https://broad-snowflake-e396.ttt2042005.workers.dev/proxy?img=";
     public function toDTO(Product $product): ProductDTO
     {
         $categories = [];
@@ -48,7 +49,7 @@ readonly class ProductMapper
             title: $product->title,
             metaTitle: $product->meta_title,
             slug: $product->slug,
-            thumb: $product->thumb,
+            thumb: $this->padThumbnailPrefix($product->thumb),
             desc: $product->desc,
             summary: $product->summary,
             type: $product->type,
@@ -105,7 +106,7 @@ readonly class ProductMapper
             productId: $product->product_id,
             title: $product->title,
             slug: $product->slug,
-            thumb: $product->thumb,
+            thumb: $this->padThumbnailPrefix($product->thumb),
             desc: $product->desc,
             summary: $product->summary,
             type: $product->type,
@@ -135,5 +136,14 @@ readonly class ProductMapper
             productId: $product->product_id,
             status: $product->status,
         );
+    }
+
+    private function padThumbnailPrefix(?string $thumb): ?string
+    {
+        if ($thumb === null) {
+            return null;
+        }
+
+        return self::THUMBNAIL_PREFIX . $thumb;
     }
 }

@@ -1,7 +1,7 @@
 {{-- resources/views/pages/contact.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Liên hệ - PinkCapy')
+@section('title', 'PinkCapy - Liên hệ')
 
 @section('content')
 <div class="grid">

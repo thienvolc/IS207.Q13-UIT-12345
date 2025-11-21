@@ -18,7 +18,7 @@ class SearchCategoriesRequest extends FormRequest
     {
         return [
             'query' => 'nullable|string|max:255',
-            'level' => 'required|integer|min:1',
+            'level' => 'nullable|integer|min:1',
             'offset' => 'nullable|integer|min:0',
             'limit' => 'nullable|integer|min:1|max:100',
             'page' => 'nullable|integer|min:1',
@@ -35,7 +35,7 @@ class SearchCategoriesRequest extends FormRequest
 
         return new AdminSearchCategoriesDTO(
             query: get_string($v, 'query'),
-            level: get_int($v, 'level') ?? 0,
+            level: get_int($v, 'level'),
             page: get_int($v, 'page') ?? 1,
             size: get_int($v, 'size') ?? 10,
             sortField: $sortField,
@@ -51,7 +51,7 @@ class SearchCategoriesRequest extends FormRequest
 
         return new PublicSearchCategoriesDTO(
             query: get_string($v, 'query'),
-            level: get_int($v, 'level') ?? 0,
+            level: get_int($v, 'level'),
             offset: get_int($v, 'offset') ?? 1,
             limit: get_int($v, 'limit') ?? 10,
             sortField: $sortField,

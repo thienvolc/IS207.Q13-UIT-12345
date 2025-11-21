@@ -170,7 +170,6 @@
     opacity: 1;
 }
 
-
 .search-clear-btn i {
     pointer-events: none;
 }
@@ -254,11 +253,12 @@
 .header-search .header-search-category button.search-cat-btn,
 .header-search button.search-cat-btn {
     background: #fff;
+    width: 150px;
     border: none;
     font-weight: 600;
     color: #333;
     height: 100%;
-    padding: 0 20px;
+    /* padding: 0 20px; */
     font-size: 14px;
     border-radius: 0;
     box-shadow: none;
@@ -326,6 +326,13 @@
     font-size: 1.4rem;
     font-weight: 500;
     color: var(--text);
+    padding: 5px;
+    border-radius: 20px;
+    background-color: var(--light);
+}
+
+.header-user:hover {
+    background-color: var(--white);
 }
 
 .header-user-avt {

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Thanh toán')
+@section('title', 'PinkCapy - Thanh toán')
 @section('content')
 <div class="checkout-page-container">
     <h2 class="checkout-title">Thanh toán</h2>

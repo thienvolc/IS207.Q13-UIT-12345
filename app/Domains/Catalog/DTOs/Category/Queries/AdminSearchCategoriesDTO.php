@@ -6,7 +6,7 @@ readonly class AdminSearchCategoriesDTO
 {
     public function __construct(
         public ?string $query,
-        public int     $level,
+        public ?int    $level,
         public int     $page,
         public int     $size,
         public string  $sortField,

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+    private const THUMBNAIL_PREFIX = "https://broad-snowflake-e396.ttt2042005.workers.dev/proxy?img=";
+
     public function index()
     {
         // Hero Slider - 3 sản phẩm nổi bật
@@ -20,7 +22,7 @@ class HomeController extends Controller
                     'product_id' => $product->product_id,
                     'title' => $product->title,
                     'slug' => $product->slug,
-                    'thumb' => $product->thumb,
+                    'thumb' => $this->padThumbnailPrefix($product->thumb),
                     'price' => $product->price,
                     'discount' => $product->discount ?? 0,
                     'quantity' => $product->quantity,
@@ -44,7 +46,7 @@ class HomeController extends Controller
                     'product_id' => $product->product_id,
                     'title' => $product->title,
                     'slug' => $product->slug,
-                    'thumb' => $product->thumb,
+                    'thumb' => $this->padThumbnailPrefix($product->thumb),
                     'price' => $product->price,
                     'discount' => $product->discount ?? 0,
                     'quantity' => $product->quantity,
@@ -65,5 +67,14 @@ class HomeController extends Controller
         $bestSellers = $products->take(16); // 16 sản phẩm bán chạy
 
         return view('pages.home', compact('heroProducts', 'categoryBanners', 'newProducts', 'featuredProducts', 'saleProducts', 'bestSellers'));
+    }
+
+    private function padThumbnailPrefix(?string $thumb): ?string
+    {
+        if ($thumb === null) {
+            return null;
+        }
+
+        return self::THUMBNAIL_PREFIX . $thumb;
     }
 }
