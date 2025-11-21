@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Giỏ hàng')
+@section('title', 'PinkCapy - Giỏ hàng')
 
 @section('content')
 <div class="cart-page-wrapper mb-5">

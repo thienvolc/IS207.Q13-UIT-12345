@@ -1,7 +1,7 @@
 {{-- resources/views/pages/products/index.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Tất cả sản phẩm')
+@section('title', 'PinkCapy - Sản phẩm')
 
 @section('content')
 <div class="grid">
@@ -16,12 +16,12 @@
     <!-- Header & Filter Bar -->
     <div class="products-header-wrapper mb-4">
         @if(isset($searchQuery) && $searchQuery)
-            <h1 class="title-lg fw-bold mb-3">
-                Kết quả tìm kiếm cho: <span class="text-primary">"{{ $searchQuery }}"</span>
-            </h1>
-            <p class="text-muted">Tìm thấy {{ count($products) }} sản phẩm</p>
+        <h1 class="title-lg fw-bold mb-3">
+            Kết quả tìm kiếm cho: <span class="text-primary">"{{ $searchQuery }}"</span>
+        </h1>
+        <p class="text-muted">Tìm thấy {{ count($products) }} sản phẩm</p>
         @else
-            <h1 class="title-lg fw-bold mb-3">Tất cả sản phẩm</h1>
+        <h1 class="title-lg fw-bold mb-3">Tất cả sản phẩm</h1>
         @endif
 
         <!-- Filter Bar -->
@@ -30,12 +30,12 @@
                 <form method="GET" action="{{ route('products.index') }}" id="filter-form">
                     <!-- Hidden inputs to preserve filters -->
                     @if(isset($searchQuery) && $searchQuery)
-                        <input type="hidden" name="search" value="{{ $searchQuery }}">
+                    <input type="hidden" name="search" value="{{ $searchQuery }}">
                     @endif
                     @if(request('category'))
-                        <input type="hidden" name="category" value="{{ request('category') }}">
+                    <input type="hidden" name="category" value="{{ request('category') }}">
                     @endif
-                    
+
                     <div class="d-flex flex-wrap align-items-center gap-3">
                         <!-- Filter Label -->
                         <div class="filter-bar__label fw-bold text-muted">
@@ -46,21 +46,21 @@
                         <div class="filter-bar__group d-flex align-items-center gap-2">
                             <span class="fw-bold text-muted">Giá:</span>
                             @php
-                                $priceRanges = [
-                                    ['', '1000000', 'Dưới 1tr'],
-                                    ['1000000', '3000000', '1-3tr'],
-                                    ['3000000', '5000000', '3-5tr'],
-                                    ['5000000', '', 'Trên 5tr']
-                                ];
+                            $priceRanges = [
+                            ['', '1000000', 'Dưới 1tr'],
+                            ['1000000', '3000000', '1-3tr'],
+                            ['3000000', '5000000', '3-5tr'],
+                            ['5000000', '', 'Trên 5tr']
+                            ];
                             @endphp
                             @foreach($priceRanges as [$min, $max, $label])
-                                @php
-                                    $isActive = request('price_min') == $min && request('price_max') == $max;
-                                @endphp
-                                <button type="button" onclick="setPriceFilter('{{ $min }}', '{{ $max }}')" 
-                                    class="btn btn-outline-secondary btn-sm {{ $isActive ? 'active' : '' }}">
-                                    {{ $label }}
-                                </button>
+                            @php
+                            $isActive = request('price_min') == $min && request('price_max') == $max;
+                            @endphp
+                            <button type="button" onclick="setPriceFilter('{{ $min }}', '{{ $max }}')"
+                                class="btn btn-outline-secondary btn-sm {{ $isActive ? 'active' : '' }}">
+                                {{ $label }}
+                            </button>
                             @endforeach
                             <input type="hidden" id="price_min_input" name="price_min" value="{{ request('price_min') }}">
                             <input type="hidden" id="price_max_input" name="price_max" value="{{ request('price_max') }}">
@@ -132,11 +132,11 @@
 
 @push('scripts')
 <script>
-function setPriceFilter(min, max) {
-    document.getElementById('price_min_input').value = min;
-    document.getElementById('price_max_input').value = max;
-    document.getElementById('filter-form').submit();
-}
+    function setPriceFilter(min, max) {
+        document.getElementById('price_min_input').value = min;
+        document.getElementById('price_max_input').value = max;
+        document.getElementById('filter-form').submit();
+    }
 </script>
 @endpush
 @endsection

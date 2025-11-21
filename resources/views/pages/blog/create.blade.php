@@ -1,7 +1,7 @@
 {{-- resources/views/pages/blog/create.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Đăng bài viết mới')
+@section('title', 'PinkCapy - Đăng bài viết mới')
 
 @section('content')
 <div class="container py-5 d-flex justify-content-center align-items-center" style="min-height:80vh;">

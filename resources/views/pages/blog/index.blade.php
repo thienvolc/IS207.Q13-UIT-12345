@@ -1,7 +1,7 @@
 {{-- resources/views/pages/blog/index.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Tin tức - PinkCapyStore')
+@section('title', 'PinkCapy - Tin tức')
 
 @section('content')
 <!-- Breadcrumb -->

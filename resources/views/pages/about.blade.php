@@ -1,7 +1,7 @@
 {{-- resources/views/pages/about.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Giới thiệu - PinkCapyStore')
+@section('title', 'PinkCapy - Giới thiệu')
 
 @section('content')
 <!-- Breadcrumb -->
