@@ -12,17 +12,17 @@ use Illuminate\Routing\Controller;
 class ProductController extends Controller
 {
     public function __construct(
-        private ProductReadService $readService
+        private readonly ProductReadService $readService
     ) {}
 
     /**
-     * Hiển thị danh sách sản phẩm.
+     * [GET] /san-pham [products.index]
      */
     public function index()
     {
         $limit = (int)request('limit', 20);
         $offset = (int)request('offset', 0);
-        
+
         [$sortField, $sortOrder] = match (request('sort')) {
             'price_asc' => ['price', 'asc'],
             'price_desc' => ['price', 'desc'],
@@ -45,49 +45,48 @@ class ProductController extends Controller
         $result = $this->readService->searchPublic($dto);
 
         return view('pages.products.index', [
-            'products' => array_map(fn($p) => $p->toArray(), $result->data),
-            'limit' => $limit,
-            'offset' => $offset,
-            'hasMore' => $result->hasMore,
-            'searchQuery' => request('search')
+            'searchQuery' => request('search'),
+            'searchProductsResponse' => $result,
         ]);
-    }
-    // Nếu cần search qua API thì dùng hàm index hoặc tạo hàm mới dùng PublicSearchProductsDTO và searchPublic
-
-    public function show(int $product_id)
-    {
-        $productDTO = $this->readService->getPublicById($product_id);
-        $product = $productDTO->toArray();
-        return view('pages.products.detail', compact('product'));
     }
 
     public function showBySlugView(string $slug)
     {
-        $productDTO = $this->readService->getPublicBySlug($slug);
-        $product = $productDTO->toArray();
-        // Lấy sản phẩm liên quan nếu cần
-        $related = null;
-        return view('pages.products.detail', compact('product', 'related'));
+        $product = $this->readService->getPublicBySlug($slug);
+
+        $requestDTO = new SearchRelatedProductsDTO(
+            productId: $product->productId,
+            offset: 1,
+            limit: 5,
+            sortField: 'created_at',
+            sortOrder: 'desc',
+        );
+
+        $relatedProductsResponse = $this->readService->searchRelated($requestDTO);
+
+        return view('pages.products.detail', [
+            'product' => $product,
+            'related' => $relatedProductsResponse,
+        ]);
     }
 
-    // Nếu cần trả về JSON thì tạo hàm mới dùng getPublicBySlug
-
-    public function related(int $product_id, Request $request)
+    public function show(int $product_id)
     {
-        $offset = (int)$request->input('offset', 0);
-        $limit = (int)$request->input('limit', 4);
-        $sortField = $request->input('sortField', 'created_at');
-        $sortOrder = $request->input('sortOrder', 'desc');
+        $product = $this->readService->getPublicById($product_id);
 
-        $dto = new SearchRelatedProductsDTO(
+        $requestDTO = new SearchRelatedProductsDTO(
             productId: $product_id,
-            offset: $offset,
-            limit: $limit,
-            sortField: $sortField,
-            sortOrder: $sortOrder
+            offset: 1,
+            limit: 4,
+            sortField: 'created_at',
+            sortOrder: 'desc',
         );
-        $result = $this->readService->searchRelated($dto);
-        $related = array_map(fn($p) => $p->toArray(), $result->data);
-        return view('pages.products.related', compact('related'));
+
+        $relatedProductsResponse = $this->readService->searchRelated($requestDTO);
+
+        return view('pages.products.detail', [
+            'product' => $product,
+            'related' => $relatedProductsResponse,
+        ]);
     }
 }

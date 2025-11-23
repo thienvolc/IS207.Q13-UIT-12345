@@ -16,6 +16,7 @@ class PageResponseDTO implements BaseDTO
         public array $data,
         public int   $page,
         public int   $size,
+        public int   $count,
         public int   $total,
         public bool  $hasMore
     ) {}
@@ -32,8 +33,9 @@ class PageResponseDTO implements BaseDTO
         $page = $paginator->currentPage();
         $total = $paginator->total();
         $hasMore = $paginator->hasMorePages();
+        $count = $paginator->count();
 
-        return new self($data, $page, $size, $total, $hasMore);
+        return new self($data, $page, $size, $count, $total, $hasMore);
     }
 
     public function toArray(): array
@@ -42,6 +44,7 @@ class PageResponseDTO implements BaseDTO
             'data' => array_map(fn($item) => $item instanceof BaseDTO ? $item->toArray() : $item, $this->data),
             'page' => $this->page,
             'size' => $this->size,
+            'count' => $this->count,
             'total' => $this->total,
             'has_more' => $this->hasMore,
         ];

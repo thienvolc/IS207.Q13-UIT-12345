@@ -1,3 +1,14 @@
+<?php
+/**
+ * @var array<App\Domains\Catalog\DTOs\Product\Responses\PublicProductDTO> heroProducts
+ * @var array<App\Domains\Catalog\DTOs\Category\Responses\PublicCategoryDTO> bannerCategories
+ * @var array<App\Domains\Catalog\DTOs\Product\Responses\PublicProductDTO> newProducts
+ * @var array<App\Domains\Catalog\DTOs\Product\Responses\PublicProductDTO> featuredProducts
+ * @var array<App\Domains\Catalog\DTOs\Product\Responses\PublicProductDTO> saleProducts
+ * @var array<App\Domains\Catalog\DTOs\Product\Responses\PublicProductDTO> bestSellers
+ * */
+?>
+
 @extends('layouts.app')
 @section('title','PinkCapy - Home')
 
@@ -54,7 +65,7 @@
       ];
       @endphp
 
-      @foreach($categoryBanners as $index => $category)
+      @foreach($bannerCategories as $index => $category)
       <div class="grid__col-3">
         <a href="{{ route('products.index') }}?category={{ $category->slug }}" class="recommends-item">
           <div class="recommends-item-wrap">
@@ -84,7 +95,7 @@
     <div class="grid-row">
       <!-- Deal -->
       @php
-      $dealProduct = $newProducts->first();
+      $dealProduct = $newProducts[1];
       @endphp
       <div class="grid__col-3 deal">
         <div class="deal-wrap">
@@ -95,30 +106,30 @@
             <div class="deal-header-coupon">
               <span>Tiết kiệm</span>
               <div class="deal-header-coupon_price">
-                {{ number_format(($dealProduct['price']) / 1000) }}K
+                {{ number_format(($dealProduct->price) / 1000) }}K
               </div>
             </div>
           </div>
           <div class="deal-img">
-            <a href="{{ route('products.show', $dealProduct['slug']) }}">
-              <img src="{{ $dealProduct['thumb'] ?? '' }}" alt="{{ $dealProduct['title'] ?? '' }}" class="img-fluid">
+            <a href="{{ route('products.show', $dealProduct->slug) }}">
+              <img src="{{ $dealProduct->thumb ?? '' }}" alt="{{ $dealProduct->title ?? '' }}" class="img-fluid">
             </a>
           </div>
           <h5 class="deal-name-produce">
-            <a href="{{ route('products.show', $dealProduct['slug'] ?? '') }}">
-              {{ $dealProduct['title'] ?? '' }}
+            <a href="{{ route('products.show', $dealProduct->slug ?? '') }}">
+              {{ $dealProduct->title ?? '' }}
             </a>
           </h5>
           <div class="deal-price">
-            <span class="deal-price-main">{{ number_format($dealProduct['price'] ?? 0) }}đ</span>
+            <span class="deal-price-main">{{ number_format($dealProduct->price ?? 0) }}đ</span>
           </div>
           <div class="deal-hang">
             <div class="deal-soluong">
               {{-- DATA THẬT: Quantity từ database --}}
-              <span class="">Available: <strong>{{ $dealProduct['quantity'] ?? 0 }}</strong></span>
+              <span class="">Available: <strong>{{ $dealProduct->quantity ?? 0 }}</strong></span>
 
               {{-- HARDCODE TẠM: Already Sold (DB chưa có field này) --}}
-              {{-- TODO: Khi có field 'sold' trong products table, thay bằng: {{ $dealProduct['sold'] }} --}}
+              {{-- TODO: Khi có field 'sold' trong products table, thay bằng: {{ $dealProduct->sold'}} --}}
               <span class="">Already Sold: <strong>{{ rand(20, 100) }}</strong></span>
             </div>
           </div>
@@ -179,7 +190,7 @@
           <div class="tab-pane fade show active" id="featured" role="tabpanel" aria-labelledby="featured-tab">
             <div class="grid-row">
               @foreach($newProducts as $product)
-              <div class="grid__col-3 product-col" data-product-id="{{ $product['product_id'] ?? '' }}">
+              <div class="grid__col-3 product-col" data-product-id="{{ $product->productId ?? '' }}">
                 <x-product-card :product="$product" />
               </div>
               @endforeach
@@ -191,7 +202,7 @@
           <div class="tab-pane fade" id="onsale" role="tabpanel" aria-labelledby="onsale-tab">
             <div class="grid-row">
               @foreach($featuredProducts as $product)
-              <div class="grid__col-3 product-col" data-product-id="{{ $product['product_id'] ?? '' }}">
+              <div class="grid__col-3 product-col" data-product-id="{{ $product->productId ?? '' }}">
                 <x-product-card :product="$product" />
               </div>
               @endforeach
@@ -224,13 +235,13 @@
           <a href="{{ route('products.index') }}" class="nav-link product__carousel-item-top">Top 10</a>
         </li>
         <li class="nav-item">
-          <a href="{{ route('products.index') }}" class="nav-link">Tai nghe</a>
+          <a href="{{ route('products.index') }}?category=tai-nghe" class="nav-link">Tai nghe</a>
         </li>
         <li class="nav-item">
-          <a href="{{ route('products.index') }}" class="nav-link">Phụ kiện</a>
+          <a href="{{ route('products.index') }}?category=phu-kien" class="nav-link">Phụ kiện</a>
         </li>
         <li class="nav-item">
-          <a href="{{ route('products.index') }}" class="nav-link">Camera</a>
+          <a href="{{ route('products.index') }}?category=camera" class="nav-link">Camera</a>
         </li>
       </ul>
     </div>
@@ -246,25 +257,25 @@
         </button>
 
         @php
-        $tab1 = $bestSellers->take(8);
-        $tab2 = $bestSellers->skip(8)->take(8);
+        $tab1 = array_slice($bestSellers, 0, 8);
+        $tab2 = array_slice($bestSellers, 8, 16);
         @endphp
 
         <div class="grid-row product-tab active" id="tab-page-1">
           @foreach($tab1 as $product)
           <div class="grid__col-3 product-col">
-            <div class="product-item product-item-horizontal" data-product-id="{{ $product['product_id'] ?? '' }}">
+            <div class="product-item product-item-horizontal" data-product-id="{{ $product->productId ?? '' }}">
               <div class="product-item__image">
-                <a href="{{ route('products.show', $product['slug']) }}">
-                  <img src="{{ $product['thumb'] ?? '' }}" alt="{{ $product['title'] ?? '' }}" class="img-fluid" loading="lazy">
+                <a href="{{ route('products.show', $product->slug) }}">
+                  <img src="{{ $product->thumb ?? '' }}" alt="{{ $product->title ?? '' }}" class="img-fluid" loading="lazy">
                 </a>
               </div>
               <div class="product-item__content">
                 <h5 class="product-item__title">
-                  <a href="{{ route('products.show', $product['slug']) }}">{{ $product['title'] ?? '' }}</a>
+                  <a href="{{ route('products.show', $product->slug) }}">{{ $product->title ?? '' }}</a>
                 </h5>
                 <div class="d-flex align-items-center justify-content-between">
-                  <div class="product-item__price mb-0">{{ number_format($product['price'] ?? 0) }}đ</div>
+                  <div class="product-item__price mb-0">{{ number_format($product->price ?? 0) }}đ</div>
                   <button class="btn-icon-vertical btn-add-cart ms-3" title="Thêm vào giỏ">
                     <i class="bi bi-cart-plus"></i>
                   </button>
@@ -280,17 +291,17 @@
         <div class="grid-row product-tab" id="tab-page-2">
           @foreach($tab2 as $product)
           <div class="grid__col-3 product-col">
-            <div class="product-item product-item-horizontal" data-product-id="{{ $product['product_id'] ?? '' }}">
+            <div class="product-item product-item-horizontal" data-product-id="{{ $product->productId ?? '' }}">
               <div class="product-item__image">
-                <a href="{{ route('products.show', $product['slug']) }}">
-                  <img src="{{ $product['thumb'] ?? '' }}" alt="{{ $product['title'] ?? '' }}" class="img-fluid" loading="lazy">
+                <a href="{{ route('products.show', $product->slug) }}">
+                  <img src="{{ $product->thumb ?? '' }}" alt="{{ $product->title ?? '' }}" class="img-fluid" loading="lazy">
                 </a>
               </div>
               <div class="product-item__content">
                 <h5 class="product-item__title">
-                  <a href="{{ route('products.show', $product['slug']) }}">{{ $product['title'] ?? '' }}</a>
+                  <a href="{{ route('products.show', $product->slug) }}">{{ $product->title ?? '' }}</a>
                 </h5>
-                <div class="product-item__price">{{ number_format($product['price'] ?? 0) }}đ</div>
+                <div class="product-item__price">{{ number_format($product->price ?? 0) }}đ</div>
 
                 <div class="product-item__actions-right">
                   <button class="btn-icon-vertical btn-add-cart" title="Thêm vào giỏ">
