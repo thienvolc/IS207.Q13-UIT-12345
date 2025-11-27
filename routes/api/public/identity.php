@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Public\Identity\AuthPublicController;
 use App\Http\Controllers\Api\Public\Identity\UserProfileController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Web\AccountController;
 
 $auth = AuthMiddleware::class;
 
@@ -19,4 +20,5 @@ Route::prefix('me')->middleware($auth)->controller(UserProfileController::class)
     Route::get('/', 'show');
     Route::put('/', 'update');
     Route::put('password', 'updatePassword');
+    Route::post('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
 });
