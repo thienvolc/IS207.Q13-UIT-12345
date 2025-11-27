@@ -28,8 +28,8 @@ body {
 }
 
 .grid {
-    width: 1200px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -81,9 +81,7 @@ body {
     color: var(--text);
     font-weight: 600;
     text-decoration: none;
-    transition:
-        color 120ms ease,
-        background 120ms ease;
+    transition: color 120ms ease, background 120ms ease;
 }
 .dropdown-item:hover {
     color: var(--text) !important;

@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Auth\AuthController;
 use \App\Http\Controllers\Public;
+use Illuminate\Support\Facades\Auth;
+
 
 // ==================== TRANG CHỦ & KHÁC ====================
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -35,3 +37,32 @@ Route::get('/cart', [\App\Http\Controllers\Me\CartController::class, 'index'])->
 
 // ==================== THANH TOÁN ====================
 Route::get('/checkout', [\App\Http\Controllers\Me\OrderController::class, 'checkout'])->name('order.checkout');
+
+// ==================== ADMIN ====================
+// Logout route (for blade logout form)
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/');
+})->name('logout');
+
+
+// ---------- Admin routes ----------
+Route::prefix('admin')
+    ->name('admin.')
+    // ->middleware(['auth','is_admin'])   // dùng khi BE đã có middleware is_admin
+    ->middleware([]) // tạm bỏ middleware để FE dev (thay bằng ['auth','is_admin'] khi backend sẵn sàng)
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/', [\App\Http\Controllers\Admin\AdminController::class, 'index'])
+            ->name('dashboard');
+
+        // Nếu bạn đã có ProductController, OrderController... ở App\Http\Controllers\Admin
+        Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+        Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show', 'update']);
+        Route::resource('customers', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'show']);
+        Route::resource('posts', \App\Http\Controllers\Admin\TagController::class);
+    });
+
