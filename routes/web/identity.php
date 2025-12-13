@@ -15,9 +15,12 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/forgot-password', 'forgotPassword')->name('password.email');
 });
 
+
+
 // Route::middleware('auth');
 Route::prefix('account')->group(function () {
     Route::get('/profile', fn() => view('pages.account.profile'))->name('account.profile');
     Route::get('/password', fn() => view('pages.account.password'))->name('account.password');
+    Route::post('/password', [AuthController::class, 'updatePassword'])->name('account.password.update');
 });
 

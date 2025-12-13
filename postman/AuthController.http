@@ -2,7 +2,7 @@
 @token = user-306
 
 ### Register
-POST {{base_url}}/api/users/auth/register
+POST {{base_url}}/api/auth/register
 Content-Type: application/json
 
 { "first_name": "Thien",
@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 ### Login
-POST {{base_url}}/api/users/auth/login
+POST {{base_url}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -23,11 +23,11 @@ Content-Type: application/json
 }
 
 ### Logout (requires token)
-POST {{base_url}}/api/users/auth/logout
+POST {{base_url}}/api/auth/logout
 Authorization: Bearer {{token}}
 
 ### Forgot password
-POST {{base_url}}/api/users/auth/forgot-password
+POST {{base_url}}/api/auth/forgot-password
 Content-Type: application/json
 
 {
@@ -35,7 +35,7 @@ Content-Type: application/json
 }
 
 ### Reset password
-POST {{base_url}}/api/users/auth/reset-password
+POST {{base_url}}/api/auth/reset-password
 Content-Type: application/json
 
 {
