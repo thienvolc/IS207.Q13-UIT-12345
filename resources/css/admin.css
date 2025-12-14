@@ -1,0 +1,342 @@
+/* =========================================
+   PinkCapy Admin Theme (Red/Pink Accent)
+   ========================================= */
+
+:root {
+    --accent: #f6244e;
+    --accent-light: #ffe6eb;
+    --accent-soft: rgba(246, 36, 78, 0.08);
+    --bg: #fdf3f5;
+    --muted: #6c757d;
+    --border: #f1ced5;
+    --card: #ffffff;
+    --radius: 10px;
+    --sidebar-width: 250px;
+}
+
+/* Layout base */
+.admin-body {
+    background: var(--bg);
+    font-family: "Roboto", sans-serif;
+}
+
+.admin-root {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+.admin-sidebar {
+    width: var(--sidebar-width);
+    background: #fff;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-shadow: 0 0 10px rgba(246, 36, 78, 0.05);
+}
+
+.admin-sidebar .sidebar-top {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-sidebar .nav-link {
+    color: #444;
+    padding: 10px 18px;
+    margin: 6px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.admin-sidebar .nav-link:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.admin-sidebar .nav-link.active {
+    background: var(--accent);
+    color: #fff !important;
+}
+
+/* MAIN */
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER */
+.admin-header {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+}
+
+/* CONTENT */
+.admin-content {
+    padding: 32px;
+}
+
+/* CARD */
+.card {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 0 6px rgba(246, 36, 78, 0.05);
+}
+
+/* TABLE */
+.table thead th {
+    background: var(--accent-soft);
+    color: #444;
+    border-bottom: 1px solid var(--border);
+}
+
+.table tbody tr:hover {
+    background: #fff5f7;
+}
+
+/* BUTTONS */
+.btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.btn-primary:hover {
+    background: #d81d42;
+    border-color: #d81d42;
+}
+
+.btn-danger {
+    background: #d81d42;
+    border-color: #d81d42;
+}
+
+/* BADGES */
+.badge.bg-warning {
+    background: #ffbf47 !important;
+}
+.badge.bg-info {
+    background: #4cbaff !important;
+}
+.badge.bg-success {
+    background: #28a745 !important;
+}
+.badge.bg-danger {
+    background: #d81d42 !important;
+}
+
+/* FOOTER */
+.admin-footer {
+    background: #fff;
+    border-top: 1px solid var(--border);
+    padding: 10px 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 991px) {
+    .admin-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        transform: translateX(-110%);
+        transition: 0.2s;
+        z-index: 2000;
+    }
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+    .admin-content {
+        padding: 20px;
+    }
+}
+/* ======= ADMIN HEADER GRADIENT ======= */
+
+.admin-header-gradient {
+    background: #f5385e;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(255, 50, 90, 0.25);
+}
+
+.text-shadow {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.btn-icon-white {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: none;
+}
+.btn-icon-white:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.search-admin input {
+    border: none;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 20px 0 0 20px;
+}
+.search-admin input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn-search-admin {
+    background: white;
+    color: #ff4d6d;
+    border-radius: 0 20px 20px 0;
+    border: none;
+}
+.btn-search-admin:hover {
+    background: #ffe6ea;
+    color: #d41640;
+}
+
+.btn-user-admin {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.12);
+    padding: 5px 10px;
+    border-radius: 20px;
+    backdrop-filter: blur(6px);
+}
+.btn-user-admin:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.dropdown-menu {
+    border-radius: 12px !important;
+    padding: 6px;
+}
+
+/* Make white items nicer */
+.dropdown-item {
+    padding: 8px 14px;
+    border-radius: 6px;
+}
+.dropdown-item:hover {
+    background: rgba(255, 77, 109, 0.1);
+    color: #ff4d6d;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .admin-header-gradient h5 {
+        font-size: 1.1rem;
+    }
+}
+
+/* =========================================
+   ADMIN FOOTER - PinkCapy Premium Style
+   ========================================= */
+.admin-footer {
+    background: linear-gradient(to top, #ffffff, #fff9fa);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -8px 30px rgba(230, 30, 42, 0.08);
+    margin-top: auto;
+    font-size: 0.925rem;
+}
+
+.footer-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #f6244e40, transparent);
+    margin: 8px 0;
+}
+
+.text-pinkcapy {
+    color: #f6244e !important;
+    font-weight: 800 !important;
+}
+
+.text-pinkcapy:hover {
+    color: #d81d3a !important;
+}
+
+/* Trái tim đập nhẹ - siêu dễ thương */
+.heartbeat {
+    display: inline-block;
+    color: #f6244e;
+    font-size: 1.1em;
+    animation: heartbeat 1.8s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.25);
+    }
+}
+
+/* Badge version sang trọng */
+.badge-version {
+    background: linear-gradient(135deg, #f6244e, #ff5478);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(246, 36, 78, 0.3);
+}
+
+/* Toast Message ĐẸP ĐỈNH */
+.admin-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    min-width: 320px;
+    z-index: 1100;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: none;
+    overflow: hidden;
+    animation: slideInRight 0.4s ease-out;
+}
+
+.toast-header {
+    border-bottom: none;
+    font-weight: 600;
+    padding: 12px 16px;
+}
+
+.toast-body {
+    padding: 16px;
+    background: #fff;
+    color: #333;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-main {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px !important;
+    }
+    .admin-toast {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        bottom: 16px;
+        min-width: 90%;
+        max-width: 400px;
+    }
+}
