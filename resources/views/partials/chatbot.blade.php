@@ -100,7 +100,7 @@
       // Call to backend API for bot replies
       async function botReply(userText){
         try {
-          const response = await fetch('http://127.0.0.1:8001/api/chat', {
+          const response = await fetch('https://pinkcapy.io.vn/chatbot/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: userText })
