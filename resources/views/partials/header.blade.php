@@ -71,22 +71,39 @@
           <i class="bi bi-handbag-fill"></i>
         </a>
       </div>
-      <!-- <div class="header-auth"><a href="/login">Đăng nhập</a> <span class="separate"></span> <a href="/register">Đăng ký</a></div> -->
-      <!-- Tài khoản -->
+      
+      @auth
+      <!-- User đã đăng nhập -->
       <div class="nav-item dropdown header-user">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
           data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="{{ asset('img/LOGO_Admin.png') }}" alt="avatar" class="header-user-avt"> Admin
+          <img src="{{ Auth::user()->profile?->avatar ?? asset('img/default-avatar.png') }}" alt="avatar" class="header-user-avt"> 
+          {{ Auth::user()->profile?->first_name ?? Auth::user()->email }}
         </a>
         <ul class="dropdown-menu header-user-menu" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="{{ route('account.profile') }}">Tài khoản của tôi</a></li>
-          <li><a class="dropdown-item" href="{{ route('cart.page') }}">Đơn mua</a></li>
+          <li><a class="dropdown-item" href="{{ route('account.profile') }}"><i class="bi bi-person me-2"></i>Tài khoản của tôi</a></li>
+          <li><a class="dropdown-item" href="{{ route('cart.page') }}"><i class="bi bi-box-seam me-2"></i>Đơn mua</a></li>
+          @if(Auth::user()->is_admin)
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-primary" href="/admin"><i class="bi bi-gear me-2"></i>Quản trị</a></li>
+          @endif
+          <li><hr class="dropdown-divider"></li>
           <li>
-            <hr class="dropdown-divider">
+            <form method="POST" action="{{ route('logout') }}">
+              @csrf
+              <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
+            </form>
           </li>
-          <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
         </ul>
       </div>
+      @else
+      <!-- User chưa đăng nhập -->
+      <div class="header-auth">
+        <a href="{{ route('login') }}" class="header-auth-link">Đăng nhập</a>
+        <span class="header-auth-separator">|</span>
+        <a href="{{ route('register') }}" class="header-auth-link">Đăng ký</a>
+      </div>
+      @endauth
     </div>
   </div>
   <!-- Header bottom -->
@@ -121,6 +138,18 @@
   </div>
   <div class="offcanvas-body">
     <nav>
+      @auth
+      <div class="off-user-info mb-3 p-3 bg-light rounded">
+        <div class="d-flex align-items-center">
+          <img src="{{ Auth::user()->profile?->avatar ?? asset('img/default-avatar.png') }}" alt="avatar" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+          <div>
+            <div class="fw-bold">{{ Auth::user()->profile?->first_name ?? '' }} {{ Auth::user()->profile?->last_name ?? '' }}</div>
+            <small class="text-muted">{{ Auth::user()->email }}</small>
+          </div>
+        </div>
+      </div>
+      @endauth
+      
       <a href="{{ route('home') }}" class="off-link">Trang chủ</a>
       <a href="{{ route('products.index') }}" class="off-link">Sản phẩm</a>
       <a href="{{ route('super-deal') }}" class="off-link">Khuyến mãi</a>
@@ -132,6 +161,22 @@
       @foreach($globalCategories ?? [] as $cat)
       <a href="{{ route('products.index') }}?category={{ $cat->slug }}" class="off-link">{{ $cat->title }}</a>
       @endforeach
+      
+      <hr>
+      @auth
+      <a href="{{ route('account.profile') }}" class="off-link"><i class="bi bi-person me-2"></i>Tài khoản của tôi</a>
+      <a href="{{ route('cart.page') }}" class="off-link"><i class="bi bi-bag me-2"></i>Giỏ hàng</a>
+      @if(Auth::user()->is_admin)
+      <a href="/admin" class="off-link text-primary"><i class="bi bi-gear me-2"></i>Quản trị</a>
+      @endif
+      <form method="POST" action="{{ route('logout') }}" class="d-inline">
+        @csrf
+        <button type="submit" class="off-link text-danger w-100 text-start border-0 bg-transparent"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
+      </form>
+      @else
+      <a href="{{ route('login') }}" class="off-link"><i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập</a>
+      <a href="{{ route('register') }}" class="off-link"><i class="bi bi-person-plus me-2"></i>Đăng ký</a>
+      @endauth
     </nav>
   </div>
 </div>

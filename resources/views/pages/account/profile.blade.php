@@ -11,17 +11,20 @@
                 <div class="profile-sidebar">
                     <div class="profile-avatar-section">
                         <div class="profile-avatar">
-                            <img src="" alt="Avatar" style="display: none;">
-                            <i class="bi bi-person-circle"></i>
+                            @if(Auth::user()->profile?->avatar)
+                                <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar">
+                            @else
+                                <i class="bi bi-person-circle"></i>
+                            @endif
                         </div>
-                        <h4 class="profile-name">Loading...</h5>
+                        <h4 class="profile-name">{{ Auth::user()->profile?->first_name ?? '' }} {{ Auth::user()->profile?->last_name ?? '' }}</h4>
                     </div>
                     <nav class="profile-nav">
                         <a href="{{ route('account.profile') }}" class="profile-nav-item active">
                             <i class="bi bi-person"></i>
                             <span>Thông tin cá nhân</span>
                         </a>
-                        <a href="/cart" class="profile-nav-item">
+                        <a href="{{ route('account.orders') }}" class="profile-nav-item">
                             <i class="bi bi-box-seam"></i>
                             <span>Đơn hàng của tôi</span>
                         </a>
@@ -44,7 +47,7 @@
             <div class="grid__col-9">
                 <div class="profile-content-card">
                     <div class="profile-card-header">
-                        <h3>Thông tin cá nhân</h4>
+                        <h3>Thông tin cá nhân</h3>
                             <p class="text-muted">Quản lý thông tin cá nhân của bạn</p>
                     </div>
 
@@ -77,8 +80,12 @@
                                 <div class="grid__col-12">
                                     <div class="avatar-upload-section">
                                         <div class="avatar-preview">
-                                            <img src="" alt="Avatar" id="avatarPreview" style="display: none;">
-                                            <i class="bi bi-person-circle" id="avatarIcon"></i>
+                                            @if(Auth::user()->profile?->avatar)
+                                                <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar" id="avatarPreview">
+                                            @else
+                                                <img src="" alt="Avatar" id="avatarPreview" style="display: none;">
+                                                <i class="bi bi-person-circle" id="avatarIcon"></i>
+                                            @endif
                                         </div>
                                         <div class="avatar-upload-info">
                                             <label for="avatar" class="btn btn-outline-primary btn-sm">
@@ -101,6 +108,7 @@
                                         name="first_name"
                                         id="first_name"
                                         class="form-control"
+                                        value="{{ Auth::user()->profile?->first_name ?? '' }}"
                                         placeholder="Nguyễn">
                                 </div>
 
@@ -112,6 +120,7 @@
                                         name="middle_name"
                                         id="middle_name"
                                         class="form-control"
+                                        value="{{ Auth::user()->profile?->middle_name ?? '' }}"
                                         placeholder="Văn">
                                 </div>
 
@@ -123,6 +132,7 @@
                                         name="last_name"
                                         id="last_name"
                                         class="form-control"
+                                        value="{{ Auth::user()->profile?->last_name ?? '' }}"
                                         placeholder="A">
                                 </div>
                             </div>
@@ -136,6 +146,7 @@
                                     <input type="email"
                                         id="email"
                                         class="form-control"
+                                        value="{{ Auth::user()->email }}"
                                         readonly>
                                     <small class="text-muted">Email không thể thay đổi</small>
                                 </div>
@@ -148,6 +159,7 @@
                                         name="phone"
                                         id="phone"
                                         class="form-control"
+                                        value="{{ Auth::user()->phone ?? '' }}"
                                         placeholder="0123456789">
                                 </div>
                             </div>
@@ -162,7 +174,7 @@
                                         id="profile"
                                         class="form-control"
                                         rows="3"
-                                        placeholder="Viết vài dòng về bản thân..."></textarea>
+                                        placeholder="Viết vài dòng về bản thân...">{{ Auth::user()->profile?->bio ?? '' }}</textarea>
                                 </div>
                             </div>
 

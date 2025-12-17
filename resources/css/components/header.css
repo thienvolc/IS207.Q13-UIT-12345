@@ -479,3 +479,50 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     background-color: var(--primary);
 }
+
+/* Header Auth Links (Chưa đăng nhập) */
+.header-auth {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+.header-auth-link {
+    color: var(--text);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.header-auth-link:hover {
+    color: var(--white);
+    background-color: var(--primary);
+}
+
+.header-auth-separator {
+    color: var(--text);
+    opacity: 0.5;
+}
+
+/* User dropdown improvements */
+.header-user-menu .dropdown-item {
+    font-size: 1.3rem;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+}
+
+.header-user-menu .dropdown-item i {
+    font-size: 1.4rem;
+}
+
+.header-user-menu .dropdown-item.text-danger:hover {
+    background-color: #fee2e2;
+}
+
+.header-user-menu .dropdown-item.text-primary:hover {
+    background-color: #dbeafe;
+}

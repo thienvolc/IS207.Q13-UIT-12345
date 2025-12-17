@@ -3,10 +3,10 @@
 use App\Http\Controllers\Web\Identity\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::controller(AuthController::class)->group(function () {
+// Routes cho guest (chưa đăng nhập)
+Route::middleware('guest')->controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLoginForm')->name('login');
     Route::post('/login', 'login');
-    Route::post('/logout', 'logout')->name('logout');
 
     Route::get('/register', 'showRegisterForm')->name('register');
     Route::post('/register', 'register');
@@ -15,12 +15,14 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/forgot-password', 'forgotPassword')->name('password.email');
 });
 
+// Route logout cần đăng nhập
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-
-// Route::middleware('auth');
-Route::prefix('account')->group(function () {
+// Routes cho user đã đăng nhập
+Route::middleware('auth')->prefix('account')->group(function () {
     Route::get('/profile', fn() => view('pages.account.profile'))->name('account.profile');
     Route::get('/password', fn() => view('pages.account.password'))->name('account.password');
     Route::post('/password', [AuthController::class, 'updatePassword'])->name('account.password.update');
+    Route::get('/orders', fn() => view('pages.account.orders'))->name('account.orders');
 });
 

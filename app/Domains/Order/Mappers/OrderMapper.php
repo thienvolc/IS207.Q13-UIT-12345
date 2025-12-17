@@ -21,7 +21,7 @@ class OrderMapper
         return new OrderDTO(
             orderId: $order->order_id,
             userId: $order->user_id,
-            total: (float)$order->total,
+            total: (float) ($order->grand_total ?? $order->total),
             status: $order->status,
             shipping: $order->shipping,
             items: $items->toArray(),
@@ -35,7 +35,7 @@ class OrderMapper
         return new OrderSummaryDTO(
             orderId: $order->order_id,
             userId: $order->user_id,
-            total: (float)$order->total,
+            total: (float) ($order->grand_total ?? $order->total),
             status: $order->status,
             createdAt: $order->created_at?->toDateTimeString(),
         );
@@ -68,9 +68,9 @@ class OrderMapper
         return new OrderItemDTO(
             orderItemId: $orderItem->order_item_id,
             productId: $orderItem->product_id,
-            price: (float)$orderItem->price,
+            price: (float) $orderItem->price,
             quantity: $orderItem->quantity,
-            discount: (float)$orderItem->discount,
+            discount: (float) $orderItem->discount,
             note: $orderItem->note,
             product: $product,
         );
@@ -83,8 +83,8 @@ class OrderMapper
             title: $product->title,
             slug: $product->slug,
             thumb: $product->thumb,
-            price: (float)$product->price,
-            discount: (float)$product->discount,
+            price: (float) $product->price,
+            discount: (float) $product->discount,
             quantity: $product->quantity,
             status: $product->status,
         );

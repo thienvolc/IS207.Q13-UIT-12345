@@ -32,5 +32,102 @@
   @include('partials.footer')
   @include('partials.chatbot')
   
+  <!-- Global Cart Script -->
+  <script>
+    // Add to cart from product card
+    async function addToCartFromCard(button, productId) {
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+        
+        try {
+            const response = await fetch('/api/web/cart/items', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: 1,
+                }),
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                button.innerHTML = '<i class="bi bi-check-lg"></i>';
+                showGlobalToast('Đã thêm vào giỏ hàng!', 'success');
+                setTimeout(() => {
+                    button.innerHTML = originalHtml;
+                    button.disabled = false;
+                }, 1500);
+            } else {
+                button.innerHTML = originalHtml;
+                button.disabled = false;
+                showGlobalToast(data.message || 'Không thể thêm vào giỏ.', 'error');
+            }
+        } catch (error) {
+            console.error('Add to cart error:', error);
+            button.innerHTML = originalHtml;
+            button.disabled = false;
+            showGlobalToast('Vui lòng đăng nhập để thêm vào giỏ hàng.', 'warning');
+        }
+    }
+    
+    // Global toast notification
+    function showGlobalToast(message, type = 'success') {
+        document.querySelectorAll('.global-toast').forEach(t => t.remove());
+        
+        const toast = document.createElement('div');
+        toast.className = 'global-toast';
+        
+        const colors = {
+            success: '#198754',
+            error: '#dc3545',
+            warning: '#ffc107',
+            info: '#0dcaf0'
+        };
+        
+        const icons = {
+            success: 'check-circle-fill',
+            error: 'x-circle-fill',
+            warning: 'exclamation-triangle-fill',
+            info: 'info-circle-fill'
+        };
+        
+        toast.innerHTML = `<i class="bi bi-${icons[type]}"></i> ${message}`;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            border-left: 4px solid ${colors[type]};
+            font-size: 14px;
+            color: #333;
+        `;
+        
+        const icon = toast.querySelector('i');
+        if (icon) icon.style.color = colors[type];
+        
+        document.body.appendChild(toast);
+        setTimeout(() => toast.style.transform = 'translateX(0)', 10);
+        setTimeout(() => {
+            toast.style.transform = 'translateX(120%)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+  </script>
+  
   @stack('scripts')
 </body>

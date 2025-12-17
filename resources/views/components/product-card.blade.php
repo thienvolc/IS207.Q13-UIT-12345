@@ -35,7 +35,11 @@
             </div>
 
             {{-- Button add to cart --}}
-            <button class="btn-add-cart ms-3" title="Thêm vào giỏ" style="opacity:1; visibility:visible;">
+            <button class="btn-add-cart ms-3" 
+                    title="Thêm vào giỏ" 
+                    style="opacity:1; visibility:visible;"
+                    data-product-id="{{ $product->productId }}"
+                    onclick="addToCartFromCard(this, {{ $product->productId }})">
                 <i class="bi bi-cart-plus"></i>
             </button>
         </div>

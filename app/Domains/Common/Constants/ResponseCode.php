@@ -167,7 +167,26 @@ class ResponseCode
         'type' => 'BAD_REQUEST',
         'message' => 'Not enough product in stock. Available {available}, requested {requested}'
     ];
-}
 
-;
-
+    // ==========================================
+    // Media Errors
+    // ==========================================
+    public const IMAGE_UPLOAD_FAILED = [
+        'statusCode' => 500,
+        'code' => '500010',
+        'type' => 'INTERNAL_SERVER_ERROR',
+        'message' => 'Failed to upload image to cloud storage.'
+    ];
+    public const IMAGE_DELETE_FAILED = [
+        'statusCode' => 500,
+        'code' => '500011',
+        'type' => 'INTERNAL_SERVER_ERROR',
+        'message' => 'Failed to delete image from cloud storage.'
+    ];
+    public const IMAGE_NOT_FOUND = [
+        'statusCode' => 404,
+        'code' => '400030',
+        'type' => 'NOT_FOUND',
+        'message' => 'Image not found or already deleted.'
+    ];
+};

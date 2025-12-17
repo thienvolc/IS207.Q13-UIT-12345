@@ -37,15 +37,16 @@ readonly class OrderService
 {
     public function __construct(
         private ProductAvailabilityService $productAvailabilityService,
-        private StockReservationService    $stockReservationService,
-        private OrderRules                 $orderRules,
-        private OrderRepository            $orderRepository,
-        private OrderItemRepository        $orderItemRepository,
-        private CartRepository             $cartRepository,
-        private CartItemRepository         $cartItemRepository,
-        private PricingService             $pricingService,
-        private OrderMapper                $orderMapper,
-    ) {}
+        private StockReservationService $stockReservationService,
+        private OrderRules $orderRules,
+        private OrderRepository $orderRepository,
+        private OrderItemRepository $orderItemRepository,
+        private CartRepository $cartRepository,
+        private CartItemRepository $cartItemRepository,
+        private PricingService $pricingService,
+        private OrderMapper $orderMapper,
+    ) {
+    }
 
     /**
      * @return OffsetPageResponseDTO<OrderDTO>
@@ -143,7 +144,10 @@ readonly class OrderService
 
         $orders = $this->orderRepository->searchOrders($pageable, $filters);
 
-        return PageResponseDTO::fromPaginator($orders);
+        return PageResponseDTO::fromPaginator(
+            $orders,
+            fn($order) => $this->orderMapper->toDTO($order)
+        );
     }
 
     public function getOrderAdminDetailsById(int $orderId): OrderDTO
@@ -196,28 +200,28 @@ readonly class OrderService
         $orderPrice = $this->pricingService->calculate($cart, $promo);
         $total = $orderPrice->subtotal + $orderPrice->tax + $orderPrice->shipping;
         $order = $this->orderRepository->create([
-            'user_id'       => $cart->user_id,
-            'subtotal'      => $orderPrice->subtotal,
-            'tax'           => $orderPrice->tax,
-            'shipping'      => $orderPrice->shipping,
-            'total'         => $total,
-            'discount_total'=> $orderPrice->discountTotal,
-            'promo'         => $promo,
-            'discount'      => $orderPrice->promoDiscount,
-            'grand_total'   => $orderPrice->grandTotal,
-            'first_name'    => $cart->first_name,
-            'middle_name'   => $cart->middle_name,
-            'last_name'     => $cart->last_name,
-            'phone'         => $cart->phone,
-            'email'         => $cart->email,
-            'line1'         => $cart->line1,
-            'line2'         => $cart->line2,
-            'city'          => $cart->city,
-            'province'      => $cart->province,
-            'country'       => $cart->country,
-            'note'          => $cart->note,
-            'status'        => OrderStatus::PENDING_PAYMENT,
-            'orders_at'     => now(),
+            'user_id' => $cart->user_id,
+            'subtotal' => $orderPrice->subtotal,
+            'tax' => $orderPrice->tax,
+            'shipping' => $orderPrice->shipping,
+            'total' => $total,
+            'discount_total' => $orderPrice->discountTotal,
+            'promo' => $promo,
+            'discount' => $orderPrice->promoDiscount,
+            'grand_total' => $orderPrice->grandTotal,
+            'first_name' => $cart->first_name,
+            'middle_name' => $cart->middle_name,
+            'last_name' => $cart->last_name,
+            'phone' => $cart->phone,
+            'email' => $cart->email,
+            'line1' => $cart->line1,
+            'line2' => $cart->line2,
+            'city' => $cart->city,
+            'province' => $cart->province,
+            'country' => $cart->country,
+            'note' => $cart->note,
+            'status' => OrderStatus::PENDING_PAYMENT,
+            'orders_at' => now(),
         ]);
 
         $orderId = $order->order_id;
@@ -232,12 +236,12 @@ readonly class OrderService
     private function createOrderItem(int $orderId, CartItem $cartItem): void
     {
         $this->orderItemRepository->create([
-            'order_id'  => $orderId,
-            'product_id'=> $cartItem->product_id,
-            'price'     => $cartItem->price,
-            'discount'  => $cartItem->discount,
-            'quantity'  => $cartItem->quantity,
-            'note'      => $cartItem->note,
+            'order_id' => $orderId,
+            'product_id' => $cartItem->product_id,
+            'price' => $cartItem->price,
+            'discount' => $cartItem->discount,
+            'quantity' => $cartItem->quantity,
+            'note' => $cartItem->note,
         ]);
     }
 

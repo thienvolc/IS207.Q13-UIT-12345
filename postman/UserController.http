@@ -4,37 +4,42 @@
 
 ### Search users
 GET {{base_url}}/api/admin/users
-    ?query=newuser@example.com
+    ?query=ttt2042005
 Authorization: Bearer {{admin_token}}
+Accept: application/json
 
 ### Create user
 POST {{base_url}}/api/admin/users
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
+Accept: application/json
 
 {
-  "email": "newuser@example.com",
-  "password": "password123",
+  "email": "ttt2042005@gmail.com",
+  "password": "admin12345",
   "phone": "0123456789"
 }
 
 ### Get user
 GET {{base_url}}/api/admin/users/305
 Authorization: Bearer {{admin_token}}
+Accept: application/json
 
 ### Update user status
 PATCH {{base_url}}/api/admin/users/1/status
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
+Accept: application/json
 
 {
   "status": 1
 }
 
 ### Update user roles
-PATCH {{base_url}}/api/admin/users/305/roles
+PATCH {{base_url}}/api/admin/users/2/roles
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
+Accept: application/json
 
 {
   "roles": [ {"role_id":  2}]

@@ -39,11 +39,17 @@ class CartMapper
 
     public function toItemDTO(CartItem $cartItem): CartItemDTO
     {
+        $product = $cartItem->product;
+
         return new CartItemDTO(
             itemId: $cartItem->cart_item_id,
             productId: $cartItem->product_id,
             quantity: $cartItem->quantity,
-            price: (float)$cartItem->product->price,
+            price: (float)$product->price,
+            productName: $product->title ?? null,
+            productSlug: $product->slug ?? null,
+            productImage: $product->thumb ?? null,
+            discount: (float)($product->discount ?? 0),
         );
     }
 }
