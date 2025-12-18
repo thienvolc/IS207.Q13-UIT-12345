@@ -200,36 +200,75 @@
                     </h3>
                     <div class="specs-content p-0">
                         @if(isset($product->meta) && count($product->meta) > 0)
+                        @php
+                        // Mapping key to friendly Vietnamese names
+                        $keyMapping = [
+                        'warranty_information' => 'Bảo hành',
+                        'product_state' => 'Tình trạng',
+                        'loaisp' => 'Loại sản phẩm',
+                        'review_count' => 'Số đánh giá',
+                        'included_accessories' => 'Phụ kiện kèm theo',
+                        'product_condition' => 'Tình trạng sản phẩm',
+                        'key_selling_points' => 'Điểm nổi bật',
+                        'review_rating' => 'Điểm đánh giá',
+                        ];
+                        @endphp
                         <div class="specs-grid">
                             @foreach($product->meta as $productMeta)
                             @if($productMeta['content'] && $productMeta['content'] !== 'N/A')
+                            @php
+                            $key = strtolower($productMeta['key']);
+                            $displayName = $keyMapping[$key] ?? $productMeta['key'];
+                            @endphp
                             <div class="spec-item">
                                 <div class="spec-icon">
-                                    @switch($productMeta['key'])
-                                    @case('Thương hiệu')
+                                    @switch($key)
+                                    @case('warranty_information')
+                                    <i class="fa-solid fa-shield-halved text-success"></i>
+                                    @break
+                                    @case('product_state')
+                                    @case('product_condition')
+                                    <i class="fa-solid fa-box-open text-info"></i>
+                                    @break
+                                    @case('loaisp')
+                                    <i class="fa-solid fa-layer-group text-primary"></i>
+                                    @break
+                                    @case('review_count')
+                                    <i class="fa-solid fa-comments text-warning"></i>
+                                    @break
+                                    @case('review_rating')
+                                    <i class="fa-solid fa-star text-warning"></i>
+                                    @break
+                                    @case('included_accessories')
+                                    <i class="fa-solid fa-gift text-danger"></i>
+                                    @break
+                                    @case('key_selling_points')
+                                    <i class="fa-solid fa-certificate text-primary"></i>
+                                    @break
+                                    @case('thương hiệu')
                                     <i class="fa-solid fa-tag text-primary"></i>
                                     @break
-                                    @case('Công suất')
+                                    @case('công suất')
                                     <i class="fa-solid fa-bolt text-warning"></i>
                                     @break
-                                    @case('Thời lượng pin')
+                                    @case('thời lượng pin')
                                     <i class="fa-solid fa-battery-full text-success"></i>
                                     @break
-                                    @case('Chống nước')
+                                    @case('chống nước')
                                     <i class="fa-solid fa-droplet text-info"></i>
                                     @break
-                                    @case('Bluetooth')
+                                    @case('bluetooth')
                                     <i class="fa-brands fa-bluetooth text-primary"></i>
                                     @break
-                                    @case('Bảo hành')
-                                    <i class="fa-solid fa-shield-halved text-danger"></i>
+                                    @case('bảo hành')
+                                    <i class="fa-solid fa-shield-halved text-success"></i>
                                     @break
                                     @default
                                     <i class="fa-solid fa-circle-info text-secondary"></i>
                                     @endswitch
                                 </div>
                                 <div class="spec-details">
-                                    <div class="spec-label">{{ $productMeta['key'] }}</div>
+                                    <div class="spec-label">{{ $displayName }}</div>
                                     <div class="spec-value">{!! $productMeta['content'] !!}</div>
                                 </div>
                             </div>
@@ -280,25 +319,27 @@
                     }
 
                     .spec-item:hover {
-                        background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%);
-                        transform: translateX(4px);
-                        box-shadow: inset 4px 0 0 #f59e0b;
+                        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+                        border-left: 3px solid #3b82f6;
                     }
 
                     .spec-icon {
-                        width: 48px;
-                        height: 48px;
+                        width: 52px;
+                        height: 52px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-                        border-radius: 12px;
+                        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+                        border-radius: 50%;
                         flex-shrink: 0;
-                        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+                        box-shadow: 0 3px 12px rgba(59, 130, 246, 0.12);
+                        border: 2px solid rgba(59, 130, 246, 0.08);
                     }
 
                     .spec-icon i {
-                        font-size: 1.4rem;
+                        font-size: 1.5rem;
                     }
 
                     .spec-details {
@@ -307,20 +348,20 @@
                     }
 
                     .spec-label {
-                        font-size: 0.813rem;
-                        font-weight: 700;
-                        color: #64748b;
-                        margin-bottom: 6px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.8px;
+                        font-size: 1.2rem;
+                        font-weight: 600;
+                        color: #1e293b;
+                        margin-bottom: 4px;
+                        text-transform: capitalize;
+                        letter-spacing: 0.02em;
                     }
 
                     .spec-value {
-                        font-size: 1.063rem;
-                        color: #0f172a;
-                        font-weight: 600;
+                        font-size: 1rem;
+                        color: #475569;
+                        font-weight: 400;
                         word-break: break-word;
-                        line-height: 1.5;
+                        line-height: 1.6;
                     }
 
                     @media (max-width: 992px) {
