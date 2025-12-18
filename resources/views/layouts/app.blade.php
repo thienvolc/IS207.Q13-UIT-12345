@@ -34,11 +34,7 @@
 
     <!-- Global Variables -->
     <script>
-        window.isAuthenticated = {
-            {
-                auth() - > check() ? 'true' : 'false'
-            }
-        };
+        window.isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
     </script>
 
     @stack('scripts')

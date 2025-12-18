@@ -282,7 +282,10 @@
                     @endif
                     <span class="price">{{ number_format($product->price - $product->discount) }}đ</span>
                   </div>
-                  <button class="btn-icon-vertical btn-add-cart ms-3" title="Thêm vào giỏ">
+                  <button class="btn-icon-vertical btn-add-cart ms-3" 
+                          title="Thêm vào giỏ"
+                          data-product-id="{{ $product->productId }}"
+                          onclick="addToCartFromCard(this, {{ $product->productId }})">
                     <i class="bi bi-cart-plus"></i>
                   </button>
                 </div>
@@ -314,7 +317,10 @@
                     @endif
                     <span class="price">{{ number_format($product->price - $product->discount) }}đ</span>
                   </div>
-                  <button class="btn-icon-vertical btn-add-cart" title="Thêm vào giỏ">
+                  <button class="btn-icon-vertical btn-add-cart" 
+                          title="Thêm vào giỏ"
+                          data-product-id="{{ $product->productId }}"
+                          onclick="addToCartFromCard(this, {{ $product->productId }})">
                     <i class="bi bi-cart-plus"></i>
                   </button>
                 </div>
