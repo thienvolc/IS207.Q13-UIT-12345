@@ -63,7 +63,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Đơn hàng</th>
-                            <th>User</th>
+                            <th>Khách hàng</th>
                             <th>Số tiền</th>
                             <th>Phương thức</th>
                             <th>Loại</th>
@@ -87,23 +87,19 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if(isset($transaction->order['user']))
-                                        <div class="d-flex align-items-center">
-                                            <div
-                                                class="avatar-sm bg-light rounded-circle text-primary d-flex align-items-center justify-content-center me-2">
-                                                {{ substr($transaction->order['user']['firstName'] ?? 'U', 0, 1) }}
-                                            </div>
-                                            <div>
-                                                <div class="small fw-bold">
-                                                    {{ ($transaction->order['user']['firstName'] ?? '') . ' ' . ($transaction->order['user']['lastName'] ?? '') }}
-                                                </div>
-                                                <div class="small text-muted">{{ $transaction->order['user']['email'] ?? '' }}</div>
-                                            </div>
-                                        </div>
-                                    @elseif(isset($transaction->order))
-                                        <span class="text-muted">Khách vãng lai #{{ $transaction->order['userId'] ?? '?' }}</span>
+                                    @php
+                                        $userId = $transaction->order['userId'] ?? null;
+                                        $firstName = $transaction->order['user']['firstName'] ?? $transaction->order['firstName'] ?? '';
+                                        $lastName = $transaction->order['user']['lastName'] ?? $transaction->order['lastName'] ?? '';
+                                        $customerName = trim("$firstName $lastName") ?: ($userId ? "Khách #$userId" : '-');
+                                    @endphp
+                                    @if($userId)
+                                        <a href="{{ route('admin.customers.show', $userId) }}"
+                                            class="text-decoration-none text-primary fw-medium">
+                                            {{ $customerName }}
+                                        </a>
                                     @else
-                                        <span class="text-muted text-center">-</span>
+                                        <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td class="fw-bold text-success">

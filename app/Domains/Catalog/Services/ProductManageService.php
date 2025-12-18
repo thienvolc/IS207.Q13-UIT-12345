@@ -21,14 +21,21 @@ readonly class ProductManageService
 {
     public function __construct(
         private ProductRepository $productRepository,
-        private ProductMapper     $productMapper,
-    ) {}
+        private ProductMapper $productMapper,
+    ) {
+    }
 
     public function create(CreateProductDTO $dto): ProductDTO
     {
         return DB::transaction(function () use ($dto) {
             $data = $this->prepareCreateData($dto);
             $product = $this->productRepository->create($data);
+
+            if (!empty($dto->metas)) {
+                foreach ($dto->metas as $meta) {
+                    $product->metas()->create($meta);
+                }
+            }
 
             return $this->productMapper->toDTO($product);
         });
@@ -41,6 +48,19 @@ readonly class ProductManageService
         return DB::transaction(function () use ($product, $dto) {
             $data = $this->prepareUpdateData($dto);
             $product->update($data);
+
+            if (!is_null($dto->metas)) {
+                $product->metas()->delete();
+                foreach ($dto->metas as $meta) {
+                    $product->metas()->create($meta);
+                }
+            }
+
+            // Sync categories
+            if (!is_null($dto->categories)) {
+                $product->categories()->sync($dto->categories);
+            }
+
             $product->refresh();
             $product->load(['categories', 'tags', 'metas']);
 

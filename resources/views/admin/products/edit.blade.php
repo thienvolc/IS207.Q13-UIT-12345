@@ -119,8 +119,8 @@
                   <label class="form-label">Giảm giá</label>
                   <div class="input-group">
                     <input type="number" name="discount" class="form-control" placeholder="0"
-                      value="{{ old('discount', $discount) }}" min="0" max="100">
-                    <span class="input-group-text">%</span>
+                      value="{{ old('discount', $discount) }}" min="0">
+                    <span class="input-group-text">đ</span>
                   </div>
                 </div>
 
@@ -137,7 +137,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="text-muted">Giá sau giảm:</span>
                   <span class="fs-5 fw-bold text-success" id="final-price">
-                    {{ number_format($price * (1 - $discount / 100), 0, ',', '.') }} ₫
+                    {{ number_format(max(0, $price - $discount), 0, ',', '.') }} ₫
                   </span>
                 </div>
               </div>
@@ -173,11 +173,11 @@
                   <div class="row g-2 mb-2 meta-row">
                     <div class="col-md-4">
                       <input type="text" name="metas[{{ $loop->index }}][key]" class="form-control"
-                        placeholder="Tên thuộc tính" value="{{ $meta->key ?? '' }}">
+                        placeholder="Tên thuộc tính" value="{{ $meta['key'] ?? '' }}">
                     </div>
                     <div class="col-md-7">
                       <input type="text" name="metas[{{ $loop->index }}][value]" class="form-control" placeholder="Giá trị"
-                        value="{{ $meta->value ?? '' }}">
+                        value="{{ $meta['content'] ?? $meta['value'] ?? '' }}">
                     </div>
                     <div class="col-md-1">
                       <button type="button" class="btn btn-outline-danger w-100 remove-meta">
@@ -257,29 +257,115 @@
 
           {{-- Categories --}}
           <div class="card mb-4">
-            <div class="card-header">
-              <i class="fa fa-folder me-2 text-primary"></i>Danh mục
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span><i class="fa fa-folder me-2 text-primary"></i>Danh mục</span>
+              <button type="button" class="btn btn-outline-primary btn-sm" id="add-category-btn">
+                <i class="fa fa-plus me-1"></i> Thêm
+              </button>
             </div>
             <div class="card-body">
-              <div class="category-list" style="max-height: 200px; overflow-y: auto;">
+              <div id="category-lines-container">
                 @php
-                  $selectedCats = collect($productCategories)->pluck('categoryId', 'categoryId')->toArray();
+                  $selectedCats = collect($productCategories ?? []);
+                  $allCategoriesJson = json_encode(collect($categories ?? [])->map(fn($c) => ['id' => $c->categoryId, 'title' => $c->title])->values());
                 @endphp
-                @forelse($categories ?? [] as $cat)
-                  @php $catId = $cat->categoryId; @endphp
-                  <div class="form-check mb-2">
-                    <input type="checkbox" class="form-check-input" name="categories[]" value="{{ $catId }}"
-                      id="cat-{{ $catId }}" @checked(isset($selectedCats[$catId]))>
-                    <label class="form-check-label" for="cat-{{ $catId }}">
-                      {{ $cat->title }}
-                    </label>
+                @forelse($selectedCats as $index => $cat)
+                  <div class="category-line d-flex align-items-center gap-2 mb-2">
+                    <input type="hidden" name="categories[]" value="{{ $cat['categoryId'] ?? $cat->categoryId ?? '' }}">
+                    <input type="text" class="form-control category-input" 
+                      value="{{ $cat['title'] ?? $cat->title ?? '' }}" 
+                      placeholder="Nhập tên danh mục..." 
+                      autocomplete="off">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-category-btn">
+                      <i class="fa fa-times"></i>
+                    </button>
+                    <ul class="category-suggestions list-group position-absolute" style="display: none; z-index: 1000; width: calc(100% - 60px);"></ul>
                   </div>
                 @empty
-                  <p class="text-muted small mb-0">Chưa có danh mục nào</p>
+                  <p class="text-muted small mb-0" id="no-category-msg">Chưa có danh mục nào. Bấm "Thêm" để thêm mới.</p>
                 @endforelse
               </div>
             </div>
           </div>
+
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const allCategories = {!! $allCategoriesJson ?? '[]' !!};
+              const container = document.getElementById('category-lines-container');
+              const addBtn = document.getElementById('add-category-btn');
+              const noMsg = document.getElementById('no-category-msg');
+
+              function hideNoMsg() {
+                if (noMsg) noMsg.style.display = 'none';
+              }
+
+              function createCategoryLine(catId = '', catTitle = '') {
+                hideNoMsg();
+                const div = document.createElement('div');
+                div.className = 'category-line d-flex align-items-center gap-2 mb-2 position-relative';
+                div.innerHTML = `
+                  <input type="hidden" name="categories[]" value="${catId}">
+                  <input type="text" class="form-control category-input" value="${catTitle}" placeholder="Nhập tên danh mục..." autocomplete="off">
+                  <button type="button" class="btn btn-outline-danger btn-sm remove-category-btn"><i class="fa fa-times"></i></button>
+                  <ul class="category-suggestions list-group position-absolute" style="display: none; z-index: 1000; top: 100%; left: 0; width: calc(100% - 60px);"></ul>
+                `;
+                container.appendChild(div);
+                setupCategoryLine(div);
+                div.querySelector('.category-input').focus();
+              }
+
+              function setupCategoryLine(lineEl) {
+                const input = lineEl.querySelector('.category-input');
+                const hiddenInput = lineEl.querySelector('input[type="hidden"]');
+                const suggestions = lineEl.querySelector('.category-suggestions');
+                const removeBtn = lineEl.querySelector('.remove-category-btn');
+
+                input.addEventListener('input', function() {
+                  const query = this.value.toLowerCase().trim();
+                  if (query.length < 1) {
+                    suggestions.style.display = 'none';
+                    return;
+                  }
+                  const matches = allCategories.filter(c => c.title.toLowerCase().includes(query));
+                  if (matches.length === 0) {
+                    suggestions.style.display = 'none';
+                    return;
+                  }
+                  suggestions.innerHTML = matches.slice(0, 8).map(c => 
+                    `<li class="list-group-item list-group-item-action" data-id="${c.id}" data-title="${c.title}">${c.title}</li>`
+                  ).join('');
+                  suggestions.style.display = 'block';
+                });
+
+                input.addEventListener('blur', function() {
+                  setTimeout(() => { suggestions.style.display = 'none'; }, 200);
+                });
+
+                suggestions.addEventListener('click', function(e) {
+                  if (e.target.tagName === 'LI') {
+                    input.value = e.target.dataset.title;
+                    hiddenInput.value = e.target.dataset.id;
+                    suggestions.style.display = 'none';
+                  }
+                });
+
+                removeBtn.addEventListener('click', function() {
+                  lineEl.remove();
+                  if (container.querySelectorAll('.category-line').length === 0 && noMsg) {
+                    noMsg.style.display = 'block';
+                  }
+                });
+              }
+
+              // Setup existing lines
+              container.querySelectorAll('.category-line').forEach(setupCategoryLine);
+
+              // Add new line button
+              addBtn.addEventListener('click', function() {
+                createCategoryLine();
+              });
+            });
+          </script>
 
           {{-- Tags --}}
           <div class="card mb-4">
@@ -373,15 +459,28 @@
 
       function updateFinalPrice() {
         const price = parseFloat(priceInput?.value) || 0;
-        let discount = parseFloat(discountInput?.value) || 0;
+        const discount = parseFloat(discountInput?.value) || 0;
         
-        // Enforce max 100%
-        if (discount > 100) discount = 100;
-
-        const finalPrice = price * (1 - discount / 100);
+        // Fixed Amount Discount
+        const finalPrice = Math.max(0, price - discount);
 
         if (finalPriceEl) {
           finalPriceEl.textContent = new Intl.NumberFormat('vi-VN').format(finalPrice) + ' ₫';
+        }
+        
+        // Validation visually
+        if (price > 0 && discount >= price) {
+            discountInput.classList.add('is-invalid');
+            if (!discountInput.nextElementSibling.nextElementSibling) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'invalid-feedback';
+                errorDiv.textContent = 'Giảm giá phải nhỏ hơn giá gốc';
+                discountInput.parentElement.appendChild(errorDiv);
+            }
+        } else {
+            discountInput.classList.remove('is-invalid');
+            const errorDiv = discountInput.parentElement.querySelector('.invalid-feedback');
+            if (errorDiv) errorDiv.remove();
         }
       }
 

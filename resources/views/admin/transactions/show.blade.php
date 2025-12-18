@@ -111,34 +111,33 @@
                 {{-- User Info --}}
                 <div class="card mb-4">
                     <div class="card-header">
-                        <i class="fa fa-user me-2"></i> Thông tin người dùng
+                        <i class="fa fa-user me-2"></i> Thông tin khách hàng
                     </div>
                     <div class="card-body">
-                        @if(isset($transaction->order['user']))
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="avatar-md bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
-                                    style="width: 48px; height: 48px; font-size: 1.25rem;">
-                                    {{ substr($transaction->order['user']['firstName'] ?? 'U', 0, 1) }}
+                        @php
+                            $userId = $transaction->order['userId'] ?? null;
+                            $firstName = $transaction->order['user']['firstName'] ?? $transaction->order['firstName'] ?? '';
+                            $lastName = $transaction->order['user']['lastName'] ?? $transaction->order['lastName'] ?? '';
+                            $email = $transaction->order['user']['email'] ?? $transaction->order['email'] ?? '';
+                            $customerName = trim("$firstName $lastName") ?: ($userId ? "Khách #$userId" : null);
+                        @endphp
+                        @if($userId)
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Khách hàng</small>
+                                <a href="{{ route('admin.customers.show', $userId) }}"
+                                    class="fw-bold text-primary text-decoration-none fs-5">
+                                    {{ $customerName }}
+                                </a>
+                            </div>
+                            @if($email)
+                                <div class="mb-2">
+                                    <small class="text-muted d-block"><i class="fa fa-envelope me-1"></i> Email</small>
+                                    <span>{{ $email }}</span>
                                 </div>
-                                <div>
-                                    <div class="fw-bold">
-                                        {{ ($transaction->order['user']['firstName'] ?? '') . ' ' . ($transaction->order['user']['lastName'] ?? '') }}
-                                    </div>
-                                    <div class="text-muted small">ID: #{{ $transaction->order['user']['userId'] ?? '?' }}</div>
-                                </div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted d-block"><i class="fa fa-envelope me-1"></i> Email</small>
-                                <span>{{ $transaction->order['user']['email'] ?? 'N/A' }}</span>
-                            </div>
-                        @elseif(isset($transaction->order))
-                            <div class="text-center py-3">
-                                <div class="fw-bold">Khách vãng lai</div>
-                                <small class="text-muted">User ID: #{{ $transaction->order['userId'] ?? '?' }}</small>
-                            </div>
+                            @endif
                         @else
                             <div class="text-center py-3 text-muted">
-                                Không có thông tin người dùng
+                                Không có thông tin khách hàng
                             </div>
                         @endif
                     </div>

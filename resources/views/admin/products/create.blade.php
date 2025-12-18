@@ -97,8 +97,8 @@
                   <label class="form-label">Giảm giá</label>
                   <div class="input-group">
                     <input type="number" name="discount" class="form-control" placeholder="0"
-                      value="{{ old('discount', 0) }}" min="0" max="100">
-                    <span class="input-group-text">%</span>
+                      value="{{ old('discount', 0) }}" min="0">
+                    <span class="input-group-text">đ</span>
                   </div>
                 </div>
 
@@ -146,20 +146,7 @@
 
         {{-- Right Column - Metadata --}}
         <div class="col-lg-4">
-          {{-- Product Image --}}
-          <div class="card mb-4">
-            <div class="card-header">
-              <i class="fa fa-image me-2 text-primary"></i>Hình ảnh sản phẩm
-            </div>
-            <div class="card-body">
-              @include('admin.partials.image-upload', [
-                'name' => 'thumb',
-                'value' => old('thumb'),
-                'label' => 'Hình đại diện',
-                'folder' => 'products'
-              ])
-            </div>
-          </div>
+
 
           {{-- Status & Type --}}
           <div class="card mb-4">
@@ -295,15 +282,28 @@
 
       function updateFinalPrice() {
         const price = parseFloat(priceInput?.value) || 0;
-        let discount = parseFloat(discountInput?.value) || 0;
-        
-        // Enforce max 100%
-        if (discount > 100) discount = 100;
-        
-        const finalPrice = price * (1 - discount / 100);
+        const discount = parseFloat(discountInput?.value) || 0;
+
+        // Fixed Amount Discount
+        const finalPrice = Math.max(0, price - discount);
 
         if (finalPriceEl) {
           finalPriceEl.textContent = new Intl.NumberFormat('vi-VN').format(finalPrice) + ' ₫';
+        }
+
+        // Validation visually
+        if (price > 0 && discount >= price) {
+          discountInput.classList.add('is-invalid');
+          if (!discountInput.nextElementSibling.nextElementSibling) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            errorDiv.textContent = 'Giảm giá phải nhỏ hơn giá gốc';
+            discountInput.parentElement.appendChild(errorDiv);
+          }
+        } else {
+          discountInput.classList.remove('is-invalid');
+          const errorDiv = discountInput.parentElement.querySelector('.invalid-feedback');
+          if (errorDiv) errorDiv.remove();
         }
       }
 

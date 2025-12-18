@@ -145,4 +145,63 @@ class DashboardController extends Controller
         $result = $this->orderService->searchOrders($dto);
         return $result->total;
     }
+
+    public function chartData(\Illuminate\Http\Request $request)
+    {
+        $period = $request->input('period', 7); // 7, 30, 90
+        $days = (int) $period;
+        $endDate = now();
+        $startDate = now()->subDays($days - 1);
+
+        // Generate date range
+        $labels = [];
+        $currentDate = clone $startDate;
+        while ($currentDate <= $endDate) {
+            $labels[] = $currentDate->format('d/m');
+            $currentDate->addDay();
+        }
+
+        // Query Revenue (Delivered Orders)
+        $revenues = \App\Domains\Order\Entities\Order::query()
+            ->where('status', \App\Domains\Order\Constants\OrderStatus::DELIVERED)
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->selectRaw('DATE(created_at) as date, SUM(grand_total) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        // Query Orders (All Orders)
+        $orders = \App\Domains\Order\Entities\Order::query()
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->pluck('count', 'date');
+
+        // Map data to labels
+        $revenueData = [];
+        $orderData = [];
+
+        $loopDate = clone $startDate;
+        while ($loopDate <= $endDate) {
+            $dateStr = $loopDate->format('Y-m-d');
+            $revenueData[] = $revenues[$dateStr] ?? 0;
+            $orderData[] = $orders[$dateStr] ?? 0;
+            $loopDate->addDay();
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Doanh thu',
+                    'data' => $revenueData,
+                ],
+                [
+                    'label' => 'Đơn hàng',
+                    'data' => $orderData,
+                ]
+            ]
+        ]);
+    }
 }

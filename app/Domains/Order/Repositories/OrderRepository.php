@@ -38,10 +38,11 @@ class OrderRepository
     private function applyFilters(Builder $query, OrderFilter $f): void
     {
         $query->when($f->query, function ($q, $search) {
-            $q->where(fn($s) => $s->where('first_name', 'like', "%$search%")
-                ->orWhere('last_name', 'like', "%$search%")
-                ->orWhere('phone', 'like', "%$search%")
-                ->orWhere('email', 'like', "%$search%")
+            $q->where(
+                fn($s) => $s->where('first_name', 'like', "%$search%")
+                    ->orWhere('last_name', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%")
             );
         });
 
@@ -81,7 +82,7 @@ class OrderRepository
 
     public function getByIdWithItemsOrFail(int $orderId): Order
     {
-        return Order::with('items')->find($orderId)
+        return Order::with('items.product')->find($orderId)
             ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
 

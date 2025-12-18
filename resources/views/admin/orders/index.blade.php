@@ -132,7 +132,7 @@
           <thead>
             <tr>
               <th style="width: 80px;">Mã đơn</th>
-              <th>Khách hàng</th>
+              <th style="width: 150px;">Khách hàng</th>
               <th style="width: 140px;">Tổng tiền</th>
               <th style="width: 120px;">Ngày đặt</th>
               <th style="width: 130px;">Trạng thái</th>
@@ -166,7 +166,10 @@
                 </td>
                 <td>
                   <div>
-                    <div class="fw-medium">Khách #{{ $order->userId }}</div>
+                    <a href="{{ route('admin.customers.show', $order->userId) }}"
+                      class="fw-medium text-decoration-none text-primary">
+                      Khách #{{ $order->userId }}
+                    </a>
                   </div>
                 </td>
                 <td class="fw-bold text-success">

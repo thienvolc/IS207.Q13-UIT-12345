@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Catalog;
 use App\Domains\Catalog\DTOs\Product\Commands\CreateProductDTO;
 use App\Domains\Catalog\DTOs\Product\Commands\UpdateProductDTO;
 use App\Domains\Catalog\DTOs\Product\Queries\AdminSearchProductsDTO;
+use App\Domains\Catalog\Entities\Product;
 use App\Domains\Catalog\Services\CategoryService;
 use App\Domains\Catalog\Services\ProductManageService;
 use App\Domains\Catalog\Services\ProductReadService;
@@ -45,17 +46,21 @@ class ProductController extends Controller
         $categories = $this->categoryService->getAllPublic();
 
         // Calculate stats
-        $totalProducts = $productsPage->total;
-        $activeProducts = 0; // TODO: Add stats endpoint to service
-        $hiddenProducts = 0;
-        $lowStockProducts = 0;
+        $totalProducts = Product::count();
+        $activeProducts = Product::where('status', 1)->count();
+        // Out of stock: Status = 2 OR Quantity = 0
+        $outOfStockProducts = Product::query()
+            ->where(function ($q) {
+                $q->where('status', 2)->orWhere('quantity', 0);
+            })->count();
+        $lowStockProducts = Product::where('quantity', '>', 0)->where('quantity', '<', 10)->count();
 
         return view('admin.products.index', [
             'products' => $productsPage->data,
             'categories' => $categories,
             'totalProducts' => $totalProducts,
             'activeProducts' => $activeProducts,
-            'hiddenProducts' => $hiddenProducts,
+            'outOfStockProducts' => $outOfStockProducts,
             'lowStockProducts' => $lowStockProducts,
             'pagination' => [
                 'current' => $productsPage->page,
@@ -86,7 +91,7 @@ class ProductController extends Controller
             'summary' => 'nullable|string|max:500',
             'desc' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'discount' => 'nullable|numeric|min:0|max:100',
+            'discount' => 'nullable|numeric|min:0|lt:price',
             'quantity' => 'required|integer|min:0',
             'status' => 'required|in:0,1',
             'type' => 'nullable|string',
@@ -97,6 +102,19 @@ class ProductController extends Controller
 
         // Generate SKU if not provided
         $sku = $validated['sku'] ?? 'SKU-' . strtoupper(uniqid());
+
+        $metas = $request->input('metas', []);
+        $formattedMetas = [];
+        if (is_array($metas)) {
+            foreach ($metas as $meta) {
+                if (!empty($meta['key'])) {
+                    $formattedMetas[] = [
+                        'key' => $meta['key'],
+                        'content' => $meta['value'] ?? $meta['content'] ?? null,
+                    ];
+                }
+            }
+        }
 
         // Build DTO from validated data (matching exact DTO signature)
         $createDTO = new CreateProductDTO(
@@ -114,6 +132,7 @@ class ProductController extends Controller
             status: (int) $validated['status'],
             starts_at: $request->get('starts_at'),
             ends_at: $request->get('ends_at'),
+            metas: $formattedMetas,
         );
 
         // Use service to create product
@@ -165,7 +184,7 @@ class ProductController extends Controller
             'summary' => 'nullable|string|max:500',
             'desc' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'discount' => 'nullable|numeric|min:0|max:100',
+            'discount' => 'nullable|numeric|min:0|lt:price',
             'quantity' => 'nullable|integer|min:0',
             'status' => 'required|in:1,2,3,4,5',
             'type' => 'nullable|string',
@@ -173,6 +192,20 @@ class ProductController extends Controller
             'sku' => 'nullable|string|max:100',
             'meta_title' => 'nullable|string|max:255',
         ]);
+
+        // Re-map metas for update BEFORE instantiation
+        $metas = $request->input('metas', []);
+        $formattedMetas = [];
+        if (is_array($metas)) {
+            foreach ($metas as $meta) {
+                if (!empty($meta['key'])) {
+                    $formattedMetas[] = [
+                        'key' => $meta['key'],
+                        'content' => $meta['value'] ?? $meta['content'] ?? null,
+                    ];
+                }
+            }
+        }
 
         // Build DTO from validated data (matching exact DTO signature)
         $updateDTO = new UpdateProductDTO(
@@ -190,6 +223,8 @@ class ProductController extends Controller
             status: (int) $validated['status'],
             startsAt: $request->get('starts_at'),
             endsAt: $request->get('ends_at'),
+            metas: $formattedMetas,
+            categories: $request->input('categories', []),
         );
 
         // Use service to update product
@@ -202,7 +237,7 @@ class ProductController extends Controller
         }
 
         return redirect()
-            ->route('admin.products.index')
+            ->route('admin.products.edit', $id)
             ->with('success', 'Sản phẩm đã được cập nhật thành công!');
     }
 

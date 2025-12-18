@@ -41,7 +41,7 @@
                 <div class="kpi-card">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="kpi-card-label">Đang hiển thị</div>
+                            <div class="kpi-card-label">Đang bán</div>
                             <div class="kpi-card-value text-success">{{ $activeProducts ?? 0 }}</div>
                         </div>
                         <div class="kpi-card-icon primary">
@@ -54,8 +54,8 @@
                 <div class="kpi-card">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="kpi-card-label">Đang ẩn</div>
-                            <div class="kpi-card-value text-muted">{{ $hiddenProducts ?? 0 }}</div>
+                            <div class="kpi-card-label">Hết hàng</div>
+                            <div class="kpi-card-value text-muted">{{ $outOfStockProducts ?? 0 }}</div>
                         </div>
                         <div class="kpi-card-icon primary">
                             <i class="fa fa-eye-slash"></i>
@@ -216,7 +216,7 @@
                                                 {{ number_format($price, 0, ',', '.') }} ₫
                                             </span>
                                             <span class="fw-medium text-danger">
-                                                {{ number_format($price * (1 - $discount / 100), 0, ',', '.') }} ₫
+                                                {{ number_format(max(0, $price - $discount), 0, ',', '.') }} ₫
                                             </span>
                                         @else
                                             <span class="fw-medium">{{ number_format($price, 0, ',', '.') }} ₫</span>

@@ -301,72 +301,7 @@
 @push('scripts')
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Revenue Chart
-      const revenueCtx = document.getElementById('revenueChart');
-      if (revenueCtx) {
-        new Chart(revenueCtx, {
-          type: 'line',
-          data: {
-            labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-            datasets: [{
-              label: 'Doanh thu (triệu ₫)',
-              data: [12, 19, 15, 25, 22, 30, 28],
-              borderColor: '#0066B3',
-              backgroundColor: 'rgba(0, 102, 179, 0.1)',
-              fill: true,
-              tension: 0.4,
-              borderWidth: 2,
-              pointBackgroundColor: '#0066B3',
-              pointBorderColor: '#fff',
-              pointBorderWidth: 2,
-              pointRadius: 4
-            }, {
-              label: 'Đơn hàng',
-              data: [5, 8, 6, 10, 9, 12, 11],
-              borderColor: '#28A745',
-              backgroundColor: 'transparent',
-              borderWidth: 2,
-              tension: 0.4,
-              pointBackgroundColor: '#28A745',
-              pointBorderColor: '#fff',
-              pointBorderWidth: 2,
-              pointRadius: 4
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: {
-                  usePointStyle: true,
-                  padding: 20
-                }
-              }
-            },
-            scales: {
-              x: {
-                grid: {
-                  display: false
-                }
-              },
-              y: {
-                beginAtZero: true,
-                grid: {
-                  color: 'rgba(0,0,0,0.05)'
-                }
-              }
-            },
-            interaction: {
-              intersect: false,
-              mode: 'index'
-            }
-          }
-        });
-      }
-
-      // Order Status Chart
+      // Order Status Chart (Keep static initial data or fetch if needed, currently keeping static initial render for status)
       const statusCtx = document.getElementById('orderStatusChart');
       if (statusCtx) {
         new Chart(statusCtx, {
@@ -400,6 +335,154 @@
             }
           }
         });
+      }
+
+      // Revenue Chart - Dynamic Data
+      const revenueCtx = document.getElementById('revenueChart');
+      let revenueChart;
+
+      if (revenueCtx) {
+        revenueChart = new Chart(revenueCtx, {
+          type: 'line',
+          data: {
+            labels: [], // Will be populated via AJAX
+            datasets: [{
+              label: 'Doanh thu (₫)',
+              data: [],
+              borderColor: '#0066B3',
+              backgroundColor: 'rgba(0, 102, 179, 0.1)',
+              fill: true,
+              tension: 0.4,
+              borderWidth: 2,
+              pointBackgroundColor: '#0066B3',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              yAxisID: 'y'
+            }, {
+              label: 'Đơn hàng',
+              data: [],
+              borderColor: '#28A745',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: '#28A745',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              yAxisID: 'y1'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                      if (context.datasetIndex === 0) { // Revenue
+                        label += new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' ₫';
+                      } else {
+                        label += context.parsed.y;
+                      }
+                    }
+                    return label;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Doanh thu'
+                },
+                grid: {
+                  color: 'rgba(0,0,0,0.05)'
+                },
+                ticks: {
+                  callback: function (value, index, values) {
+                    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                    if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
+                    return value;
+                  }
+                }
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                beginAtZero: true,
+                grid: {
+                  drawOnChartArea: false, // only want the grid lines for one axis to show up
+                },
+                title: {
+                  display: true,
+                  text: 'Số đơn hàng'
+                },
+                ticks: {
+                  precision: 0
+                }
+              },
+            },
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            }
+          }
+        });
+
+        // Initialize with default period (7 days)
+        fetchChartData(7);
+      }
+
+      // Handle period clicks
+      const periodButtons = document.querySelectorAll('[data-period]');
+      periodButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+          // Update active state
+          periodButtons.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+
+          // Fetch data
+          const period = this.getAttribute('data-period');
+          fetchChartData(period);
+        });
+      });
+
+      function fetchChartData(period) {
+        fetch(`{{ route('admin.dashboard.chart-data') }}?period=${period}`)
+          .then(response => response.json())
+          .then(data => {
+            if (revenueChart) {
+              revenueChart.data.labels = data.labels;
+              revenueChart.data.datasets[0].data = data.datasets[0].data; // Revenue
+              revenueChart.data.datasets[1].data = data.datasets[1].data; // Orders
+              revenueChart.update();
+            }
+          })
+          .catch(error => console.error('Error fetching chart data:', error));
       }
     });
   </script>

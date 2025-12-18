@@ -15,6 +15,8 @@ Route::middleware(['auth'])
 
         Route::get('/', [DashboardController::class, 'index'])
             ->name('dashboard');
+        Route::get('/chart-data', [DashboardController::class, 'chartData'])
+            ->name('dashboard.chart-data');
 
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);

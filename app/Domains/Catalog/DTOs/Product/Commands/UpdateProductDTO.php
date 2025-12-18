@@ -5,7 +5,7 @@ namespace App\Domains\Catalog\DTOs\Product\Commands;
 readonly class UpdateProductDTO
 {
     public function __construct(
-        public int     $productId,
+        public int $productId,
         public ?string $title,
         public ?string $metaTitle,
         public ?string $slug,
@@ -14,12 +14,15 @@ readonly class UpdateProductDTO
         public ?string $summary,
         public ?string $type,
         public ?string $sku,
-        public ?float  $price,
-        public ?float  $discount,
-        public ?int    $status,
+        public ?float $price,
+        public ?float $discount,
+        public ?int $status,
         public ?string $startsAt,
         public ?string $endsAt,
-    ) {}
+        public ?array $metas = null,
+        public ?array $categories = null,
+    ) {
+    }
 
     public function toArray(): array
     {
@@ -37,6 +40,7 @@ readonly class UpdateProductDTO
             'status' => $this->status,
             'starts_at' => $this->startsAt,
             'ends_at' => $this->endsAt,
+            'metas' => $this->metas,
         ], fn($value) => !is_null($value));
     }
 }
