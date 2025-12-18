@@ -135,7 +135,7 @@
                                 </td>
                                 <td>
                                     <a href="{{ route('admin.transactions.show', $transaction->transactionId) }}"
-                                        class="btn btn-sm btn-light text-primary" title="Chi tiết">
+                                        class="btn btn-sm btn-outline-primary" title="Chi tiết">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                 </td>

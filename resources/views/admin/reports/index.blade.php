@@ -69,7 +69,7 @@
                     <div class="col-md-4">
                         <div class="card text-center h-100">
                             <div class="card-body py-4">
-                                <div class="avatar-md bg-success-subtle text-success rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                                <div class="avatar-md bg-primary-soft text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
                                     style="width: 64px; height: 64px; min-width: 64px;">
                                     <i class="fa fa-dollar-sign fs-4"></i>
                                 </div>
@@ -81,7 +81,7 @@
                     <div class="col-md-4">
                         <div class="card text-center h-100">
                             <div class="card-body py-4">
-                                <div class="avatar-md bg-primary-subtle text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                                <div class="avatar-md bg-primary-soft text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
                                     style="width: 64px; height: 64px; min-width: 64px;">
                                     <i class="fa fa-shopping-bag fs-4"></i>
                                 </div>
@@ -93,7 +93,7 @@
                     <div class="col-md-4">
                         <div class="card text-center h-100">
                             <div class="card-body py-4">
-                                <div class="avatar-md bg-info-subtle text-info rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                                <div class="avatar-md bg-primary-soft text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
                                     style="width: 64px; height: 64px; min-width: 64px;">
                                     <i class="fa fa-chart-line fs-4"></i>
                                 </div>

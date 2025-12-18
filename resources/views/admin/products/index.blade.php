@@ -110,8 +110,11 @@
                         <label class="form-label small text-muted">Trạng thái</label>
                         <select class="form-select" name="status">
                             <option value="">Tất cả</option>
-                            <option value="1" @selected(request('status') == '1')>Hiển thị</option>
-                            <option value="0" @selected(request('status') == '0')>Ẩn</option>
+                            <option value="1" @selected(request('status') == '1')>Đang bán</option>
+                            <option value="2" @selected(request('status') == '2')>Hết hàng</option>
+                            <option value="3" @selected(request('status') == '3')>Tạm ngưng</option>
+                            <option value="4" @selected(request('status') == '4')>Ngừng KD</option>
+                            <option value="5" @selected(request('status') == '5')>Lưu trữ</option>
                         </select>
                     </div>
 
@@ -230,11 +233,25 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if($status == 1)
-                                        <span class="badge badge-status completed">Hiện</span>
-                                    @else
-                                        <span class="badge badge-status cancelled">Ẩn</span>
-                                    @endif
+                                    @php
+                                        $statusClass = match ($status) {
+                                            1 => 'badge badge-status completed', // Active
+                                            2 => 'badge badge-status pending', // Out of Stock
+                                            3 => 'badge badge-status secondary', // Inactive
+                                            4 => 'badge badge-status cancelled', // Discontinued
+                                            5 => 'badge badge-status dark', // Archive
+                                            default => 'badge bg-light text-dark border'
+                                        };
+                                        $statusText = match ($status) {
+                                            1 => 'Đang bán',
+                                            2 => 'Hết hàng',
+                                            3 => 'Tạm ngưng',
+                                            4 => 'Ngừng KD',
+                                            5 => 'Lưu trữ',
+                                            default => 'Unknown'
+                                        };
+                                    @endphp
+                                    <span class="{{ $statusClass }}">{{ $statusText }}</span>
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">

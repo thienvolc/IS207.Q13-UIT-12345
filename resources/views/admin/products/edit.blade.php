@@ -205,8 +205,11 @@
               <div class="mb-3">
                 <label class="form-label">Trạng thái</label>
                 <select name="status" class="form-select">
-                  <option value="1" @selected(old('status', $status) == 1)>Hiển thị</option>
-                  <option value="0" @selected(old('status', $status) == 0)>Ẩn</option>
+                  <option value="1" @selected(old('status', $status) == 1)>Đang bán (Active)</option>
+                  <option value="2" @selected(old('status', $status) == 2)>Hết hàng (Out of Stock)</option>
+                  <option value="3" @selected(old('status', $status) == 3)>Ngừng bán tạm thời (Inactive)</option>
+                  <option value="4" @selected(old('status', $status) == 4)>Ngừng kinh doanh (Discontinued)</option>
+                  <option value="5" @selected(old('status', $status) == 5)>Lưu trữ (Archive)</option>
                 </select>
               </div>
 

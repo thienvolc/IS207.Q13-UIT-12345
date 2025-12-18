@@ -167,7 +167,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0|max:100',
             'quantity' => 'nullable|integer|min:0',
-            'status' => 'required|in:0,1',
+            'status' => 'required|in:1,2,3,4,5',
             'type' => 'nullable|string',
             'thumb' => 'nullable|string|max:500',
             'sku' => 'nullable|string|max:100',

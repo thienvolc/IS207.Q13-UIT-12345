@@ -1,14 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary: #6610f2;
-    --primary-light: #7928f5;
-    --primary-dark: #520dc2;
-    --primary-soft: rgba(102, 16, 242, 0.1);
+    --primary: #0d6efd;
+    --primary-light: #3d8bfd;
+    --primary-dark: #0a58ca;
+    --primary-soft: rgba(13, 110, 253, 0.1);
 
     --secondary: #6c757d;
     --secondary-light: #868e96;
     --secondary-dark: #5a6268;
+    --secondary-soft: rgba(108, 117, 125, 0.1);
 
     --dark: #1d1e20;
     --dark-lighter: #495057;
@@ -935,6 +936,16 @@
 .badge-status.cancelled {
     background: var(--danger-soft);
     color: var(--danger);
+}
+
+.badge-status.secondary {
+    background: var(--secondary-soft);
+    color: var(--secondary);
+}
+
+.badge-status.dark {
+    background: rgba(33, 37, 41, 0.1);
+    color: var(--dark);
 }
 
 /* ===========================================
