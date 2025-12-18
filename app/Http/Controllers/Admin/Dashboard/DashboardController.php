@@ -15,10 +15,9 @@ class DashboardController extends Controller
 {
     public function __construct(
         private readonly ProductReadService $productReadService,
-        private readonly OrderService       $orderService,
-        private readonly UserService        $userService,
-    )
-    {
+        private readonly OrderService $orderService,
+        private readonly UserService $userService,
+    ) {
     }
 
     // [GET] /admin
@@ -62,9 +61,18 @@ class DashboardController extends Controller
 
         // Orders by status
         $pendingOrders = $this->countOrdersByStatus(OrderStatus::PENDING_PAYMENT);
-        $processingOrders = $this->countOrdersByStatus(OrderStatus::PROCESSING);
+
+        // Processing group: Paid + Processing + Shipped
+        $processingOrders = $this->countOrdersByStatus(OrderStatus::PAID) +
+            $this->countOrdersByStatus(OrderStatus::PROCESSING) +
+            $this->countOrdersByStatus(OrderStatus::SHIPPED);
+
         $completedOrders = $this->countOrdersByStatus(OrderStatus::DELIVERED);
-        $cancelledOrders = $this->countOrdersByStatus(OrderStatus::CANCELLED);
+
+        // Cancelled group: Cancelled + Refunded + Returned
+        $cancelledOrders = $this->countOrdersByStatus(OrderStatus::CANCELLED) +
+            $this->countOrdersByStatus(OrderStatus::REFUNDED) +
+            $this->countOrdersByStatus(OrderStatus::RETURNED);
 
         // Customers stats
         $customersDTO = new SearchUsersDTO(

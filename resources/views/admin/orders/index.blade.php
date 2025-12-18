@@ -92,10 +92,13 @@
             <label class="form-label small text-muted">Trạng thái</label>
             <select class="form-select" name="status">
               <option value="">Tất cả</option>
-              <option value="pending" @selected(request('status') == 'pending')>Chờ xử lý</option>
+              <option value="pending" @selected(request('status') == 'pending')>Chờ thanh toán</option>
+              <option value="paid" @selected(request('status') == 'paid')>Đã thanh toán</option>
               <option value="processing" @selected(request('status') == 'processing')>Đang xử lý</option>
               <option value="shipped" @selected(request('status') == 'shipped')>Đang giao</option>
               <option value="completed" @selected(request('status') == 'completed')>Hoàn thành</option>
+              <option value="refunded" @selected(request('status') == 'refunded')>Hoàn tiền</option>
+              <option value="returned" @selected(request('status') == 'returned')>Trả hàng</option>
               <option value="cancelled" @selected(request('status') == 'cancelled')>Đã hủy</option>
             </select>
           </div>
@@ -142,16 +145,16 @@
                 $orderId = $order->orderId;
                 $status = $order->status ?? 1;
                 $statusLabels = [
-                  1 => ['text' => 'Chờ thanh toán', 'class' => 'pending'],
-                  2 => ['text' => 'Đã thanh toán', 'class' => 'processing'],
-                  3 => ['text' => 'Đang xử lý', 'class' => 'processing'],
-                  4 => ['text' => 'Đang giao', 'class' => 'processing'],
-                  5 => ['text' => 'Đã giao', 'class' => 'completed'],
-                  6 => ['text' => 'Hoàn tiền', 'class' => 'cancelled'],
-                  7 => ['text' => 'Trả hàng', 'class' => 'cancelled'],
-                  8 => ['text' => 'Đã hủy', 'class' => 'cancelled'],
+                  1 => ['text' => 'Chờ thanh toán', 'class' => 'badge badge-status pending'],
+                  2 => ['text' => 'Đã thanh toán', 'class' => 'badge badge-status processing'],
+                  3 => ['text' => 'Đang xử lý', 'class' => 'badge badge-status processing'],
+                  4 => ['text' => 'Đang giao', 'class' => 'badge badge-status processing'],
+                  5 => ['text' => 'Đã giao', 'class' => 'badge badge-status completed'],
+                  6 => ['text' => 'Hoàn tiền', 'class' => 'badge badge-status secondary'],
+                  7 => ['text' => 'Trả hàng', 'class' => 'badge badge-status secondary'],
+                  8 => ['text' => 'Đã hủy', 'class' => 'badge badge-status cancelled'],
                 ];
-                $statusInfo = $statusLabels[$status] ?? ['text' => 'Không xác định', 'class' => 'pending'];
+                $statusInfo = $statusLabels[$status] ?? ['text' => 'Không xác định', 'class' => 'badge badge-status pending'];
                 $total = $order->total ?? 0;
                 $createdAt = $order->createdAt ?? null;
               @endphp
@@ -173,7 +176,7 @@
                   <small>{{ $createdAt ? \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i') : '-' }}</small>
                 </td>
                 <td>
-                  <span class="badge badge-status {{ $statusInfo['class'] }}">{{ $statusInfo['text'] }}</span>
+                  <span class="{{ $statusInfo['class'] }}">{{ $statusInfo['text'] }}</span>
                 </td>
                 <td>
                   <a href="{{ route('admin.orders.show', $orderId) }}" class="btn btn-sm btn-outline-primary"

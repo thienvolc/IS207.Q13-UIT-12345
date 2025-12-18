@@ -97,7 +97,7 @@
           {{-- Pricing --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-tag me-2 text-success"></i>Giá bán
+              <i class="fa fa-tag me-2 text-primary"></i>Giá bán
             </div>
             <div class="card-body">
               <div class="row g-3">
@@ -147,7 +147,7 @@
           {{-- Images --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-images me-2 text-info"></i>Hình ảnh
+              <i class="fa fa-images me-2 text-primary"></i>Hình ảnh
             </div>
             <div class="card-body">
               @include('admin.partials.image-upload', [
@@ -162,7 +162,7 @@
           {{-- Product Metas --}}
           <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-              <span><i class="fa fa-list-alt me-2 text-secondary"></i>Thông số kỹ thuật</span>
+              <span><i class="fa fa-list-alt me-2 text-primary"></i>Thông số kỹ thuật</span>
               <button type="button" class="btn btn-sm btn-outline-primary" id="add-meta">
                 <i class="fa fa-plus me-1"></i> Thêm
               </button>
@@ -198,7 +198,7 @@
           {{-- Status & Type --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-cog me-2 text-secondary"></i>Thiết lập
+              <i class="fa fa-cog me-2 text-primary"></i>Thiết lập
             </div>
             <div class="card-body">
               {{-- Status --}}
@@ -234,7 +234,7 @@
           {{-- Inventory --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-warehouse me-2 text-warning"></i>Kho hàng
+              <i class="fa fa-warehouse me-2 text-primary"></i>Kho hàng
             </div>
             <div class="card-body">
               <div class="mb-3">
@@ -284,7 +284,7 @@
           {{-- Tags --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-tags me-2 text-info"></i>Tags
+              <i class="fa fa-tags me-2 text-primary"></i>Tags
             </div>
             <div class="card-body">
               @php

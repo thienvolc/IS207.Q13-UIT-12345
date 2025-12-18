@@ -109,9 +109,12 @@ class OrderController extends Controller
 
         return match ($status) {
             'pending' => OrderStatus::PENDING_PAYMENT,
+            'paid' => OrderStatus::PAID,
             'processing' => OrderStatus::PROCESSING,
             'shipped' => OrderStatus::SHIPPED,
             'completed', 'delivered' => OrderStatus::DELIVERED,
+            'refunded' => OrderStatus::REFUNDED,
+            'returned' => OrderStatus::RETURNED,
             'cancelled' => OrderStatus::CANCELLED,
             default => is_numeric($status) ? (int) $status : null,
         };

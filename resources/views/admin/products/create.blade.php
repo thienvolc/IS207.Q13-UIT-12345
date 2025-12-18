@@ -75,7 +75,7 @@
           {{-- Pricing --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-tag me-2 text-success"></i>Giá bán
+              <i class="fa fa-tag me-2 text-primary"></i>Giá bán
             </div>
             <div class="card-body">
               <div class="row g-3">
@@ -122,7 +122,7 @@
           {{-- Images --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-images me-2 text-info"></i>Hình ảnh
+              <i class="fa fa-images me-2 text-primary"></i>Hình ảnh
             </div>
             <div class="card-body">
               <div class="mb-3">
@@ -149,7 +149,7 @@
           {{-- Product Image --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-image me-2 text-info"></i>Hình ảnh sản phẩm
+              <i class="fa fa-image me-2 text-primary"></i>Hình ảnh sản phẩm
             </div>
             <div class="card-body">
               @include('admin.partials.image-upload', [
@@ -164,7 +164,7 @@
           {{-- Status & Type --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-cog me-2 text-secondary"></i>Thiết lập
+              <i class="fa fa-cog me-2 text-primary"></i>Thiết lập
             </div>
             <div class="card-body">
               {{-- Status --}}
@@ -195,7 +195,7 @@
           {{-- Inventory --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-warehouse me-2 text-warning"></i>Kho hàng
+              <i class="fa fa-warehouse me-2 text-primary"></i>Kho hàng
             </div>
             <div class="card-body">
               <div class="mb-3">
@@ -231,7 +231,7 @@
           {{-- Tags --}}
           <div class="card mb-4">
             <div class="card-header">
-              <i class="fa fa-tags me-2 text-info"></i>Tags
+              <i class="fa fa-tags me-2 text-primary"></i>Tags
             </div>
             <div class="card-body">
               <input type="text" name="tags" class="form-control" placeholder="Nhập tags, phân cách bằng dấu phẩy"

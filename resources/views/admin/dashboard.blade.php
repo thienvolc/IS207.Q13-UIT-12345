@@ -170,11 +170,26 @@
                         </span>
                       </td>
                       <td>
-                        @if(($product->status ?? 0) == 1)
-                          <span class="badge badge-status completed">Hiện</span>
-                        @else
-                          <span class="badge badge-status cancelled">Ẩn</span>
-                        @endif
+                        @php
+                          $pStatus = $product->status ?? 0;
+                          $pClass = match ($pStatus) {
+                            1 => 'badge badge-status completed',
+                            2 => 'badge badge-status pending',
+                            3 => 'badge badge-status secondary',
+                            4 => 'badge badge-status cancelled',
+                            5 => 'badge badge-status dark',
+                            default => 'badge bg-light text-dark'
+                          };
+                          $pText = match ($pStatus) {
+                            1 => 'Đang bán',
+                            2 => 'Hết hàng',
+                            3 => 'Tạm ngưng',
+                            4 => 'Ngừng KD',
+                            5 => 'Lưu trữ',
+                            default => 'Ẩn'
+                          };
+                        @endphp
+                        <span class="{{ $pClass }}">{{ $pText }}</span>
                       </td>
                       <td>
                         <a href="{{ route('admin.products.edit', $product->productId ?? $product->product_id ?? $product->id) }}"
@@ -221,23 +236,31 @@
                       ₫
                     </div>
                     @php
-                      $status = $order->status ?? 'pending';
-                      $statusClass = match ($status) {
-                        'pending' => 'pending',
-                        'processing' => 'processing',
-                        'completed', 'delivered' => 'completed',
-                        'cancelled' => 'cancelled',
-                        default => 'pending'
+                      $st = $order->status ?? 1;
+                      $stClass = match ($st) {
+                        1 => 'badge badge-status pending',
+                        2 => 'badge badge-status processing',
+                        3 => 'badge badge-status processing',
+                        4 => 'badge badge-status processing',
+                        5 => 'badge badge-status completed',
+                        6 => 'badge badge-status secondary',
+                        7 => 'badge badge-status secondary',
+                        8 => 'badge badge-status cancelled',
+                        default => 'badge badge-status pending'
                       };
-                      $statusText = match ($status) {
-                        'pending' => 'Chờ xử lý',
-                        'processing' => 'Đang xử lý',
-                        'completed', 'delivered' => 'Hoàn thành',
-                        'cancelled' => 'Đã hủy',
-                        default => ucfirst($status)
+                      $stText = match ($st) {
+                        1 => 'Chờ thanh toán',
+                        2 => 'Đã thanh toán',
+                        3 => 'Đang xử lý',
+                        4 => 'Đang giao',
+                        5 => 'Hoàn thành',
+                        6 => 'Hoàn tiền',
+                        7 => 'Trả hàng',
+                        8 => 'Đã hủy',
+                        default => 'Chờ thanh toán'
                       };
                     @endphp
-                    <span class="badge badge-status {{ $statusClass }}">{{ $statusText }}</span>
+                    <span class="{{ $stClass }}">{{ $stText }}</span>
                   </div>
                 </li>
               @empty

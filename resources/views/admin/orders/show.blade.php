@@ -38,7 +38,7 @@
         {{-- Products list --}}
         <div class="card mb-4">
           <div class="card-header">
-            <i class="fa fa-box me-2"></i> Sản phẩm trong đơn ({{ count($items) }})
+            <i class="fa fa-box me-2 text-primary"></i> Sản phẩm trong đơn ({{ count($items) }})
           </div>
           <div class="card-body p-0">
             <div class="table-responsive">
@@ -100,25 +100,25 @@
         {{-- Order Status --}}
         <div class="card mb-4">
           <div class="card-header">
-            <i class="fa fa-info-circle me-2"></i> Trạng thái đơn hàng
+            <i class="fa fa-info-circle me-2 text-primary"></i> Trạng thái đơn hàng
           </div>
           <div class="card-body">
             @php
               $statusLabels = [
-                1 => ['label' => 'Chờ thanh toán', 'class' => 'pending'],
-                2 => ['label' => 'Đã thanh toán', 'class' => 'processing'],
-                3 => ['label' => 'Đang xử lý', 'class' => 'processing'],
-                4 => ['label' => 'Đang giao', 'class' => 'processing'],
-                5 => ['label' => 'Đã giao', 'class' => 'completed'],
-                6 => ['label' => 'Hoàn tiền', 'class' => 'cancelled'],
-                7 => ['label' => 'Trả hàng', 'class' => 'cancelled'],
-                8 => ['label' => 'Đã hủy', 'class' => 'cancelled'],
+                1 => ['text' => 'Chờ thanh toán', 'class' => 'badge badge-status pending'],
+                2 => ['text' => 'Đã thanh toán', 'class' => 'badge badge-status processing'],
+                3 => ['text' => 'Đang xử lý', 'class' => 'badge badge-status processing'],
+                4 => ['text' => 'Đang giao', 'class' => 'badge badge-status processing'],
+                5 => ['text' => 'Đã giao', 'class' => 'badge badge-status completed'],
+                6 => ['text' => 'Hoàn tiền', 'class' => 'badge badge-status secondary'],
+                7 => ['text' => 'Trả hàng', 'class' => 'badge badge-status secondary'],
+                8 => ['text' => 'Đã hủy', 'class' => 'badge badge-status cancelled'],
               ];
-              $statusInfo = $statusLabels[$status] ?? ['label' => 'Không xác định', 'class' => 'pending'];
+              $statusInfo = $statusLabels[$status] ?? ['text' => 'Không xác định', 'class' => 'badge badge-status pending'];
             @endphp
             <div class="mb-3">
-              <span class="badge badge-status {{ $statusInfo['class'] }} fs-6">
-                {{ $statusInfo['label'] }}
+              <span class="{{ $statusInfo['class'] }} fs-6">
+                {{ $statusInfo['text'] }}
               </span>
             </div>
 
@@ -134,6 +134,8 @@
                   <option value="3" @selected($status == 3)>Đang xử lý</option>
                   <option value="4" @selected($status == 4)>Đang giao</option>
                   <option value="5" @selected($status == 5)>Đã giao</option>
+                  <option value="6" @selected($status == 6)>Hoàn tiền</option>
+                  <option value="7" @selected($status == 7)>Trả hàng</option>
                   <option value="8" @selected($status == 8)>Đã hủy</option>
                 </select>
               </div>
@@ -153,7 +155,7 @@
         {{-- Order Info --}}
         <div class="card">
           <div class="card-header">
-            <i class="fa fa-receipt me-2"></i> Thông tin đơn hàng
+            <i class="fa fa-receipt me-2 text-primary"></i> Thông tin đơn hàng
           </div>
           <div class="card-body">
             <div class="mb-2">
