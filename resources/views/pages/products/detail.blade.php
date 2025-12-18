@@ -445,6 +445,5 @@
 @endpush
 
 @push('scripts')
-@vite('resources/js/detail.js')
 @endpush
 @endsection

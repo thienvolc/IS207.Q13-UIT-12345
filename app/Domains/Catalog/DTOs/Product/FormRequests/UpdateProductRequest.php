@@ -26,7 +26,7 @@ class UpdateProductRequest extends FormRequest
             'summary' => 'nullable|string|max:500',
             'type' => 'nullable|string|max:50',
             'sku' => 'nullable|string|max:100|unique:products,sku,' . $productId . ',product_id',
-            'price' => 'nullable|integer|min:0',
+            'price' => 'nullable|integer|min:0|max:80',
             'discount' => 'nullable|numeric|min:0|max:100',
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after:starts_at',

@@ -295,8 +295,13 @@
 
       function updateFinalPrice() {
         const price = parseFloat(priceInput?.value) || 0;
-        const discount = parseFloat(discountInput?.value) || 0;
+        let discount = parseFloat(discountInput?.value) || 0;
+        
+        // Enforce max 100%
+        if (discount > 100) discount = 100;
+        
         const finalPrice = price * (1 - discount / 100);
+
         if (finalPriceEl) {
           finalPriceEl.textContent = new Intl.NumberFormat('vi-VN').format(finalPrice) + ' ₫';
         }

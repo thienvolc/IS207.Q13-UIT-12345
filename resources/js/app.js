@@ -9,3 +9,4 @@ import "./header.js";
 import "./home.js";
 import "./cart.js";
 import "./search.js";
+import './detail.js';
