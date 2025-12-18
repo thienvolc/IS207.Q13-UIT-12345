@@ -26,7 +26,7 @@ class ProductController extends Controller
         [$sortField, $sortOrder] = match (request('sort')) {
             'price_asc' => ['price', 'asc'],
             'price_desc' => ['price', 'desc'],
-            'name' => ['name', 'asc'],
+            'name' => ['title', 'asc'],
             default => ['created_at', 'desc'],
         };
 

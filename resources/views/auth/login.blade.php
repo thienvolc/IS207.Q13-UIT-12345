@@ -38,7 +38,12 @@
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Mật khẩu</label>
-                        <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required placeholder="Nhập mật khẩu">
+                        <div class="position-relative">
+                            <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required placeholder="Nhập mật khẩu" style="padding-right: 50px !important;">
+                            <button type="button" class="position-absolute" onclick="togglePassword('password', this)" style="right: 10px !important; top: 50% !important; transform: translateY(-50%) !important; border: none !important; background: none !important; padding: 8px !important; cursor: pointer !important; z-index: 999 !important; line-height: 1 !important;" tabindex="-1">
+                                <i class="bi bi-eye" style="font-size: 1.3rem !important; color: #6c757d !important;"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="mb-3 d-flex justify-content-between align-items-center">
                         <div class="form-check">
@@ -60,3 +65,22 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+</script>
+@endpush

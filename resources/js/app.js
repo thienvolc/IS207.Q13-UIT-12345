@@ -3,6 +3,7 @@
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 // Import modules
+import "./global.js";
 import "./base.js";
 import "./header.js";
 import "./home.js";

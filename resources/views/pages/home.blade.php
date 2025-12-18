@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @var array<App\Domains\Catalog\DTOs\Product\Responses\PublicProductDTO> heroProducts
  * @var array<App\Domains\Catalog\DTOs\Category\Responses\PublicCategoryDTO> bannerCategories
@@ -275,7 +276,12 @@
                   <a href="{{ route('products.show', $product->slug) }}">{{ $product->title ?? '' }}</a>
                 </h5>
                 <div class="d-flex align-items-center justify-content-between">
-                  <div class="product-item__price mb-0">{{ number_format($product->price ?? 0) }}đ</div>
+                  <div class="product-item__price mb-0">
+                    @if($product->discount != 0)
+                    <del class="h5 text-muted mb-0">{{ number_format($product->price) }}đ</del>
+                    @endif
+                    <span class="price">{{ number_format($product->price - $product->discount) }}đ</span>
+                  </div>
                   <button class="btn-icon-vertical btn-add-cart ms-3" title="Thêm vào giỏ">
                     <i class="bi bi-cart-plus"></i>
                   </button>
@@ -301,9 +307,13 @@
                 <h5 class="product-item__title">
                   <a href="{{ route('products.show', $product->slug) }}">{{ $product->title ?? '' }}</a>
                 </h5>
-                <div class="product-item__price">{{ number_format($product->price ?? 0) }}đ</div>
-
-                <div class="product-item__actions-right">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="product-item__price mb-0">
+                    @if($product->discount != 0)
+                    <del class="h5 text-muted mb-0">{{ number_format($product->price) }}đ</del>
+                    @endif
+                    <span class="price">{{ number_format($product->price - $product->discount) }}đ</span>
+                  </div>
                   <button class="btn-icon-vertical btn-add-cart" title="Thêm vào giỏ">
                     <i class="bi bi-cart-plus"></i>
                   </button>

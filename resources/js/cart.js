@@ -4,9 +4,8 @@
 
 // Check if user is logged in
 function isUserLoggedIn() {
-    // TODO: Implement proper authentication check
-    // For now, check if there's a session or token
-    return false; // Tạm thời return false để dùng guest cart
+    // Check from server-side rendered variable
+    return window.isAuthenticated === true;
 }
 
 // Guest Cart - Save to localStorage
@@ -58,12 +57,12 @@ function updateGuestCartCount() {
 
 // Add to Cart function
 async function addToCart(productId, quantity = 1) {
-    // If user not logged in, use guest cart
+    // If user not logged in, show warning and return
     if (!isUserLoggedIn()) {
-        const success = addToGuestCart(productId, quantity);
-        if (success) {
-            showToast("Đã thêm vào giỏ hàng!", "success");
-        }
+        window.showGlobalToast(
+            "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
+            "warning",
+        );
         return;
     }
 
@@ -89,7 +88,7 @@ async function addToCart(productId, quantity = 1) {
 
         if (response.ok) {
             // Show success message
-            showToast("Đã thêm vào giỏ hàng!", "success");
+            window.showGlobalToast("Đã thêm vào giỏ hàng!", "success");
 
             // Update cart count in header
             updateCartCount();
@@ -99,7 +98,7 @@ async function addToCart(productId, quantity = 1) {
             // User not logged in, fallback to guest cart
             const success = addToGuestCart(productId, quantity);
             if (success) {
-                showToast(
+                window.showGlobalToast(
                     "Đã thêm vào giỏ hàng! (Đăng nhập để lưu vĩnh viễn)",
                     "success",
                 );
@@ -107,7 +106,10 @@ async function addToCart(productId, quantity = 1) {
             return null;
         } else {
             // Show error message
-            showToast(data.message || "Không thể thêm vào giỏ hàng", "error");
+            window.showGlobalToast(
+                data.message || "Không thể thêm vào giỏ hàng",
+                "error",
+            );
             return null;
         }
     } catch (error) {
@@ -115,9 +117,9 @@ async function addToCart(productId, quantity = 1) {
         // Fallback to guest cart on error
         const success = addToGuestCart(productId, quantity);
         if (success) {
-            showToast("Đã thêm vào giỏ hàng!", "success");
+            window.showGlobalToast("Đã thêm vào giỏ hàng!", "success");
         } else {
-            showToast("Có lỗi xảy ra, vui lòng thử lại", "error");
+            window.showGlobalToast("Có lỗi xảy ra, vui lòng thử lại", "error");
         }
         return null;
     }
@@ -154,41 +156,6 @@ async function updateCartCount() {
     } catch (error) {
         console.error("Lỗi khi cập nhật số lượng giỏ hàng:", error);
     }
-}
-
-// Show toast notification
-function showToast(message, type = "info") {
-    // Remove existing toast
-    const existingToast = document.querySelector(".toast-notification");
-    if (existingToast) {
-        existingToast.remove();
-    }
-
-    // Create toast element
-    const toast = document.createElement("div");
-    toast.className = `toast-notification toast-${type}`;
-    toast.innerHTML = `
-        <div class="toast-content">
-            <i class="bi bi-${type === "success" ? "check-circle-fill" : "exclamation-circle-fill"}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-
-    // Add to body
-    document.body.appendChild(toast);
-
-    // Show toast
-    setTimeout(() => {
-        toast.classList.add("show");
-    }, 100);
-
-    // Auto hide after 3 seconds
-    setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }, 3000);
 }
 
 // Initialize add to cart buttons

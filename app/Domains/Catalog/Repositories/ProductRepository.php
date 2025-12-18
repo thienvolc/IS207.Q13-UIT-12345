@@ -65,8 +65,7 @@ class ProductRepository
         int      $excludeProductId,
         array    $categoryIds,
         array    $tagIds
-    ): LengthAwarePaginator
-    {
+    ): LengthAwarePaginator {
         $query = Product::query()
             ->with(['categories', 'tags', 'metas'])
             ->where('product_id', '!=', $excludeProductId)
@@ -108,28 +107,41 @@ class ProductRepository
     {
         $query->when($f->query, function (Builder $q, $v) {
             $searchTerm = '%' . $v . '%';
+            $searchValue = strtolower(trim($v));
 
-            $q->where(function (Builder $sq) use ($searchTerm) {
+            // Danh sách từ khóa chỉ tìm chính xác (không bao gồm combo)
+            $exactSearchKeywords = ['chuột', 'bàn phím', 'tai nghe', 'loa', 'webcam', 'mic'];
+
+            $q->where(function (Builder $sq) use ($searchTerm, $searchValue, $exactSearchKeywords) {
                 $sq->where('title', 'like', $searchTerm)
                     ->orWhere('desc', 'like', $searchTerm)
                     ->orWhere('summary', 'like', $searchTerm);
+
+                // Nếu tìm từ khóa đơn (chuột, bàn phím...), loại trừ combo
+                if (in_array($searchValue, $exactSearchKeywords)) {
+                    $sq->where('title', 'not like', '%combo%');
+                }
             });
         });
 
-        $query->when($f->categoryIdOrSlug, function($q) use ($f) {
+        $query->when($f->categoryIdOrSlug, function ($q) use ($f) {
             $isCategoryId = is_int($f->categoryIdOrSlug) || ctype_digit($f->categoryIdOrSlug);
-            
+
             if ($isCategoryId) {
                 $q->whereHas('categories', fn($subQ) => $subQ->where('categories.category_id', $f->categoryIdOrSlug));
             } else {
                 $q->whereHas('categories', fn($subQ) => $subQ->where('categories.slug', $f->categoryIdOrSlug));
             }
         });
-        $query->when($f->tagId,
-            fn($q, $v) => $query->whereHas('tags',
-                fn($q) => $q->where('tags.tag_id', $f->tagId)));
-        $query->when($f->priceMin, fn($q, $v) => $q->where('price', '>=', $v));
-        $query->when($f->priceMax, fn($q, $v) => $q->where('price', '<=', $v));
+        $query->when(
+            $f->tagId,
+            fn($q, $v) => $query->whereHas(
+                'tags',
+                fn($q) => $q->where('tags.tag_id', $f->tagId)
+            )
+        );
+        $query->when($f->priceMin, fn($q, $v) => $q->whereRaw('(price - discount) >= ?', [$v]));
+        $query->when($f->priceMax, fn($q, $v) => $q->whereRaw('(price - discount) <= ?', [$v]));
     }
 
     private function applyRelated(Builder $query, array $categoryIds, array $tagIds): void
@@ -155,8 +167,13 @@ class ProductRepository
 
     private function queryWithPagination($query, $pageable): LengthAwarePaginator
     {
-        return $query
-            ->orderBy($pageable->sort->by, $pageable->sort->order)
-            ->paginate($pageable->size, ['*'], 'page', $pageable->page);
+        // Sort by discounted price if sorting by price
+        if ($pageable->sort->by === 'price') {
+            $query->orderByRaw('(price - discount) ' . $pageable->sort->order);
+        } else {
+            $query->orderBy($pageable->sort->by, $pageable->sort->order);
+        }
+
+        return $query->paginate($pageable->size, ['*'], 'page', $pageable->page);
     }
 }
