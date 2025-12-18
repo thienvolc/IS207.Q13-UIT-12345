@@ -71,23 +71,27 @@
           <i class="bi bi-handbag-fill"></i>
         </a>
       </div>
-      
+
       @auth
       <!-- User đã đăng nhập -->
       <div class="nav-item dropdown header-user">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
           data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="{{ Auth::user()->profile?->avatar ?? asset('img/default-avatar.png') }}" alt="avatar" class="header-user-avt"> 
+          <img src="{{ Auth::user()->profile?->avatar ?? asset('img/default-avatar.png') }}" alt="avatar" class="header-user-avt">
           {{ Auth::user()->profile?->first_name ?? Auth::user()->email }}
         </a>
         <ul class="dropdown-menu header-user-menu" aria-labelledby="userDropdown">
           <li><a class="dropdown-item" href="{{ route('account.profile') }}"><i class="bi bi-person me-2"></i>Tài khoản của tôi</a></li>
           <li><a class="dropdown-item" href="{{ route('cart.page') }}"><i class="bi bi-box-seam me-2"></i>Đơn mua</a></li>
           @if(Auth::user()->is_admin)
-          <li><hr class="dropdown-divider"></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
           <li><a class="dropdown-item text-primary" href="/admin"><i class="bi bi-gear me-2"></i>Quản trị</a></li>
           @endif
-          <li><hr class="dropdown-divider"></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
           <li>
             <form method="POST" action="{{ route('logout') }}">
               @csrf
@@ -149,7 +153,7 @@
         </div>
       </div>
       @endauth
-      
+
       <a href="{{ route('home') }}" class="off-link">Trang chủ</a>
       <a href="{{ route('products.index') }}" class="off-link">Sản phẩm</a>
       <a href="{{ route('super-deal') }}" class="off-link">Khuyến mãi</a>
@@ -161,7 +165,7 @@
       @foreach($globalCategories ?? [] as $cat)
       <a href="{{ route('products.index') }}?category={{ $cat->slug }}" class="off-link">{{ $cat->title }}</a>
       @endforeach
-      
+
       <hr>
       @auth
       <a href="{{ route('account.profile') }}" class="off-link"><i class="bi bi-person me-2"></i>Tài khoản của tôi</a>

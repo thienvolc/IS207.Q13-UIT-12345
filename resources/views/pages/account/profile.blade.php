@@ -12,9 +12,9 @@
                     <div class="profile-avatar-section">
                         <div class="profile-avatar">
                             @if(Auth::user()->profile?->avatar)
-                                <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar">
+                            <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar">
                             @else
-                                <i class="bi bi-person-circle"></i>
+                            <i class="bi bi-person-circle"></i>
                             @endif
                         </div>
                         <h4 class="profile-name">{{ Auth::user()->profile?->first_name ?? '' }} {{ Auth::user()->profile?->last_name ?? '' }}</h4>
@@ -48,7 +48,7 @@
                 <div class="profile-content-card">
                     <div class="profile-card-header">
                         <h3>Thông tin cá nhân</h3>
-                            <p class="text-muted">Quản lý thông tin cá nhân của bạn</p>
+                        <p class="text-muted">Quản lý thông tin cá nhân của bạn</p>
                     </div>
 
                     <div class="profile-card-body">
@@ -81,10 +81,10 @@
                                     <div class="avatar-upload-section">
                                         <div class="avatar-preview">
                                             @if(Auth::user()->profile?->avatar)
-                                                <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar" id="avatarPreview">
+                                            <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar" id="avatarPreview">
                                             @else
-                                                <img src="" alt="Avatar" id="avatarPreview" style="display: none;">
-                                                <i class="bi bi-person-circle" id="avatarIcon"></i>
+                                            <img src="" alt="Avatar" id="avatarPreview" style="display: none;">
+                                            <i class="bi bi-person-circle" id="avatarIcon"></i>
                                             @endif
                                         </div>
                                         <div class="avatar-upload-info">
@@ -202,118 +202,21 @@
         const avatarPreview = document.getElementById('avatarPreview');
         const avatarIcon = document.getElementById('avatarIcon');
         const resetBtn = document.getElementById('resetBtn');
-
-        let originalData = {};
-        let uploadedAvatarUrl = null;
-
-        // Get CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-        // Get auth token from localStorage or cookie
-        const authToken = localStorage.getItem('auth_token') || getCookie('auth_token');
-
-        // Load user profile
-        async function loadProfile() {
-            // Nếu không có token, hiển thị dữ liệu mẫu
-            if (!authToken) {
-                loadDemoData();
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/me', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to load profile');
-                }
-
-                const result = await response.json();
-                const user = result.data;
-
-                // Store original data
-                originalData = {
-                    first_name: user.first_name || '',
-                    middle_name: user.middle_name || '',
-                    last_name: user.last_name || '',
-                    phone: user.phone || '',
-                    profile: user.profile || '',
-                    avatar: user.avatar || ''
-                };
-
-                // Fill form
-                document.getElementById('first_name').value = user.first_name || '';
-                document.getElementById('middle_name').value = user.middle_name || '';
-                document.getElementById('last_name').value = user.last_name || '';
-                document.getElementById('email').value = user.email || '';
-                document.getElementById('phone').value = user.phone || '';
-                document.getElementById('profile').value = user.profile || '';
-
-                // Update sidebar name
-                const fullName = [user.first_name, user.middle_name, user.last_name]
-                    .filter(n => n).join(' ') || user.email;
-                document.querySelector('.profile-name').textContent = fullName;
-
-                // Set avatar
-                if (user.avatar) {
-                    avatarPreview.src = user.avatar;
-                    avatarPreview.style.display = 'block';
-                    avatarIcon.style.display = 'none';
-
-                    // Update sidebar avatar
-                    const sidebarAvatar = document.querySelector('.profile-avatar img');
-                    const sidebarIcon = document.querySelector('.profile-avatar i');
-                    if (sidebarAvatar) {
-                        sidebarAvatar.src = user.avatar;
-                        sidebarAvatar.style.display = 'block';
-                    }
-                    if (sidebarIcon) {
-                        sidebarIcon.style.display = 'none';
-                    }
-                }
-
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                showAlert('Không thể tải thông tin profile. Hiển thị dữ liệu mẫu.', 'warning');
-                loadDemoData();
-            }
-        }
-
-        // Load demo data for preview
-        function loadDemoData() {
-            const demoUser = {
-                first_name: 'Nguyễn',
-                middle_name: 'Văn',
-                last_name: 'A',
-                email: 'demo@pinkcapy.com',
-                phone: '0123456789',
-                profile: 'Đây là trang profile demo',
-                avatar: ''
-            };
-
-            originalData = demoUser;
-
-            document.getElementById('first_name').value = demoUser.first_name;
-            document.getElementById('middle_name').value = demoUser.middle_name;
-            document.getElementById('last_name').value = demoUser.last_name;
-            document.getElementById('email').value = demoUser.email;
-            document.getElementById('phone').value = demoUser.phone;
-            document.getElementById('profile').value = demoUser.profile;
-
-            const fullName = [demoUser.first_name, demoUser.middle_name, demoUser.last_name]
-                .filter(n => n).join(' ');
-            document.querySelector('.profile-name').textContent = fullName;
-        }
+        // Store original data for reset functionality
+        let originalData = {
+            first_name: document.getElementById('first_name').value,
+            middle_name: document.getElementById('middle_name').value,
+            last_name: document.getElementById('last_name').value,
+            phone: document.getElementById('phone').value,
+            profile: document.getElementById('profile').value,
+            avatar: avatarPreview.src || ''
+        };
 
         // Avatar preview
         if (avatarInput) {
-            avatarInput.addEventListener('change', async function(e) {
+            avatarInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
                     // Validate file size (2MB)
@@ -328,35 +231,15 @@
                     reader.onload = function(e) {
                         avatarPreview.src = e.target.result;
                         avatarPreview.style.display = 'block';
-                        avatarIcon.style.display = 'none';
+                        if (avatarIcon) {
+                            avatarIcon.style.display = 'none';
+                        }
                     };
                     reader.readAsDataURL(file);
 
-                    // Upload to server (you need to implement upload endpoint)
-                    await uploadAvatar(file);
+                    showAlert('Ảnh đã được chọn. Nhấn "Lưu thay đổi" để cập nhật.', 'info');
                 }
             });
-        }
-
-        // Upload avatar
-        async function uploadAvatar(file) {
-            const formData = new FormData();
-            formData.append('avatar', file);
-
-            try {
-                // TODO: Replace with your actual upload endpoint
-                // For now, we'll use a placeholder URL
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploadedAvatarUrl = e.target.result;
-                };
-                reader.readAsDataURL(file);
-
-                showAlert('Ảnh đã được chọn. Nhấn "Lưu thay đổi" để cập nhật.', 'info');
-            } catch (error) {
-                console.error('Error uploading avatar:', error);
-                showAlert('Không thể tải ảnh lên', 'danger');
-            }
         }
 
         // Submit form
@@ -368,52 +251,63 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang lưu...';
 
-            const formData = {
-                first_name: document.getElementById('first_name').value.trim() || null,
-                middle_name: document.getElementById('middle_name').value.trim() || null,
-                last_name: document.getElementById('last_name').value.trim() || null,
-                phone: document.getElementById('phone').value.trim() || null,
-                profile: document.getElementById('profile').value.trim() || null,
-            };
-
-            // Add avatar if uploaded
-            if (uploadedAvatarUrl) {
-                formData.avatar = uploadedAvatarUrl;
-            }
-
-            // Nếu không có token, chỉ hiển thị thông báo demo
-            if (!authToken) {
-                setTimeout(() => {
-                    showAlert('Chế độ demo - Dữ liệu không được lưu thực tế. Vui lòng đăng nhập để sử dụng đầy đủ tính năng.', 'info');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }, 1000);
-                return;
-            }
+            const formData = new FormData(form);
 
             try {
-                const response = await fetch('/api/me', {
-                    method: 'PUT',
+                const response = await fetch('{{ route("account.profile.update") }}', {
+                    method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify(formData)
+                    body: formData
                 });
 
                 const result = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(result.message || 'Failed to update profile');
+                    throw new Error(result.message || 'Không thể cập nhật thông tin');
                 }
 
                 showAlert('Cập nhật thông tin thành công!', 'success');
 
-                // Reload profile
-                await loadProfile();
-                uploadedAvatarUrl = null;
+                // Update original data
+                originalData = {
+                    first_name: document.getElementById('first_name').value,
+                    middle_name: document.getElementById('middle_name').value,
+                    last_name: document.getElementById('last_name').value,
+                    phone: document.getElementById('phone').value,
+                    profile: document.getElementById('profile').value,
+                    avatar: avatarPreview.src
+                };
+
+                // Update sidebar info
+                const fullName = [originalData.first_name, originalData.middle_name, originalData.last_name]
+                    .filter(n => n).join(' ');
+                if (fullName) {
+                    document.querySelector('.profile-name').textContent = fullName;
+                }
+
+                // Update sidebar avatar if changed
+                const sidebarAvatar = document.querySelector('.profile-avatar img');
+                const sidebarIcon = document.querySelector('.profile-avatar i');
+                if (avatarPreview.src && avatarPreview.style.display !== 'none') {
+                    if (sidebarAvatar) {
+                        sidebarAvatar.src = avatarPreview.src;
+                        sidebarAvatar.style.display = 'block';
+                    }
+                    if (sidebarIcon) {
+                        sidebarIcon.style.display = 'none';
+                    }
+                }
+
+                // Clear file input
+                avatarInput.value = '';
+
+                // Reload page after 1.5s to show updated avatar from server
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
 
             } catch (error) {
                 console.error('Error updating profile:', error);
@@ -435,14 +329,17 @@
             if (originalData.avatar) {
                 avatarPreview.src = originalData.avatar;
                 avatarPreview.style.display = 'block';
-                avatarIcon.style.display = 'none';
+                if (avatarIcon) {
+                    avatarIcon.style.display = 'none';
+                }
             } else {
                 avatarPreview.style.display = 'none';
-                avatarIcon.style.display = 'block';
+                if (avatarIcon) {
+                    avatarIcon.style.display = 'block';
+                }
             }
 
             avatarInput.value = '';
-            uploadedAvatarUrl = null;
         });
 
         // Helper function to show alerts
@@ -463,17 +360,6 @@
                 alertDiv.remove();
             }, 5000);
         }
-
-        // Helper function to get cookie
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return null;
-        }
-
-        // Load profile on page load
-        loadProfile();
     });
 </script>
 @endpush

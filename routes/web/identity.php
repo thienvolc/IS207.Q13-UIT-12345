@@ -21,8 +21,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Routes cho user đã đăng nhập
 Route::middleware('auth')->prefix('account')->group(function () {
     Route::get('/profile', fn() => view('pages.account.profile'))->name('account.profile');
+    Route::post('/profile', [AuthController::class, 'updateProfile'])->name('account.profile.update');
     Route::get('/password', fn() => view('pages.account.password'))->name('account.password');
     Route::post('/password', [AuthController::class, 'updatePassword'])->name('account.password.update');
-    Route::get('/orders', fn() => view('pages.account.orders'))->name('account.orders');
+    Route::get('/orders', [\App\Http\Controllers\Web\Identity\OrderController::class, 'index'])->name('account.orders');
 });
-

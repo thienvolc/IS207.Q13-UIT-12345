@@ -445,5 +445,6 @@
 @endpush
 
 @push('scripts')
+
 @endpush
 @endsection

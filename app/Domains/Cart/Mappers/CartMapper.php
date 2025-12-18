@@ -34,13 +34,18 @@ class CartMapper
      */
     public function toItemDTOs(EloquentCollection $cartItems): Collection
     {
-        return $cartItems->map(fn($i) => $this->toItemDTO($i));
+        // Bỏ qua các CartItem không có product (sản phẩm đã xóa hoặc không active)
+        return $cartItems->filter(fn($i) => $i->product !== null)
+            ->map(fn($i) => $this->toItemDTO($i));
     }
 
     public function toItemDTO(CartItem $cartItem): CartItemDTO
     {
         $product = $cartItem->product;
-
+        if (!$product) {
+            // Trả về null, hoặc có thể throw exception, nhưng tốt nhất là filter ở trên
+            return null;
+        }
         return new CartItemDTO(
             itemId: $cartItem->cart_item_id,
             productId: $cartItem->product_id,
