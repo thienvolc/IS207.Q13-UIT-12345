@@ -215,4 +215,56 @@ class AuthController extends AppController
 
         return back()->with('status', 'Đổi mật khẩu thành công!');
     }
+
+    /**
+     * POST /account/profile
+     * Cập nhật thông tin profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'nullable|string|max:150',
+            'middle_name' => 'nullable|string|max:150',
+            'last_name' => 'nullable|string|max:150',
+            'phone' => 'nullable|string|max:20',
+            'avatar' => 'nullable|image|max:2048',
+        ]);
+
+        $user = Auth::user();
+        $profile = $user->profile;
+
+        if (!$profile) {
+            $profile = new \App\Domains\Identity\Entities\UserProfile();
+            $profile->user_id = $user->user_id;
+        }
+
+        $profile->first_name = $request->first_name;
+        $profile->middle_name = $request->middle_name;
+        $profile->last_name = $request->last_name;
+
+        // Cập nhật phone trong bảng users
+        if ($request->phone) {
+            $user->phone = $request->phone;
+        }
+
+        // Xử lý upload avatar
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+            $path = $avatar->store('avatars', 'public');
+            $profile->avatar = '/storage/' . $path;
+        }
+
+        // Lưu thông tin
+        $user->save();
+        $profile->save();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật thông tin thành công!'
+            ]);
+        }
+
+        return back()->with('success', 'Cập nhật thông tin thành công!');
+    }
 }

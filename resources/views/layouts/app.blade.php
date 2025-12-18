@@ -36,6 +36,6 @@
     <script>
         window.isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
     </script>
-
+    
     @stack('scripts')
 </body>
