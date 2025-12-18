@@ -17,7 +17,7 @@ Accept: application/json
 {
   "email": "ttt2042005@gmail.com",
   "password": "admin12345",
-  "phone": "0123456789"
+  "phone": "0924204924"
 }
 
 ### Get user
@@ -35,7 +35,8 @@ Accept: application/json
   "status": 1
 }
 
-### Update user roles
+
+### Update user roles 311 for old database, 2 for new one
 PATCH {{base_url}}/api/admin/users/2/roles
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
