@@ -12,9 +12,9 @@
                     <div class="profile-avatar-section">
                         <div class="profile-avatar">
                             @if(Auth::user()->profile?->avatar)
-                                <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar">
+                            <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar">
                             @else
-                                <i class="bi bi-person-circle"></i>
+                            <i class="bi bi-person-circle"></i>
                             @endif
                         </div>
                         <h4 class="profile-name">{{ Auth::user()->profile?->first_name ?? '' }} {{ Auth::user()->profile?->last_name ?? '' }}</h4>
@@ -73,20 +73,22 @@
 
                         <form method="POST" action="{{ route('account.password.update') }}" style="max-width: 500px;">
                             @csrf
-                            <div class="mb-3">
+                            <div class="mb-3 position-relative">
                                 <label for="current_password" class="form-label">
                                     <i class="bi bi-lock"></i> Mật khẩu hiện tại
                                 </label>
                                 <input type="password" class="form-control" id="current_password" name="current_password" required autocomplete="current-password" placeholder="Nhập mật khẩu hiện tại">
+                                <span class="toggle-password" toggle="#current_password" style="position:absolute;top:38px;right:16px;cursor:pointer;z-index:2;"><i class="bi bi-eye-slash"></i></span>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 position-relative">
                                 <label for="new_password" class="form-label">
                                     <i class="bi bi-lock-fill"></i> Mật khẩu mới
                                 </label>
                                 <input type="password" class="form-control" id="new_password" name="new_password" required autocomplete="new-password" placeholder="Nhập mật khẩu mới (tối thiểu 8 ký tự)">
+                                <span class="toggle-password" toggle="#new_password" style="position:absolute;top:38px;right:16px;cursor:pointer;z-index:2;"><i class="bi bi-eye-slash"></i></span>
                                 <small class="text-muted">Mật khẩu phải có ít nhất 8 ký tự</small>
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-4 position-relative">
                                 <label for="new_password_confirmation" class="form-label">
                                     <i class="bi bi-lock-fill"></i> Nhập lại mật khẩu mới
                                 </label>
@@ -103,3 +105,23 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.toggle-password').forEach(function(el) {
+        el.addEventListener('click', function() {
+            const input = document.querySelector(this.getAttribute('toggle'));
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        });
+    });
+</script>
+@endpush

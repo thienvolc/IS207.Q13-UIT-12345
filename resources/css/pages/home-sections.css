@@ -416,3 +416,313 @@
     padding-top: 11px;
     font-weight: 600;
 }
+/* ================================================
+   RESPONSIVE STYLES
+   ================================================ */
+
+/* Tablet (max-width: 991px) */
+@media (max-width: 991px) {
+    .hero {
+        height: 350px;
+    }
+
+    .hero__inner {
+        grid-template-columns: 1fr 0.8fr;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .hero__content {
+        padding: 15px 0;
+        text-align: left;
+    }
+
+    .hero__title {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .hero__subtitle {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    .hero__meta {
+        justify-content: flex-start;
+        margin-bottom: 15px;
+    }
+
+    .hero__price-currency {
+        font-size: 16px;
+    }
+
+    .hero__price strong {
+        font-size: 30px;
+    }
+
+    .hero__price sup {
+        font-size: 18px;
+    }
+
+    .btn-cta {
+        font-size: 12px;
+        padding: 10px 20px;
+    }
+
+    .hero__visual {
+        display: block;
+        margin-right: 20px;
+    }
+
+    .hero__visual img {
+        max-width: 280px;
+    }
+}
+
+/* Tablet Small (max-width: 767px) */
+@media (max-width: 767px) {
+    .hero {
+        height: auto;
+        min-height: 300px;
+        padding: 25px 0;
+    }
+
+    .hero__inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .hero__content {
+        text-align: center;
+    }
+
+    .hero__title {
+        font-size: 26px;
+    }
+
+    .hero__meta {
+        justify-content: center;
+    }
+
+    .btn-cta {
+        display: inline-block;
+    }
+
+    .hero__visual {
+        display: none;
+    }
+}
+
+/* Mobile (max-width: 575px) */
+@media (max-width: 575px) {
+    .hero {
+        height: auto;
+        min-height: 320px;
+        padding: 30px 0;
+    }
+
+    .hero__inner {
+        width: 90%;
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .hero__content {
+        padding: 10px 0;
+    }
+
+    .hero__title {
+        font-size: 28px;
+        margin-bottom: 12px;
+        letter-spacing: 0.5px;
+    }
+
+    .hero__subtitle {
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+
+    .hero__meta {
+        margin-bottom: 18px;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .hero__from {
+        font-size: 13px;
+    }
+
+    .hero__price-currency {
+        font-size: 18px;
+    }
+
+    .hero__price strong {
+        font-size: 32px;
+    }
+
+    .hero__price sup {
+        font-size: 20px;
+    }
+
+    .btn-cta {
+        font-size: 14px;
+        padding: 14px 28px;
+        display: block;
+        text-align: center;
+        width: fit-content;
+        margin: 0 auto;
+    }
+
+    .hero__dots {
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .hero__visual {
+        display: none;
+    }
+}
+
+/* Small Mobile (max-width: 375px) */
+@media (max-width: 375px) {
+    .hero {
+        min-height: 280px;
+    }
+
+    .hero__title {
+        font-size: 24px;
+    }
+
+    .hero__subtitle {
+        font-size: 13px;
+    }
+
+    .hero__price strong {
+        font-size: 28px;
+    }
+
+    .btn-cta {
+        font-size: 13px;
+        padding: 12px 24px;
+    }
+}
+/* ================================================
+   RECOMMENDS SECTION RESPONSIVE
+   ================================================ */
+
+@media (max-width: 991px) {
+    /* Ẩn recommends items trên tablet và mobile, giữ products */
+    .recommends-item {
+        display: none !important;
+    }
+
+    /* Ẩn parent grid__col chứa recommends-item */
+    .grid__col-3:has(.recommends-item) {
+        display: none !important;
+    }
+}
+
+@media (max-width: 575px) {
+    /* Recommends already hidden from 991px breakpoint */
+}
+
+/* ================================================
+   DEAL SECTION RESPONSIVE
+   ================================================ */
+
+@media (max-width: 991px) {
+    .deal {
+        min-width: auto;
+    }
+
+    .deal-wrap {
+        padding: 15px;
+    }
+
+    .deal-header-title {
+        font-size: 1.6rem;
+        min-width: 100px;
+    }
+
+    .deal-header-coupon {
+        width: 65px;
+        height: 65px;
+    }
+
+    .deal-header-coupon span {
+        font-size: 1.1rem;
+    }
+
+    .deal-header-coupon_price {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .deal-wrap {
+        padding: 12px;
+        border-radius: 15px;
+    }
+
+    .deal-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .deal-header-title {
+        font-size: 1.5rem;
+        min-width: auto;
+    }
+
+    .deal-header-coupon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .deal-header-coupon span {
+        font-size: 1rem;
+    }
+
+    .deal-header-coupon_price {
+        font-size: 1.3rem;
+    }
+
+    .deal-name-produce {
+        font-size: 13px;
+        max-width: 150px;
+    }
+
+    .deal-price-main {
+        font-size: 14px;
+    }
+}
+
+/* ================================================
+   COUNTDOWN RESPONSIVE
+   ================================================ */
+
+@media (max-width: 575px) {
+    .countdown-wrap {
+        gap: 10px;
+    }
+
+    .countdown-item {
+        min-width: 50px;
+        padding: 8px;
+    }
+
+    .countdown-number {
+        font-size: 24px;
+    }
+
+    .countdown-label {
+        font-size: 11px;
+    }
+
+    .countdown-separator {
+        font-size: 20px;
+        margin: 0 4px;
+    }
+}

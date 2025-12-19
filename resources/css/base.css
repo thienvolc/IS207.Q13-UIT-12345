@@ -153,3 +153,48 @@ body {
         opacity: 1;
     }
 }
+/* ================================================
+   RESPONSIVE GRID SYSTEM
+   ================================================ */
+
+/* Tablet (max-width: 991px) */
+@media (max-width: 991px) {
+    .grid__col-3,
+    .grid__col-9 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    /* Hide deal sidebar on tablet, show below products */
+    .deal {
+        order: 2;
+    }
+
+    .tabs-section {
+        order: 1;
+    }
+}
+
+/* Mobile (max-width: 575px) */
+@media (max-width: 575px) {
+    .grid-row {
+        margin: 0 -10px;
+    }
+
+    .grid__col-2-4,
+    .grid__col-3,
+    .grid__col-4,
+    .grid__col-6,
+    .grid__col-9 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        padding: 0 10px;
+    }
+
+    /* Hide deal sidebar completely on mobile */
+    .deal {
+        display: none !important;
+    }
+}
