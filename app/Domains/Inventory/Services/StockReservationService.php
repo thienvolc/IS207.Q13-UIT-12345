@@ -12,7 +12,8 @@ readonly class StockReservationService
 {
     public function __construct(
         private ProductRepository $productRepository
-    ) {}
+    ) {
+    }
 
     public function reserveProductStock(CartItem $cartItem): void
     {
@@ -22,15 +23,17 @@ readonly class StockReservationService
         $updated = $this->productRepository->decrementStock($product->product_id, $requestedQuantity);
 
         if (!$updated) {
-            throw new BusinessException(ResponseCode::PRODUCT_NOT_AVAILABLE,
-                ['available' => $product->quantity ?? 0, 'requested' => $requestedQuantity]);
+            throw new BusinessException(
+                ResponseCode::PRODUCT_NOT_AVAILABLE,
+                ['available' => $product->quantity ?? 0, 'requested' => $requestedQuantity]
+            );
         }
     }
 
     public function restoreAllProductStockInOrder(Order $order): void
     {
         foreach ($order->items as $item) {
-            $item->product->increment('quantity', $item->quantity);
+            $item->product?->increment('quantity', $item->quantity);
         }
     }
 

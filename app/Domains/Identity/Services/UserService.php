@@ -14,6 +14,7 @@ use App\Domains\Identity\DTOs\User\Queries\SearchUsersDTO;
 use App\Domains\Identity\DTOs\User\Responses\CurrentUserDTO;
 use App\Domains\Identity\DTOs\User\Responses\UserDTO;
 use App\Domains\Identity\DTOs\User\Responses\UserEmailDTO;
+use App\Domains\Identity\DTOs\User\Responses\UserStatusDTO;
 use App\Domains\Identity\Entities\User;
 use App\Domains\Identity\Mappers\UserMapper;
 use App\Domains\Identity\Repositories\UserProfileRepository;
@@ -28,10 +29,11 @@ use Illuminate\Support\Facades\Hash;
 readonly class UserService
 {
     public function __construct(
-        private UserMapper            $userMapper,
-        private UserRepository        $userRepository,
+        private UserMapper $userMapper,
+        private UserRepository $userRepository,
         private UserProfileRepository $userProfileRepository
-    ) {}
+    ) {
+    }
 
     public function getCurrent(): CurrentUserDTO
     {
@@ -77,8 +79,10 @@ readonly class UserService
 
         $users = $this->userRepository->searchUsers($pageable, $filters);
 
-        return PageResponseDTO::fromPaginator($users,
-            fn($user) => $this->userMapper->toDTO($user));
+        return PageResponseDTO::fromPaginator(
+            $users,
+            fn($user) => $this->userMapper->toDTO($user)
+        );
     }
 
     public function create(CreateUserDTO $dto): UserDTO
@@ -115,7 +119,7 @@ readonly class UserService
         });
     }
 
-    public function updateUserStatus(UpdateUserStatusDTO $dto): array
+    public function updateUserStatus(UpdateUserStatusDTO $dto): UserStatusDTO
     {
         return DB::transaction(function () use ($dto) {
             $user = $this->userRepository->findByIdWithRolesOrFail($dto->userId);

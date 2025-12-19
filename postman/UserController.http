@@ -21,12 +21,12 @@ Accept: application/json
 }
 
 ### Get user
-GET {{base_url}}/api/admin/users/305
+GET {{base_url}}/api/admin/users/301
 Authorization: Bearer {{admin_token}}
 Accept: application/json
 
 ### Update user status
-PATCH {{base_url}}/api/admin/users/1/status
+PATCH {{base_url}}/api/admin/users/301/status
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 Accept: application/json
@@ -37,7 +37,7 @@ Accept: application/json
 
 
 ### Update user roles 311 for old database, 2 for new one
-PATCH {{base_url}}/api/admin/users/2/roles
+PATCH {{base_url}}/api/admin/users/301/roles
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 Accept: application/json

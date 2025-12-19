@@ -28,11 +28,11 @@ Authorization: Bearer {{admin_token}}
 }
 
 ### Get product (admin)
-GET {{base_url}}/api/admin/products/1
+GET {{base_url}}/api/admin/products/118313
 Authorization: Bearer {{admin_token}}
 
 ### Update product
-PUT {{base_url}}/api/admin/products/244
+PUT {{base_url}}/api/admin/products/118311
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
@@ -41,11 +41,11 @@ Authorization: Bearer {{admin_token}}
 }
 
 ### Delete product
-#DELETE {{base_url}}/api/admin/products/1
-#Authorization: Bearer {{admin_token}}
+DELETE {{base_url}}/api/admin/products/118313
+Authorization: Bearer {{admin_token}}
 
 ### Update categories for product
-PUT {{base_url}}/api/admin/products/1/categories
+PUT {{base_url}}/api/admin/products/118311/categories
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
@@ -63,7 +63,7 @@ Authorization: Bearer {{admin_token}}
 }
 
 ### Adjust inventory
-PATCH {{base_url}}/api/admin/products/1/inventories
+PATCH {{base_url}}/api/admin/products/118312/inventories
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 

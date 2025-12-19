@@ -1,5 +1,5 @@
 @base_url = http://127.0.0.1:8000
-@token = user-305
+@token = user-301
 
 ### Get my profile
 GET {{base_url}}/api/me

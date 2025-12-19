@@ -7,23 +7,33 @@ use App\Domains\Media\DTOs\Upload\Commands\UploadImageDTO;
 use App\Domains\Media\DTOs\Upload\Commands\UploadMultipleImagesDTO;
 use App\Domains\Media\DTOs\Upload\Responses\UploadedImageDTO;
 use App\Exceptions\BusinessException;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary;
 
 class CloudinaryService
 {
+    private Cloudinary $cloudinary;
     private string $defaultFolder;
 
     public function __construct()
     {
+        $disk = config('filesystems.disks.cloudinary');
+
+        $this->cloudinary = new Cloudinary([
+            'cloud' => [
+                'cloud_name' => $disk['cloud'],
+                'api_key' => $disk['key'],
+                'api_secret' => $disk['secret'],
+            ],
+            'url' => ['secure' => $disk['secure'] ?? true],
+        ]);
+
         $this->defaultFolder = config('cloudinary.folder', 'pinkcapy');
     }
 
     public function uploadImage(UploadImageDTO $dto): UploadedImageDTO
     {
-        $folder = $dto->folder ?? $this->defaultFolder;
-
         $options = [
-            'folder' => $folder,
+            'folder' => $dto->folder ?? $this->defaultFolder,
             'resource_type' => 'image',
         ];
 
@@ -31,32 +41,29 @@ class CloudinaryService
             $options['public_id'] = $dto->publicId;
         }
 
-        $result = Cloudinary::upload($dto->file->getRealPath(), $options);
+        $result = $this->cloudinary->uploadApi()->upload(
+            $dto->file->getRealPath(),
+            $options
+        );
 
-        return UploadedImageDTO::fromCloudinaryResponse($result->getResponse());
+        return UploadedImageDTO::fromCloudinaryResponse($result->getArrayCopy());
     }
 
     public function uploadMultipleImages(UploadMultipleImagesDTO $dto): array
     {
-        $uploadedImages = [];
-        $targetFolder = $dto->folder ?? $this->defaultFolder;
+        $folder = $dto->folder ?? $this->defaultFolder;
 
-        foreach ($dto->files as $file) {
-            $imageDto = new UploadImageDTO(
-                file: $file,
-                folder: $targetFolder,
-            );
-            $uploadedImages[] = $this->uploadImage($imageDto);
-        }
-
-        return $uploadedImages;
+        return array_map(
+            fn($file) => $this->uploadImage(new UploadImageDTO($file, $folder)),
+            $dto->files
+        );
     }
 
     public function deleteImage(string $publicId): void
     {
-        $result = Cloudinary::destroy($publicId);
+        $result = $this->cloudinary->uploadApi()->destroy($publicId);
 
-        if ($result->getResponse()['result'] !== 'ok') {
+        if ($result['result'] !== 'ok') {
             throw new BusinessException(ResponseCode::IMAGE_NOT_FOUND);
         }
     }
@@ -64,16 +71,14 @@ class CloudinaryService
     public function deleteMultipleImages(array $publicIds): array
     {
         $results = [];
-
-        foreach ($publicIds as $publicId) {
+        foreach ($publicIds as $id) {
             try {
-                $this->deleteImage($publicId);
-                $results[$publicId] = true;
+                $this->deleteImage($id);
+                $results[$id] = true;
             } catch (BusinessException) {
-                $results[$publicId] = false;
+                $results[$id] = false;
             }
         }
-
         return $results;
     }
 }

@@ -178,9 +178,37 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">
-                                <i class="fa fa-trash me-1"></i> Xóa
+                                <i class="fa fa-trash me-1"></i> Xóa vĩnh viễn
                             </button>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Image Delete Confirmation Modal --}}
+        <div class="modal fade" id="deleteImageModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title text-danger">
+                            <i class="fa fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <div id="deleteImagePreview" class="mb-3">
+                            <img src="" alt="Preview" class="img-thumbnail"
+                                style="max-height: 100px; max-width: 100px; object-fit: cover;">
+                        </div>
+                        <p class="mb-2">Bạn có chắc chắn muốn xóa ảnh này?</p>
+                        <small class="text-muted">Hành động này không thể hoàn tác.</small>
+                    </div>
+                    <div class="modal-footer border-0 justify-content-center">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteImageBtn">
+                            <i class="fa fa-trash me-1"></i> Xóa vĩnh viễn
+                        </button>
                     </div>
                 </div>
             </div>
@@ -290,7 +318,7 @@
             // Upload function using Cloudinary API
             async function uploadImage(file) {
                 const formData = new FormData();
-                formData.append('image', file);
+                formData.append('file', file);
                 formData.append('folder', 'blog');
 
                 const response = await fetch('/api/upload/image', {
@@ -350,11 +378,11 @@
             window.clearThumb = function () {
                 thumbUrl.value = '';
                 thumbPreview.innerHTML = `
-                                    <div class="py-3">
-                                        <i class="fa fa-image fa-2x text-muted mb-2"></i>
-                                        <p class="text-muted small mb-0">Chưa có ảnh</p>
-                                    </div>
-                                `;
+                                                <div class="py-3">
+                                                    <i class="fa fa-image fa-2x text-muted mb-2"></i>
+                                                    <p class="text-muted small mb-0">Chưa có ảnh</p>
+                                                </div>
+                                            `;
             };
 
             thumbUpload.addEventListener('change', async function (e) {
@@ -367,10 +395,10 @@
                     const result = await uploadImage(file);
                     thumbUrl.value = result.url;
                     thumbPreview.innerHTML = `
-                                        <img src="${result.url}" alt="Thumbnail" class="img-fluid" style="max-height: 90px;">
-                                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" 
-                                            onclick="clearThumb()"><i class="fa fa-times"></i></button>
-                                    `;
+                                                    <img src="${result.url}" alt="Thumbnail" class="img-fluid" style="max-height: 90px;">
+                                                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" 
+                                                        onclick="clearThumb()"><i class="fa fa-times"></i></button>
+                                                `;
                     showToast('Upload thumbnail thành công!');
                 } catch (error) {
                     thumbPreview.innerHTML = '<div class="py-3 text-danger"><i class="fa fa-exclamation-circle"></i><p class="small mb-0">Upload thất bại!</p></div>';
@@ -403,38 +431,56 @@
                 return images;
             }
 
+            // Delete image modal state
+            let pendingDeleteCard = null;
+            let pendingDeletePublicId = null;
+            const deleteImageModal = new bootstrap.Modal(document.getElementById('deleteImageModal'));
+            const deleteImagePreview = document.querySelector('#deleteImagePreview img');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteImageBtn');
+
+            // Handle confirm delete button
+            confirmDeleteBtn.addEventListener('click', async () => {
+                if (pendingDeleteCard) {
+                    if (pendingDeletePublicId) {
+                        await deleteImage(pendingDeletePublicId);
+                    }
+                    pendingDeleteCard.remove();
+                    if (imageGallery.children.length === 0) {
+                        imageGallery.innerHTML = '<span class="text-muted small align-self-center">Chưa có ảnh nào</span>';
+                    }
+                    showToast('Đã xóa ảnh!');
+                    deleteImageModal.hide();
+                    pendingDeleteCard = null;
+                    pendingDeletePublicId = null;
+                }
+            });
+
             // Create image card
             function createImageCard(url, publicId = null) {
                 const card = document.createElement('div');
                 card.className = 'position-relative';
                 card.style.cssText = 'width: 100px; height: 100px;';
                 card.innerHTML = `
-                                    <img src="${url}" class="img-thumbnail w-100 h-100" style="object-fit: cover; cursor: pointer;" 
-                                        title="Click để copy Markdown">
-                                    <div class="position-absolute top-0 end-0 d-flex gap-1 m-1">
-                                        <button type="button" class="btn btn-xs btn-danger p-1" style="font-size: 10px; line-height: 1;" 
-                                            title="Xóa ảnh"><i class="fa fa-times"></i></button>
-                                    </div>
-                                    <small class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white text-center" 
-                                        style="font-size: 9px; padding: 2px;">Copy URL</small>
-                                `;
+                        <img src="${url}" class="img-thumbnail w-100 h-100" style="object-fit: cover; cursor: pointer;" 
+                            title="Click để copy Markdown">
+                        <div class="position-absolute top-0 end-0 d-flex gap-1 m-1">
+                            <button type="button" class="btn btn-xs btn-danger p-1" style="font-size: 10px; line-height: 1;" 
+                                title="Xóa ảnh"><i class="fa fa-times"></i></button>
+                        </div>
+                        <small class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white text-center" 
+                            style="font-size: 9px; padding: 2px;">Copy URL</small>
+                    `;
 
                 // Click to copy
                 card.querySelector('img').onclick = () => copyToClipboard(`![image](${url})`);
 
-                // Delete button
-                card.querySelector('.btn-danger').onclick = async (e) => {
+                // Delete button - show modal instead of confirm()
+                card.querySelector('.btn-danger').onclick = (e) => {
                     e.stopPropagation();
-                    if (confirm('Xóa ảnh này?')) {
-                        if (publicId) {
-                            await deleteImage(publicId);
-                        }
-                        card.remove();
-                        if (imageGallery.children.length === 0) {
-                            imageGallery.innerHTML = '<span class="text-muted small align-self-center">Chưa có ảnh nào</span>';
-                        }
-                        showToast('Đã xóa ảnh!');
-                    }
+                    pendingDeleteCard = card;
+                    pendingDeletePublicId = publicId;
+                    deleteImagePreview.src = url;
+                    deleteImageModal.show();
                 };
 
                 return card;
