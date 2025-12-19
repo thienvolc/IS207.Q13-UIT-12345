@@ -15,10 +15,11 @@ readonly class CheckoutService
 {
     public function __construct(
         private ProductAvailabilityService $productAvailabilityService,
-        private CartRepository             $cartRepository,
-        private CartItemRepository         $cartItemRepository,
-        private CheckoutMapper             $checkoutMapper,
-    ) {}
+        private CartRepository $cartRepository,
+        private CartItemRepository $cartItemRepository,
+        private CheckoutMapper $checkoutMapper,
+    ) {
+    }
 
     public function checkout(CheckoutCartDTO $dto): CartCheckoutDTO
     {
@@ -30,8 +31,7 @@ readonly class CheckoutService
 
             $this->productAvailabilityService->lockStockAndValidateAvailability($cart->items);
 
-            // TODO: reserve stock for place order
-
+            // Tạo checkout cart với shipping data
             $checkoutCart = $this->cartRepository->createCheckoutCartForUser($userId, $cartItems);
             $shippingData = $dto->getShippingData();
             $checkoutCart->update($shippingData);

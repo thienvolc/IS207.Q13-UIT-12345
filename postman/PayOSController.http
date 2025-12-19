@@ -1,0 +1,22 @@
+@base_url = http://127.0.0.1:8000
+
+### Test PayOS Webhook (simulated)
+POST {{base_url}}/api/payment/payos/webhook
+Content-Type: application/json
+
+{
+    "orderCode": 1,
+    "amount": 100000,
+    "description": "Thanh toan don hang #1",
+    "status": "PAID",
+    "reference": "TXN123456"
+}
+
+### Test PayOS Return URL
+GET {{base_url}}/api/payment/payos/return
+    ?orderCode=1
+    &status=PAID
+
+### Test PayOS Cancel URL
+GET {{base_url}}/api/payment/payos/cancel
+    ?orderCode=1

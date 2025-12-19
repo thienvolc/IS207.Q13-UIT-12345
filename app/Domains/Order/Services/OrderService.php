@@ -25,6 +25,7 @@ use App\Domains\Order\Entities\Order;
 use App\Domains\Order\Mappers\OrderMapper;
 use App\Domains\Order\Repositories\OrderItemRepository;
 use App\Domains\Order\Repositories\OrderRepository;
+use App\Domains\Payment\Services\PaymentService;
 use App\Exceptions\BusinessException;
 use App\Infra\Utils\Pagination\Pageable;
 use App\Infra\Utils\Pagination\PaginationUtil;
@@ -45,6 +46,7 @@ readonly class OrderService
         private CartItemRepository $cartItemRepository,
         private PricingService $pricingService,
         private OrderMapper $orderMapper,
+        private PaymentService $paymentService,
     ) {
     }
 
@@ -65,24 +67,34 @@ readonly class OrderService
         return OffsetPageResponseDTO::fromPaginator($orders);
     }
 
-    public function placeOrder(PlaceOrderDTO $dto): OrderSummaryDTO
+    public function placeOrder(PlaceOrderDTO $dto, string $ipAddress): OrderSummaryDTO
     {
         $userId = $this->userId();
 
-        return DB::transaction(function () use ($userId, $dto) {
+        return DB::transaction(function () use ($userId, $dto, $ipAddress) {
             $cart = $this->cartRepository->getCheckoutCartByIdAndUserOrFail($dto->cartId, $userId);
             $this->assertCartNotEmpty($cart);
 
             $this->productAvailabilityService->lockStockAndValidateAvailability($cart->items);
 
-            // TODO: validate stock reserve
+            // Xử lý theo payment method
+            $paymentUrl = null;
+            $orderStatus = OrderStatus::PROCESSING; // COD orders go straight to processing
 
-            $order = $this->createOrder($cart, $dto->promo);
+            if ($dto->paymentMethod === 'vnpay') {
+                $orderStatus = OrderStatus::PENDING_PAYMENT;
+            }
+
+            $order = $this->createOrder($cart, $dto->promo, $orderStatus);
             $this->completeCart($cart);
 
-            // TODO: Init payment process here
+            // Chỉ gọi VNPay nếu payment method là vnpay
+            if ($dto->paymentMethod === 'vnpay') {
+                $paymentResult = $this->paymentService->initVNPayPayment($order, $ipAddress);
+                $paymentUrl = $paymentResult->paymentUrl;
+            }
 
-            return $this->orderMapper->toSummaryDTO($order);
+            return $this->orderMapper->toSummaryDTO($order, $paymentUrl);
         });
     }
 
@@ -195,7 +207,7 @@ readonly class OrderService
         }
     }
 
-    private function createOrder(Cart $cart, ?string $promo): Order
+    private function createOrder(Cart $cart, ?string $promo, string $orderStatus = OrderStatus::PENDING_PAYMENT): Order
     {
         $orderPrice = $this->pricingService->calculate($cart, $promo);
         $total = $orderPrice->subtotal + $orderPrice->tax + $orderPrice->shipping;
@@ -220,7 +232,7 @@ readonly class OrderService
             'province' => $cart->province,
             'country' => $cart->country,
             'note' => $cart->note,
-            'status' => OrderStatus::PENDING_PAYMENT,
+            'status' => $orderStatus,
             'orders_at' => now(),
         ]);
 

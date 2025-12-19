@@ -158,84 +158,72 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ===============================
-// BEST SELLERS - TAB NAVIGATION
+// GENERIC PRODUCT CAROUSEL
 // ===============================
 document.addEventListener("DOMContentLoaded", function () {
-    let currentTab = 1;
-    const totalTabs = 2;
+    const carousels = document.querySelectorAll(".product-carousel-section");
 
-    // Change Tab Function
-    function changeTab(direction) {
-        const oldTab = currentTab;
-        currentTab += direction;
+    carousels.forEach((carousel) => {
+        const track = carousel.querySelector(".product-carousel-track");
+        const nextBtn = carousel.querySelector(".js-carousel-next");
+        const prevBtn = carousel.querySelector(".js-carousel-prev");
 
-        // Loop around
-        if (currentTab > totalTabs) currentTab = 1;
-        if (currentTab < 1) currentTab = totalTabs;
+        if (!track || !nextBtn || !prevBtn) return;
 
-        showTab(currentTab, direction);
-    }
+        // Slide 1 item at a time
+        // Item width is 20% (5 items visible)
+        let currentIndex = 0;
+        const totalItems = track.children.length;
+        const itemsPerPage = 5;
+        const maxIndex = totalItems > itemsPerPage ? totalItems - itemsPerPage : 0;
 
-    // Go to specific tab
-    function goToTab(tabNumber) {
-        const direction = tabNumber > currentTab ? 1 : -1;
-        currentTab = tabNumber;
-        showTab(currentTab, direction);
-    }
+        // Ensure buttons state on init
+        updateButtons();
 
-    // Show Tab with animation
-    function showTab(tabNumber, direction = 1) {
-        const tabs = document.querySelectorAll(".product-tab");
-
-        // Add slide-out animation to current tab
-        tabs.forEach((tab, index) => {
-            if (tab.classList.contains("active")) {
-                // Slide out in opposite direction
-                if (direction > 0) {
-                    tab.classList.add("slide-out-left");
-                } else {
-                    tab.classList.add("slide-out-right");
-                }
-
-                // Remove active after animation starts
-                setTimeout(() => {
-                    tab.classList.remove(
-                        "active",
-                        "slide-out-left",
-                        "slide-out-right",
-                    );
-                }, 100);
+        // Next Button Click
+        nextBtn.addEventListener("click", () => {
+            if (currentIndex < maxIndex) {
+                currentIndex++;
+                updateCarousel();
             }
         });
 
-        // Show selected tab with slide-in animation
-        setTimeout(() => {
-            const selectedTab = document.getElementById(
-                `tab-page-${tabNumber}`,
-            );
-            if (selectedTab) {
-                selectedTab.classList.add("active");
+        // Prev Button Click
+        prevBtn.addEventListener("click", () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCarousel();
             }
-        }, 100);
-    }
+        });
 
-    // Event delegation for navigation buttons
-    document.addEventListener("click", function (e) {
-        const target = e.target.closest("[data-tab-action]");
-        if (target) {
-            const action = target.dataset.tabAction;
-            if (action === "next") {
-                changeTab(1);
-            } else if (action === "prev") {
-                changeTab(-1);
-            }
+        function updateCarousel() {
+            // Translate track by currentIndex * 20%
+            track.style.transform = `translateX(-${currentIndex * 20}%)`;
+            updateButtons();
         }
 
-        // Tab dots click handler
-        const dotTarget = e.target.closest("[data-tab-number]");
-        if (dotTarget) {
-            const tabNumber = parseInt(dotTarget.dataset.tabNumber);
-            goToTab(tabNumber);
+        function updateButtons() {
+            // Disable/Hide Prev button if at start
+            if (currentIndex <= 0) {
+                prevBtn.style.opacity = "0"; // Hide completely or fade
+                prevBtn.style.pointerEvents = "none";
+                prevBtn.style.visibility = "hidden";
+            } else {
+                prevBtn.style.opacity = "1";
+                prevBtn.style.pointerEvents = "auto";
+                prevBtn.style.visibility = "visible";
+            }
+
+            // Disable/Hide Next button if at end
+            if (currentIndex >= maxIndex) {
+                nextBtn.style.opacity = "0";
+                nextBtn.style.pointerEvents = "none";
+                nextBtn.style.visibility = "hidden";
+            } else {
+                nextBtn.style.opacity = "1";
+                nextBtn.style.pointerEvents = "auto";
+                nextBtn.style.visibility = "visible";
+            }
         }
     });
 });

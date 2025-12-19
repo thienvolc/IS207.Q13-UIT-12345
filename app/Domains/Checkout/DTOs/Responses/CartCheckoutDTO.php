@@ -8,16 +8,18 @@ use App\Domains\Common\DTOs\BaseDTO;
 readonly class CartCheckoutDTO implements BaseDTO
 {
     public function __construct(
-        public int    $cartId,
-        public int    $itemCount,
+        public int $cartId,
+        public int $itemCount,
         public string $line1,
         public string $line2,
         public string $city,
         public string $province,
         public string $country,
         /** @var CartItemDTO[] */
-        public array  $items
-    ) {}
+        public array $items,
+        public ?string $paymentUrl = null,
+    ) {
+    }
 
     public function toArray(): array
     {
@@ -30,6 +32,7 @@ readonly class CartCheckoutDTO implements BaseDTO
             'province' => $this->province,
             'country' => $this->country,
             'items' => array_map(fn($it) => $it->toArray(), $this->items),
+            'payment_url' => $this->paymentUrl,
         ];
     }
 }

@@ -39,93 +39,91 @@
         @endif
 
         <!-- Filter Bar -->
-        <div class="filter-bar card border-0 shadow-sm">
-            <div class="card-body p-3">
-                <form method="GET" action="{{ route('products.index') }}" id="filter-form">
-                    <!-- Hidden inputs to preserve filters -->
-                    @if(isset($searchQuery) && $searchQuery)
-                    <input type="hidden" name="search" value="{{ $searchQuery }}">
-                    @endif
-                    @if(request('category'))
-                    <input type="hidden" name="category" value="{{ request('category') }}">
-                    @endif
+        <div class="filter-wrapper">
+            <h2 class="filter-label-header">Chọn theo tiêu chí</h2>
 
-                    <div class="d-flex flex-wrap align-items-center gap-3">
-                        <!-- Filter Label -->
-                        <div class="filter-bar__label fw-bold text-muted">
-                            <i class="fa-solid fa-filter me-2"></i>Bộ lọc:
-                        </div>
+            <!-- Row 1: Main Button & Logic Filters -->
+            <div class="filter-chips-list">
+                <!-- Bộ lọc Main Button (Visual only or toggle) -->
+                <button class="btn-filter-main">
+                    <i class="fa-solid fa-filter"></i> Bộ lọc
+                </button>
 
-                        <!-- Price Filter -->
-                        <div class="filter-bar__group d-flex align-items-center gap-2">
-                            <span class="fw-bold text-muted">Giá:</span>
-                            @php
-                            $priceRanges = [
-                            ['', '1000000', 'Dưới 1tr'],
-                            ['1000000', '3000000', '1-3tr'],
-                            ['3000000', '5000000', '3-5tr'],
-                            ['5000000', '', 'Trên 5tr']
-                            ];
-                            @endphp
-                            @foreach($priceRanges as [$min, $max, $label])
-                            @php
-                            $isActive = request('price_min') == $min && request('price_max') == $max;
-                            @endphp
-                            <button type="button" onclick="setPriceFilter('{{ $min }}', '{{ $max }}')"
-                                class="btn btn-outline-secondary btn-sm {{ $isActive ? 'active' : '' }}">
-                                {{ $label }}
-                            </button>
-                            @endforeach
-                            <input type="hidden" id="price_min_input" name="price_min"
-                                value="{{ request('price_min') }}">
-                            <input type="hidden" id="price_max_input" name="price_max"
-                                value="{{ request('price_max') }}">
-                        </div>
-
-                        <!-- Divider -->
-                        <div class="vr d-none d-md-block"></div>
-
-                        <!-- Sort Filter -->
-                        <div class="filter-bar__group d-flex align-items-center gap-2">
-                            <span class="small fw-bold text-muted">Sắp xếp:</span>
-                            <select
-                                class="form-select form-select-sm" name="sort" onchange="this.form.submit()"
-                                style="width: auto; min-width: 150px;">
-                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>
-                                    Mới nhất
-                                </option>
-                                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>
-                                    Giá: Thấp → Cao
-                                </option>
-                                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>
-                                    Giá: Cao → Thấp
-                                </option>
-                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>
-                                    Tên A-Z
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- Product Count -->
-                        <div class="ms-auto text-muted">
-                            <i class="fa-solid fa-box"></i>
-                            <strong>{{ $searchProductsResponse->count }}</strong> sản phẩm
-                        </div>
-
-                        <!-- Clear Filter -->
-                        @if(request()->hasAny(['category', 'price_min', 'price_max', 'sort']))
-                        <div>
-                            <a href="{{ route('products.index') }}"
-                                class="btn btn-link btn-sm text-danger text-decoration-none">
-                                <i class="fa-solid fa-rotate-left me-1"></i>
-                                Xóa bộ lọc
-                            </a>
-                        </div>
-                        @endif
-                    </div>
-                </form>
+                <!-- Dynamic Price Filters (Chips) -->
+                @php
+                    $priceRanges = [
+                        ['', '1000000', 'Dưới 1tr'],
+                        ['1000000', '3000000', '1-3tr'],
+                        ['3000000', '5000000', '3-5tr'],
+                        ['5000000', '', 'Trên 5tr']
+                    ];
+                @endphp
+                
+                @foreach($priceRanges as [$min, $max, $label])
+                    @php
+                        $isActive = request('price_min') == $min && request('price_max') == $max;
+                        $activeClass = $isActive ? 'active' : '';
+                    @endphp
+                    <button type="button" onclick="setPriceFilter('{{ $min }}', '{{ $max }}')"
+                        class="btn-filter-chip no-arrow {{ $activeClass }}">
+                        {{ $label }}
+                    </button>
+                @endforeach
             </div>
+
+            <!-- Row 2: Sort & Other Options (Static placeholders + Real Sort) -->
+            <!-- Row 2: Sort Options (New Design) -->
+            <div class="sort-bar-row">
+                <div class="sort-label">Sắp xếp theo</div>
+                <div class="sort-chips-group">
+                    <!-- Phổ biến (Default/Newest for now) -->
+                    <button type="button" onclick="setSortFilter('newest')"
+                         class="btn-sort-chip {{ request('sort', 'newest') == 'newest' ? 'active' : '' }}">
+                        <i class="fa-regular fa-star"></i> Phổ biến
+                    </button>
+
+                    <!-- Khuyến mãi HOT (Placeholder logic) -->
+                    <button type="button" class="btn-sort-chip">
+                        <i class="fa-solid fa-percent"></i> Khuyến mãi HOT
+                    </button>
+                    
+                    <!-- Price Low-High -->
+                    <button type="button" onclick="setSortFilter('price_asc')"
+                        class="btn-sort-chip {{ request('sort') == 'price_asc' ? 'active' : '' }}">
+                        <i class="fa-solid fa-arrow-down-short-wide"></i> Giá Thấp - Cao
+                    </button>
+
+                    <!-- Price High-Low -->
+                    <button type="button" onclick="setSortFilter('price_desc')"
+                        class="btn-sort-chip {{ request('sort') == 'price_desc' ? 'active' : '' }}">
+                        <i class="fa-solid fa-arrow-down-wide-short"></i> Giá Cao - Thấp
+                    </button>
+                </div>
+            </div>
+            
+
+            
         </div>
+        
+        <!-- Hidden Form for Logic Submission -->
+        <form method="GET" action="{{ route('products.index') }}" id="filter-form" class="d-none">
+             @if(isset($searchQuery) && $searchQuery)
+            <input type="hidden" name="search" value="{{ $searchQuery }}">
+            @endif
+             @if(request('category'))
+            <input type="hidden" name="category" value="{{ request('category') }}">
+            @endif
+            <input type="hidden" id="price_min_input" name="price_min" value="{{ request('price_min') }}">
+            <input type="hidden" id="price_max_input" name="price_max" value="{{ request('price_max') }}">
+            <input type="hidden" id="hiddenSort" name="sort" value="{{ request('sort', 'newest') }}">
+        </form>
+
+        <script>
+            function setSortFilter(value) {
+                document.getElementById('hiddenSort').value = value;
+                document.getElementById('filter-form').submit();
+            }
+        </script>
     </div>
 
     <!-- Products Grid -->

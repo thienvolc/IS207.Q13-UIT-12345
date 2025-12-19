@@ -23,7 +23,9 @@ class TransactionRepository
 
     private function applyFilters($query, TransactionFilter $f): void
     {
-        $query->when($f->userId, fn($q, $v) =>
+        $query->when(
+            $f->userId,
+            fn($q, $v) =>
             $q->whereHas('order', fn($o) => $o->where('user_id', $v))
         );
         $query->when($f->orderId, fn($q, $v) => $q->where('order_id', $v));
@@ -42,4 +44,26 @@ class TransactionRepository
         return Transaction::with(['order', 'order.user'])->find($transactionId)
             ?? throw new BusinessException(ResponseCode::NOT_FOUND);
     }
+
+    public function create(array $data): Transaction
+    {
+        return Transaction::create($data);
+    }
+
+    public function updateByOrderId(int $orderId, array $data): void
+    {
+        Transaction::where('order_id', $orderId)
+            ->latest()
+            ->first()
+                ?->update($data);
+    }
+
+    public function getSuccessfulByOrderId(int $orderId): ?Transaction
+    {
+        return Transaction::where('order_id', $orderId)
+            ->where('status', 3)
+            ->where('type', 1)
+            ->first();
+    }
 }
+

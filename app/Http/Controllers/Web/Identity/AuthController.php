@@ -18,7 +18,8 @@ class AuthController extends AppController
 {
     public function __construct(
         private readonly AuthService $authService
-    ) {}
+    ) {
+    }
 
     /**
      * GET /forgot-password
@@ -227,6 +228,7 @@ class AuthController extends AppController
             'middle_name' => 'nullable|string|max:150',
             'last_name' => 'nullable|string|max:150',
             'phone' => 'nullable|string|max:20',
+            'profile' => 'nullable|string|max:500',
             'avatar' => 'nullable|image|max:2048',
         ]);
 
@@ -241,17 +243,30 @@ class AuthController extends AppController
         $profile->first_name = $request->first_name;
         $profile->middle_name = $request->middle_name;
         $profile->last_name = $request->last_name;
+        $profile->profile = $request->profile; // Lưu bio từ field 'profile' trong form
 
         // Cập nhật phone trong bảng users
         if ($request->phone) {
             $user->phone = $request->phone;
         }
 
-        // Xử lý upload avatar
+        // Xử lý upload avatar qua Cloudinary
         if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar');
-            $path = $avatar->store('avatars', 'public');
-            $profile->avatar = '/storage/' . $path;
+            try {
+                $cloudinaryService = app(\App\Domains\Media\Services\CloudinaryService::class);
+                $uploadDto = new \App\Domains\Media\DTOs\Upload\Commands\UploadImageDTO(
+                    file: $request->file('avatar'),
+                    folder: 'avatars',
+                    publicId: 'user_' . $user->user_id . '_avatar',
+                );
+                $result = $cloudinaryService->uploadImage($uploadDto);
+                $profile->avatar = $result->url;
+            } catch (\Exception $e) {
+                // Fallback to local storage if Cloudinary fails
+                $avatar = $request->file('avatar');
+                $path = $avatar->store('avatars', 'public');
+                $profile->avatar = '/storage/' . $path;
+            }
         }
 
         // Lưu thông tin
@@ -261,7 +276,15 @@ class AuthController extends AppController
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật thông tin thành công!'
+                'message' => 'Cập nhật thông tin thành công!',
+                'data' => [
+                    'first_name' => $profile->first_name,
+                    'middle_name' => $profile->middle_name,
+                    'last_name' => $profile->last_name,
+                    'profile' => $profile->profile,
+                    'avatar' => $profile->avatar,
+                    'phone' => $user->phone,
+                ]
             ]);
         }
 

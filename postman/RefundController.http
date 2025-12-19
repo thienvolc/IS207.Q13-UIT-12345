@@ -1,0 +1,12 @@
+@base_url = http://127.0.0.1:8000
+@admin_token = admin-1
+
+### Refund order (Admin)
+POST {{base_url}}/api/admin/orders/1/refund
+Authorization: Bearer {{admin_token}}
+Accept: application/json
+
+### Refund order 2
+POST {{base_url}}/api/admin/orders/2/refund
+Authorization: Bearer {{admin_token}}
+Accept: application/json

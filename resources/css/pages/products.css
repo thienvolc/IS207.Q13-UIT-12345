@@ -14,231 +14,155 @@
     font-weight: 700;
 }
 
-/* Filter Bar */
-.filter-bar {
-    background: white;
-    border-radius: 0.8rem;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
+/* Filter Container */
+.filter-wrapper {
+    margin-bottom: 2rem;
 }
 
-.filter-bar:hover {
-    border-color: #cbd5e0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.filter-bar .card-body {
-    padding: 1.5rem 2rem;
-}
-
-/* Filter Label */
-.filter-bar__label {
-    font-size: 1.4rem;
-    color: #4a5568;
-    display: flex;
-    align-items: center;
-}
-
-.filter-bar__label i {
-    color: var(--primary);
-}
-
-/* Filter Groups */
-.filter-bar__group {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-
-.filter-bar__group > span {
-    font-size: 1.4rem;
-    color: #4a5568;
-    font-weight: 600;
-}
-
-/* Price Filter Buttons */
-.filter-bar .btn-outline-secondary {
-    border: 1px solid #e2e8f0;
-    color: #4a5568;
-    font-size: 1.3rem;
-    padding: 0.5rem 1.4rem;
-    border-radius: 0.6rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    background: white;
-}
-
-.filter-bar .btn-outline-secondary:hover {
-    background: #f7fafc;
-    border-color: var(--primary);
-    color: var(--primary);
-    transform: translateY(-1px);
-}
-
-.filter-bar .btn-outline-secondary.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(246, 36, 78, 0.3);
-}
-
-/* Sort Select */
-.filter-bar .form-select-sm {
-    border: 1px solid #e2e8f0;
-    padding: 0.5rem 2.5rem 0.5rem 1.2rem;
-    font-size: 1.3rem;
-    border-radius: 0.6rem;
-    color: #4a5568;
-    background: white;
-    transition: all 0.2s ease;
-}
-
-.filter-bar .form-select-sm:hover {
-    border-color: #cbd5e0;
-}
-
-.filter-bar .form-select-sm:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 0.2rem rgba(246, 36, 78, 0.1);
-}
-
-/* Product Count */
-.filter-bar .text-muted {
-    font-size: 1.4rem;
-    color: #718096;
-}
-
-.filter-bar .text-muted i {
-    color: var(--primary);
-    margin-right: 0.5rem;
-}
-
-.filter-bar .text-muted strong {
-    color: #2d3748;
-    font-size: 1.6rem;
+.filter-label-header {
+    font-size: 2rem;
     font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #000;
 }
 
-/* Clear Filter Button */
-.filter-bar .btn-link {
-    font-size: 1.3rem;
-    text-decoration: none;
-    padding: 0.4rem 0.8rem;
+/* Chips Container */
+.filter-chips-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Main Filter Button (Bộ lọc) */
+.btn-filter-main {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid #d70018 !important;
+    border-radius: 8px;
+    background: white;
+    color: #d70018 !important;
+    font-weight: 600;
+    font-size: 1.4rem;
     transition: all 0.2s ease;
+    height: 40px;
+}
+
+.btn-filter-main:hover {
+    background: #fff0f1;
+}
+
+.btn-filter-main i {
+    font-size: 1.6rem;
+}
+
+/* Chip Item (Gray Buttons) */
+.btn-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    background: #f3f4f6; /* Light gray */
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: #444;
+    font-size: 1.4rem;
+    font-weight: 400;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    height: 40px;
+    white-space: nowrap;
+}
+
+.btn-filter-chip:hover {
+    background: #e5e7eb; /* Darker gray on hover */
+    color: #000;
+    border-color: #d1d5db;
+}
+
+.btn-filter-chip.active {
+    border-color: #d70018;
+    color: #d70018;
+    background: #fff0f1;
+}
+
+.btn-filter-chip i {
+    font-size: 1.5rem;
+    color: #666;
+}
+
+/* Dropdown Arrow */
+.btn-filter-chip::after {
+    display: inline-block;
+    margin-left: 0.5rem;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+    opacity: 0.5;
+}
+
+/* Chip without dropdown arrow (Special classes) */
+.btn-filter-chip.no-arrow::after {
+    display: none;
+}
+
+/* ==============================================
+   Sort Bar Chips (Sắp xếp theo)
+   ============================================== */
+.sort-bar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.sort-label {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #000;
+}
+
+.sort-chips-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-sort-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #f3f4f6;
+    border: 1px solid transparent;
+    border-radius: 20px; /* Fully rounded caps */
+    color: #444;
+    font-size: 1.3rem;
     font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.filter-bar .btn-link:hover {
-    text-decoration: underline;
-    transform: translateX(-2px);
+.btn-sort-chip:hover {
+    background: #e5e7eb;
 }
 
-/* Divider */
-.filter-bar .vr {
-    height: 2.5rem;
-    opacity: 0.2;
+.btn-sort-chip.active {
+    background: #eef2ff; /* Light blue bg */
+    border-color: #3b82f6; /* Blue border */
+    color: #3b82f6;
 }
 
-/* Responsive */
-@media (max-width: 991px) {
-    .products-header-wrapper .title-lg {
-        font-size: 2.2rem;
-        margin-bottom: 1.2rem;
-    }
-
-    .filter-bar .card-body {
-        padding: 1.2rem 1.6rem;
-    }
-
-    .filter-bar .d-flex.gap-3 {
-        gap: 1rem !important;
-    }
-
-    .filter-bar__label {
-        font-size: 1.3rem;
-    }
-
-    .filter-bar .btn-outline-secondary {
-        font-size: 1.2rem;
-        padding: 0.4rem 1rem;
-    }
-}
-
-@media (max-width: 767px) {
-    .products-header-wrapper .title-lg {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .filter-bar .card-body {
-        padding: 1rem 1.2rem;
-    }
-
-    /* Stack filters vertically on mobile */
-    .filter-bar .d-flex.gap-3 {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 1rem !important;
-    }
-
-    .filter-bar__label {
-        width: 100%;
-    }
-
-    .filter-bar__group {
-        width: 100%;
-        flex-wrap: wrap;
-    }
-
-    .filter-bar .btn-outline-secondary {
-        flex: 1;
-        min-width: 80px;
-        font-size: 1.2rem;
-        padding: 0.5rem 0.8rem;
-    }
-
-    .filter-bar .form-select-sm {
-        width: 100%;
-        font-size: 1.3rem;
-    }
-
-    .filter-bar .text-muted {
-        width: 100%;
-        font-size: 1.3rem;
-    }
-
-    .filter-bar .btn-link {
-        width: 100%;
-        text-align: left;
-        padding: 0.4rem 0;
-    }
-
-    /* Hide divider on mobile */
-    .filter-bar .vr {
-        display: none;
-    }
-
-    /* Make ms-auto work on mobile */
-    .filter-bar .ms-auto {
-        margin-left: 0 !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .products-header-wrapper .title-lg {
-        font-size: 1.8rem;
-    }
-
-    .filter-bar__label,
-    .filter-bar__group > span {
-        font-size: 1.2rem;
-    }
-
-    .filter-bar .btn-outline-secondary {
-        font-size: 1.1rem;
-        padding: 0.4rem 0.6rem;
-    }
+.btn-sort-chip i {
+    font-size: 1.4rem;
 }
 
 /* ==========================================================================

@@ -6,13 +6,17 @@ use App\Applications\DTOs\Responses\ResponseDTO;
 use App\Domains\Order\DTOs\FormRequest\AdminSearchOrdersRequest;
 use App\Domains\Order\DTOs\FormRequest\UpdateOrderStatusRequest;
 use App\Domains\Order\Services\OrderService;
+use App\Domains\Payment\Services\RefundService;
 use App\Http\Controllers\AppController;
+use Illuminate\Http\Request;
 
 class OrderAdminController extends AppController
 {
     public function __construct(
-        private readonly OrderService $orderService
-    ) {}
+        private readonly OrderService $orderService,
+        private readonly RefundService $refundService,
+    ) {
+    }
 
     /**
      * [GET] /admin/orders
@@ -56,6 +60,15 @@ class OrderAdminController extends AppController
     public function cancel(int $order_Id): ResponseDTO
     {
         $result = $this->orderService->cancelOrderAdmin($order_Id);
+        return $this->success($result);
+    }
+
+    /**
+     * [POST] /admin/orders/{order_id}/refund
+     */
+    public function refund(Request $request, int $order_id): ResponseDTO
+    {
+        $result = $this->refundService->refundOrder($order_id, $request->ip());
         return $this->success($result);
     }
 }

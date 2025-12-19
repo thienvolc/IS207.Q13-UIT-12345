@@ -13,7 +13,8 @@ class UserOrderController extends AppController
 {
     public function __construct(
         private readonly OrderService $orderService
-    ) {}
+    ) {
+    }
 
     /**
      * GET /me/orders
@@ -29,7 +30,7 @@ class UserOrderController extends AppController
      */
     public function place(PlaceOrderRequest $req): ResponseDTO
     {
-        $order = $this->orderService->placeOrder($req->toDTO());
+        $order = $this->orderService->placeOrder($req->toDTO(), $req->ip());
         return $this->created($order);
     }
 

@@ -3,7 +3,7 @@
     --light: #fee1e4;
     --text: #444444;
     --text-2: #288ad6;
-    --text-3: #dd2f2c;
+    --text-3: #d70018;
     --border: #f0f0f0;
     --black: #000;
     --white: #fff;
@@ -15,14 +15,14 @@
 html {
     font-size: 62.5%;
     line-height: 1.6rem;
-    font-family: "Roboto", "Arial", "Helvetica Neue", sans-serif;
+    font-family: "Inter", "Arial", "Helvetica Neue", sans-serif;
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    font-family: "Roboto", "Arial", "Helvetica Neue", sans-serif;
+    font-family: "Inter", "Arial", "Helvetica Neue", sans-serif;
     letter-spacing: 0;
     font-weight: 400;
 }
@@ -67,6 +67,11 @@ body {
 
 .grid__col-9 {
     width: 75%;
+    padding: 0 15px;
+}
+
+.grid__col-12 {
+    width: 100%;
     padding: 0 15px;
 }
 

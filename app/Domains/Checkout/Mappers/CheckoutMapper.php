@@ -10,21 +10,23 @@ readonly class CheckoutMapper
 {
     public function __construct(
         private CartMapper $cartMapper
-    ) {}
+    ) {
+    }
 
-    public function toDTO(Cart $cart): CartCheckoutDTO
+    public function toDTO(Cart $cart, ?string $paymentUrl = null): CartCheckoutDTO
     {
         $items = $this->cartMapper->toItemDTOs($cart->items);
 
         return new CartCheckoutDTO(
             cartId: $cart->cart_id,
             itemCount: $items->count(),
-            line1: $cart->line1,
-            line2: $cart->line2,
-            city: $cart->city,
-            province: $cart->province,
-            country: $cart->country,
-            items: $items->toArray()
+            line1: $cart->line1 ?? '',
+            line2: $cart->line2 ?? '',
+            city: $cart->city ?? '',
+            province: $cart->province ?? '',
+            country: $cart->country ?? '',
+            items: $items->toArray(),
+            paymentUrl: $paymentUrl,
         );
     }
 }

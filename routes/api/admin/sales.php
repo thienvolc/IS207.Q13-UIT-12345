@@ -14,6 +14,7 @@ Route::prefix('admin/orders')->middleware($auth . ':admin')->controller(OrderAdm
     Route::get('{order_id}/status', 'status');
     Route::patch('{order_id}/status', 'updateStatus');
     Route::delete('{order_id}/cancel', 'cancel');
+    Route::post('{order_id}/refund', 'refund');
 });
 
 Route::prefix('admin/transactions')->middleware($auth . ':admin')->controller(TransactionAdminController::class)->group(function () {

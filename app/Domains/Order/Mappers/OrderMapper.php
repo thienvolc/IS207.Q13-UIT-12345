@@ -43,7 +43,7 @@ class OrderMapper
         );
     }
 
-    public function toSummaryDTO(Order $order): OrderSummaryDTO
+    public function toSummaryDTO(Order $order, ?string $paymentUrl = null): OrderSummaryDTO
     {
         return new OrderSummaryDTO(
             orderId: $order->order_id,
@@ -51,6 +51,7 @@ class OrderMapper
             total: (float) ($order->grand_total ?? $order->total),
             status: $order->status,
             createdAt: $order->created_at?->toDateTimeString(),
+            paymentUrl: $paymentUrl,
         );
     }
 

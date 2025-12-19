@@ -11,350 +11,253 @@
 ?>
 
 @extends('layouts.app')
-@section('title','PinkCapy - Home')
+@section('title', 'PinkCapy - Home')
 
 @section('content')
-<!-- Slide Section -->
-<section class="grid hero hero--anim mb-5">
-  <div class="hero__inner">
-    <div class="hero__content">
-      <h1 class="hero__title"></h1>
-      <p class="hero__subtitle"></p>
+  <!-- Slide Section -->
+  <section class="grid hero hero--anim mb-5 home-padding">
+    <div class="hero__inner">
+      <div class="hero__content">
+        <h1 class="hero__title"></h1>
+        <p class="hero__subtitle"></p>
 
-      <div class="hero__meta">
-        <span class="hero__from">TỪ</span>
-        <span class="hero__price">
-          <strong></strong>
-          <sup></sup><span class="hero__price-currency">đ</span>
-        </span>
-      </div>
+        <div class="hero__meta">
+          <span class="hero__from">TỪ</span>
+          <span class="hero__price">
+            <strong></strong>
+            <sup></sup><span class="hero__price-currency">đ</span>
+          </span>
+        </div>
 
-      <a href="/san-pham/" class="btn-cta">Mua ngay</a>
+        <a href="/san-pham/" class="btn-cta">Mua ngay</a>
 
-      <div class="hero__dots" aria-hidden="true">
-        <span class="dot is-active" data-index="0"></span>
-        <span class="dot" data-index="1"></span>
-        <span class="dot" data-index="2"></span>
-      </div>
-    </div>
-
-    <div class="hero__visual">
-      <img src="/img/hero1.png" alt="" class="hero__img">
-    </div>
-  </div>
-</section>
-
-@push('scripts')
-<script src="{{ asset('js/home.js') }}"></script>
-@endpush
-
-<section class="grid">
-  <!-- Banner recommends-->
-  <div class="mb-5">
-    <div class="grid-row">
-      {{-- ============================================ --}}
-      {{-- DATA THẬT - Categories từ Aiven Cloud DB --}}
-      {{-- ============================================ --}}
-      @php
-      // HARDCODE TẠM: Banner images và titles
-      $bannerData = [
-        [
-          'image' => '/img/hero3.png',
-          'title' => 'ÂM THANH',
-          'slug' => 'tai-nghe'
-        ],
-        [
-          'image' => '/img/hero2.png',
-          'title' => 'BÀN PHÍM',
-          'slug' => 'banphim'
-        ],
-        [
-          'image' => '/img/rcm3.jpg',
-          'title' => 'PHỤ KIỆN',
-          'slug' => 'phu-kien'
-        ],
-        [
-          'image' => '/img/hero4.png',
-          'title' => 'ĐỒNG HỒ THÔNG MINH',
-          'slug' => 'dong-ho'
-        ]
-      ];
-      @endphp
-
-      @foreach($bannerData as $banner)
-      <div class="grid__col-3">
-        <a href="{{ route('products.index') }}?category={{ $banner['slug'] }}" class="recommends-item">
-          <div class="recommends-item-wrap">
-            <div class="grid__col-6">
-              <img src="{{ $banner['image'] }}"
-                alt="{{ $banner['title'] }}"
-                class="img-fluid">
-            </div>
-            <div class="grid__col-6">
-              <div class="recommends-item-title">
-                MUA NGAY
-                <strong>DEAL HOT</strong>
-                DÀNH CHO {{ $banner['title'] }}
-              </div>
-              <div class="recommends-item-link-show">Xem chi tiết
-                <span class="recommends-item-icon"><i class="bi bi-arrow-right-circle"></i></span>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-      @endforeach
-    </div>
-  </div>
-  <!-- Deal and tabs -->
-  <div class="mb-5">
-    <div class="grid-row">
-      <!-- Deal -->
-      @php
-      $dealProduct = $newProducts[1];
-      @endphp
-      <div class="grid__col-3 deal">
-        <div class="deal-wrap">
-          <div class="deal-header">
-            <h3 class="deal-header-title">
-              ƯU ĐÃI ĐẶC BIỆT
-            </h3>
-            <div class="deal-header-coupon">
-              <span>Tiết kiệm</span>
-              <div class="deal-header-coupon_price">
-                {{ number_format(($dealProduct->price) / 1000) }}K
-              </div>
-            </div>
-          </div>
-          <div class="deal-img">
-            <a href="{{ route('products.show', $dealProduct->slug) }}">
-              <img src="{{ $dealProduct->thumb ?? '' }}" alt="{{ $dealProduct->title ?? '' }}" class="img-fluid">
-            </a>
-          </div>
-          <h5 class="deal-name-produce">
-            <a href="{{ route('products.show', $dealProduct->slug ?? '') }}">
-              {{ $dealProduct->title ?? '' }}
-            </a>
-          </h5>
-          <div class="deal-price">
-            <span class="deal-price-main">{{ number_format($dealProduct->price ?? 0) }}đ</span>
-          </div>
-          <div class="deal-hang">
-            <div class="deal-soluong">
-              {{-- DATA THẬT: Quantity từ database --}}
-              <span class="">Available: <strong>{{ $dealProduct->quantity ?? 0 }}</strong></span>
-
-              {{-- HARDCODE TẠM: Already Sold (DB chưa có field này) --}}
-              {{-- TODO: Khi có field 'sold' trong products table, thay bằng: {{ $dealProduct->sold'}} --}}
-              <span class="">Already Sold: <strong>{{ rand(20, 100) }}</strong></span>
-            </div>
-          </div>
-          <div class="deal-offer-end">
-            <h6>Ưu đãi kết thúc trong:</h6>
-            <div class="js-countdown d-flex justify-content-center" data-end-date="2025/12/31" data-hours-format="%H" data-minutes-format="%M" data-seconds-format="%S">
-              <div class="countdown-item">
-                <div class="countdown-number">
-                  <span class="js-cd-hours">00</span>
-                </div>
-                <div class="countdown-label">GIỜ</div>
-              </div>
-              <div class="countdown-separator">:</div>
-              <div class="countdown-item">
-                <div class="countdown-number">
-                  <span class="js-cd-minutes">00</span>
-                </div>
-                <div class="countdown-label">PHÚT</div>
-              </div>
-              <div class="countdown-separator">:</div>
-              <div class="countdown-item">
-                <div class="countdown-number">
-                  <span class="js-cd-seconds">00</span>
-                </div>
-                <div class="countdown-label">GIÂY</div>
-              </div>
-            </div>
-          </div>
+        <div class="hero__dots" aria-hidden="true">
+          <span class="dot is-active" data-index="0"></span>
+          <span class="dot" data-index="1"></span>
+          <span class="dot" data-index="2"></span>
         </div>
       </div>
-      <!-- Tabs -->
-      <div class="grid__col-9 tabs-section">
-        <!-- Nav Tabs -->
-        <div class="tabs-nav-wrapper">
-          <ul class="nav nav-pills nav-classic justify-content-center" id="productTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="featured-tab" data-bs-toggle="pill" data-bs-target="#featured" type="button" role="tab" aria-controls="featured" aria-selected="true">
-                SẢN PHẨM MỚI
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="onsale-tab" data-bs-toggle="pill" data-bs-target="#onsale" type="button" role="tab" aria-controls="onsale" aria-selected="false">
-                SẢN PHẨM NỔI BẬT
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="toprated-tab" data-bs-toggle="pill" data-bs-target="#toprated" type="button" role="tab" aria-controls="toprated" aria-selected="false">
-                SẢN PHẨM ĐANG GIẢM GIÁ
-              </button>
-            </li>
-          </ul>
-        </div>
-        <!-- End Nav Tabs -->
 
-        <!-- Tab Content -->
-        <div class="tab-content" id="productTabsContent">
-          <!-- Tab New -->
-          <div class="tab-pane fade show active" id="featured" role="tabpanel" aria-labelledby="featured-tab">
-            <div class="grid-row">
-              @foreach($newProducts as $product)
-              <div class="grid__col-3 product-col" data-product-id="{{ $product->productId ?? '' }}">
-                <x-product-card :product="$product" />
-              </div>
-              @endforeach
-            </div>
-          </div>
-          <!-- End Tab New -->
-
-          <!-- Tab nổi bật -->
-          <div class="tab-pane fade" id="onsale" role="tabpanel" aria-labelledby="onsale-tab">
-            <div class="grid-row">
-              @foreach($featuredProducts as $product)
-              <div class="grid__col-3 product-col" data-product-id="{{ $product->productId ?? '' }}">
-                <x-product-card :product="$product" />
-              </div>
-              @endforeach
-            </div>
-          </div>
-          <!-- End Tab nổi bật -->
-
-          <!-- Tab đang giảm giá -->
-          <div class="tab-pane fade" id="toprated" role="tabpanel" aria-labelledby="toprated-tab">
-            <div class="grid-row">
-              @foreach($saleProducts as $product)
-              <div class="grid__col-3 product-col">
-                <x-product-card :product="$product" />
-              </div>
-              @endforeach
-            </div>
-          </div>
-          <!-- End Tab đang giảm giá -->
-        </div>
-        <!-- End Tab Content -->
+      <div class="hero__visual">
+        <img src="/img/hero1.png" alt="" class="hero__img">
       </div>
     </div>
-  </div>
-  <!-- Product carousel -->
-  <div class="product__carousel-wrap">
-    <div class="product__carousel">
-      <h3>Best Sellers</h3>
-      <ul class="nav nav-pills product__carousel-list">
-        <li class="nav-item">
-          <a href="{{ route('products.index') }}" class="nav-link product__carousel-item-top">Top 10</a>
-        </li>
-        <li class="nav-item">
-          <a href="{{ route('products.index') }}?category=tai-nghe" class="nav-link">Tai nghe</a>
-        </li>
-        <li class="nav-item">
-          <a href="{{ route('products.index') }}?category=phu-kien" class="nav-link">Phụ kiện</a>
-        </li>
-        <li class="nav-item">
-          <a href="{{ route('products.index') }}?category=camera" class="nav-link">Camera</a>
-        </li>
-      </ul>
-    </div>
+  </section>
 
-    <div class="container">
-      <div class="product-carousel-wrapper">
-        <!-- Tab Navigation Buttons -->
-        <button class="scroll-btn scroll-btn-left" data-tab-action="prev">
-          <i class="bi bi-chevron-left"></i>
-        </button>
-        <button class="scroll-btn scroll-btn-right" data-tab-action="next">
-          <i class="bi bi-chevron-right"></i>
-        </button>
+  @push('scripts')
+    <script src="{{ asset('js/home.js') }}"></script>
+  @endpush
 
+  <section class="grid home-padding">
+    <!-- Banner recommends-->
+    <div class="mb-5">
+      <div class="grid-row">
+        {{-- ============================================ --}}
+        {{-- DATA THẬT - Categories từ Aiven Cloud DB --}}
+        {{-- ============================================ --}}
         @php
-        $tab1 = array_slice($bestSellers, 0, 8);
-        $tab2 = array_slice($bestSellers, 8, 16);
+          // HARDCODE TẠM: Banner images và titles
+          $bannerData = [
+            [
+              'image' => '/img/hero3.png',
+              'title' => 'ÂM THANH',
+              'slug' => 'tai-nghe'
+            ],
+            [
+              'image' => '/img/hero2.png',
+              'title' => 'BÀN PHÍM',
+              'slug' => 'banphim'
+            ],
+            [
+              'image' => '/img/rcm3.jpg',
+              'title' => 'PHỤ KIỆN',
+              'slug' => 'phu-kien'
+            ],
+            [
+              'image' => '/img/hero4.png',
+              'title' => 'ĐỒNG HỒ THÔNG MINH',
+              'slug' => 'dong-ho'
+            ]
+          ];
         @endphp
 
-        <div class="grid-row product-tab active" id="tab-page-1">
-          @foreach($tab1 as $product)
-          <div class="grid__col-3 product-col">
-            <div class="product-item product-item-horizontal" data-product-id="{{ $product->productId ?? '' }}">
-              <div class="product-item__image">
-                <a href="{{ route('products.show', $product->slug) }}">
-                  <img src="{{ $product->thumb ?? '' }}" alt="{{ $product->title ?? '' }}" class="img-fluid" loading="lazy">
-                </a>
-              </div>
-              <div class="product-item__content">
-                <h5 class="product-item__title">
-                  <a href="{{ route('products.show', $product->slug) }}">{{ $product->title ?? '' }}</a>
-                </h5>
-                <div class="d-flex align-items-center justify-content-between">
-                  <div class="product-item__price mb-0">
-                    @if($product->discount != 0)
-                    <del class="h5 text-muted mb-0">{{ number_format($product->price) }}đ</del>
-                    @endif
-                    <span class="price">{{ number_format($product->price - $product->discount) }}đ</span>
+        @foreach($bannerData as $banner)
+          <div class="grid__col-3">
+            <a href="{{ route('products.index') }}?category={{ $banner['slug'] }}" class="recommends-item">
+              <div class="recommends-item-wrap">
+                <div class="grid__col-6">
+                  <img src="{{ $banner['image'] }}" alt="{{ $banner['title'] }}" class="img-fluid">
+                </div>
+                <div class="grid__col-6">
+                  <div class="recommends-item-title">
+                    MUA NGAY
+                    <strong>DEAL HOT</strong>
+                    DÀNH CHO {{ $banner['title'] }}
                   </div>
-                  <button class="btn-icon-vertical btn-add-cart ms-3" 
-                          title="Thêm vào giỏ"
-                          data-product-id="{{ $product->productId }}"
-                          onclick="addToCartFromCard(this, {{ $product->productId }})">
-                    <i class="bi bi-cart-plus"></i>
-                  </button>
+                  <div class="recommends-item-link-show">Xem chi tiết
+                    <span class="recommends-item-icon"><i class="bi bi-arrow-right-circle"></i></span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </a>
           </div>
-          @endforeach
-        </div>
-        <!-- End Tab 1 -->
+        @endforeach
+      </div>
+    </div>
+    <!-- Product Tabs Section (Restored) -->
+    <div class="mb-5">
+      <div class="grid-row">
+        <!-- Tabs - Full Width -->
+        <div class="grid__col-12 tabs-section">
+          <!-- Nav Tabs -->
+          <div class="tabs-nav-wrapper">
+            <ul class="nav nav-pills nav-classic justify-content-center" id="productTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="featured-tab" data-bs-toggle="pill" data-bs-target="#featured"
+                  type="button" role="tab" aria-controls="featured" aria-selected="true">
+                  SẢN PHẨM MỚI
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="onsale-tab" data-bs-toggle="pill" data-bs-target="#onsale" type="button"
+                  role="tab" aria-controls="onsale" aria-selected="false">
+                  SẢN PHẨM NỔI BẬT
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="toprated-tab" data-bs-toggle="pill" data-bs-target="#toprated" type="button"
+                  role="tab" aria-controls="toprated" aria-selected="false">
+                  SẢN PHẨM ĐANG GIẢM GIÁ
+                </button>
+              </li>
+            </ul>
+          </div>
+          <!-- End Nav Tabs -->
 
-        <!-- Tab 2 - Products 9-16 -->
-        <div class="grid-row product-tab" id="tab-page-2">
-          @foreach($tab2 as $product)
-          <div class="grid__col-3 product-col">
-            <div class="product-item product-item-horizontal" data-product-id="{{ $product->productId ?? '' }}">
-              <div class="product-item__image">
-                <a href="{{ route('products.show', $product->slug) }}">
-                  <img src="{{ $product->thumb ?? '' }}" alt="{{ $product->title ?? '' }}" class="img-fluid" loading="lazy">
-                </a>
-              </div>
-              <div class="product-item__content">
-                <h5 class="product-item__title">
-                  <a href="{{ route('products.show', $product->slug) }}">{{ $product->title ?? '' }}</a>
-                </h5>
-                <div class="d-flex align-items-center justify-content-between">
-                  <div class="product-item__price mb-0">
-                    @if($product->discount != 0)
-                    <del class="h5 text-muted mb-0">{{ number_format($product->price) }}đ</del>
-                    @endif
-                    <span class="price">{{ number_format($product->price - $product->discount) }}đ</span>
+          <!-- Tab Content -->
+          <div class="tab-content" id="productTabsContent">
+            <!-- Tab New -->
+            <div class="tab-pane fade show active" id="featured" role="tabpanel" aria-labelledby="featured-tab">
+              <div class="grid-row">
+                @foreach($newProducts as $product)
+                  <div class="grid__col-2-4 product-col mb-3" data-product-id="{{ $product->productId ?? '' }}">
+                    <x-product-card :product="$product" />
                   </div>
-                  <button class="btn-icon-vertical btn-add-cart" 
-                          title="Thêm vào giỏ"
-                          data-product-id="{{ $product->productId }}"
-                          onclick="addToCartFromCard(this, {{ $product->productId }})">
-                    <i class="bi bi-cart-plus"></i>
-                  </button>
-                </div>
+                @endforeach
               </div>
             </div>
-          </div>
-          @endforeach
-        </div>
-        <!-- End Tab 2 -->
+            <!-- End Tab New -->
 
-        <!-- Tab Indicators -->
-        <div class="carousel-progress">
-          <div class="tab-indicators">
-            <span class="tab-dot active" data-tab-number="1"></span>
-            <span class="tab-dot" data-tab-number="2"></span>
+            <!-- Tab nổi bật -->
+            <div class="tab-pane fade" id="onsale" role="tabpanel" aria-labelledby="onsale-tab">
+              <div class="grid-row">
+                @foreach($featuredProducts as $product)
+                  <div class="grid__col-2-4 product-col mb-3" data-product-id="{{ $product->productId ?? '' }}">
+                    <x-product-card :product="$product" />
+                  </div>
+                @endforeach
+              </div>
+            </div>
+            <!-- End Tab nổi bật -->
+
+            <!-- Tab đang giảm giá -->
+            <div class="tab-pane fade" id="toprated" role="tabpanel" aria-labelledby="toprated-tab">
+              <div class="grid-row">
+                @foreach($saleProducts as $product)
+                  <div class="grid__col-2-4 product-col mb-3">
+                    <x-product-card :product="$product" />
+                  </div>
+                @endforeach
+              </div>
+            </div>
+            <!-- End Tab đang giảm giá -->
           </div>
+          <!-- End Tab Content -->
         </div>
       </div>
     </div>
-  </div>
-</section>
+
+    <!-- Homepage Sections (Reorganized) -->
+    @php
+      $homeSections = [
+        [
+          'title' => 'TOP 10 BEST SELLER',
+          'products' => $bestSellers,
+          'link' => route('products.index') . '?sort=best_seller'
+        ],
+        [
+          'title' => 'TAI NGHE',
+          'products' => $headphoneProducts,
+          'link' => route('products.index') . '?category=tai-nghe'
+        ],
+        [
+          'title' => 'ĐỒNG HỒ',
+          'products' => $watchProducts,
+          'link' => route('products.index') . '?category=do-choi-cong-nghe'
+        ],
+        [
+          'title' => 'CAMERA',
+          'products' => $cameraProducts,
+          'link' => route('products.index') . '?category=camera'
+        ]
+      ];
+    @endphp
+
+    @foreach($homeSections as $section)
+      @if(count($section['products']) > 0)
+        @php
+          $isBestSeller = $section['title'] === 'TOP 10 BEST SELLER';
+          // Add blue border #6ea3f9 to Best Seller frame (thinner: 1px)
+          $bgStyle = $isBestSeller ? "background-image: url('/img/bg_vertex.jpg'); background-size: cover; border-radius: 20px; padding: 20px; border: 3px solid #6ea3f9;" : "";
+          $titleClass = $isBestSeller ? "section-title-bestseller" : "section-title-glow";
+          $titleColor = $isBestSeller ? "#d70018" : "#d70018"; // Keep consistent red
+        @endphp
+
+        <div class="mb-5" style="{{ $bgStyle }}">
+          <!-- Section Header -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold text-uppercase mb-0 {{ $titleClass }}" style="color: {{ $titleColor }};">
+              {{ $section['title'] }}
+            </h3>
+
+            @if(!$isBestSeller)
+              <a href="{{ $section['link'] }}" class="link-see-all">
+                Xem tất cả <i class="bi bi-chevron-right"></i>
+              </a>
+            @endif
+          </div>
+
+          <!-- Product Carousel -->
+          <div class="product-carousel-section position-relative">
+            <div class="product-carousel-viewport overflow-hidden">
+              <!-- Added 'flex-nowrap' to ensure horizontal layout -->
+              <div class="grid-row flex-nowrap product-carousel-track" style="transition: transform 0.5s ease-in-out;">
+                @foreach($section['products'] as $product)
+                  <div class="grid__col-2-4 product-col mb-3 flex-shrink-0" data-product-id="{{ $product->productId ?? '' }}">
+                    <x-product-card :product="$product" />
+                  </div>
+                @endforeach
+              </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <button class="carousel-btn-custom carousel-btn-prev js-carousel-prev">
+              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="48"
+                  d="M328 112 184 256l144 144"></path>
+              </svg>
+            </button>
+            <button class="carousel-btn-custom carousel-btn-next js-carousel-next">
+              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="48"
+                  d="M184 112l144 144-144 144"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      @endif
+    @endforeach
+  </section>
 @endsection

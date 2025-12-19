@@ -115,6 +115,16 @@
                                 </label>
                             </div>
                             <div class="payment-method">
+                                <input type="radio" name="payment_method" value="vnpay" id="pm-vnpay">
+                                <label for="pm-vnpay">
+                                    <i class="bi bi-credit-card-2-front fs-4 text-primary"></i>
+                                    <div>
+                                        <strong>VNPay</strong>
+                                        <small>Thanh toán qua ví VNPay, ATM, Visa, Mastercard</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="payment-method">
                                 <input type="radio" name="payment_method" value="banking" id="pm-banking">
                                 <label for="pm-banking">
                                     <i class="bi bi-bank fs-4"></i>

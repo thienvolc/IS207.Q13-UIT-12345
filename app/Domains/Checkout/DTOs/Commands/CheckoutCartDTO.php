@@ -5,19 +5,21 @@ namespace App\Domains\Checkout\DTOs\Commands;
 readonly class CheckoutCartDTO
 {
     public function __construct(
-        public array   $items,
-        public string  $firstName,
+        public array $items,
+        public string $firstName,
         public ?string $middleName,
-        public string  $lastName,
-        public string  $phone,
-        public string  $email,
-        public string  $line1,
+        public string $lastName,
+        public string $phone,
+        public string $email,
+        public string $line1,
         public ?string $line2,
-        public string  $city,
-        public string  $province,
-        public string  $country,
+        public string $city,
+        public string $province,
+        public string $country,
         public ?string $note,
-    ) {}
+        public string $paymentMethod = 'cod',
+    ) {
+    }
 
     public function getShippingData(): array
     {

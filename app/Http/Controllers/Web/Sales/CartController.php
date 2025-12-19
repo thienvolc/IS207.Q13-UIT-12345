@@ -6,6 +6,8 @@ use App\Domains\Cart\DTOs\Commands\AddCartItemDTO;
 use App\Domains\Cart\Services\CartService;
 use App\Domains\Checkout\DTOs\Commands\CheckoutCartDTO;
 use App\Domains\Checkout\Services\CheckoutService;
+use App\Domains\Order\DTOs\Commands\PlaceOrderDTO;
+use App\Domains\Order\Services\OrderService;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\AppController;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +19,9 @@ class CartController extends AppController
     public function __construct(
         private readonly CartService $cartService,
         private readonly CheckoutService $checkoutService,
-    ) {}
+        private readonly OrderService $orderService,
+    ) {
+    }
 
     /**
      * GET /cart - Hiển thị trang giỏ hàng
@@ -59,8 +63,8 @@ class CartController extends AppController
 
         try {
             $dto = new AddCartItemDTO(
-                productId: (int)$request->product_id,
-                quantity: (int)$request->quantity,
+                productId: (int) $request->product_id,
+                quantity: (int) $request->quantity,
             );
 
             $item = $this->cartService->addOrIncrementQuantityCartItem($dto);
@@ -93,7 +97,7 @@ class CartController extends AppController
         ]);
 
         try {
-            $item = $this->cartService->updateQuantity($cartItemId, (int)$request->quantity);
+            $item = $this->cartService->updateQuantity($cartItemId, (int) $request->quantity);
 
             return response()->json([
                 'success' => true,
@@ -168,7 +172,7 @@ class CartController extends AppController
         $user = Auth::user();
         $profile = $user->profile;
         $cart = $this->cartService->getOrCreateActiveCart();
-        
+
         // Redirect về giỏ hàng nếu trống
         if (count($cart->items) === 0) {
             return redirect()->route('cart.page')->with('error', 'Giỏ hàng trống. Vui lòng thêm sản phẩm.');
@@ -196,6 +200,7 @@ class CartController extends AppController
             'line1' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'province' => 'required|string|max:100',
+            'payment_method' => 'required|string|in:cod,vnpay,banking',
         ], [
             'items.required' => 'Vui lòng chọn sản phẩm để thanh toán.',
             'first_name.required' => 'Vui lòng nhập họ.',
@@ -205,6 +210,8 @@ class CartController extends AppController
             'line1.required' => 'Vui lòng nhập địa chỉ.',
             'city.required' => 'Vui lòng chọn quận/huyện.',
             'province.required' => 'Vui lòng chọn tỉnh/thành phố.',
+            'payment_method.required' => 'Vui lòng chọn phương thức thanh toán.',
+            'payment_method.in' => 'Phương thức thanh toán không hợp lệ.',
         ]);
 
         try {
@@ -221,9 +228,29 @@ class CartController extends AppController
                 province: $request->province,
                 country: $request->country ?? 'Vietnam',
                 note: $request->note,
+                paymentMethod: $request->payment_method,
             );
 
+            // Bước 1: Tạo checkout cart
             $checkoutCart = $this->checkoutService->checkout($dto);
+
+            // Bước 2: Tạo order từ checkout cart
+            $placeOrderDTO = new PlaceOrderDTO(
+                cartId: $checkoutCart->cartId,
+                promo: null,
+                paymentMethod: $request->payment_method,
+            );
+
+            $orderSummary = $this->orderService->placeOrder($placeOrderDTO, $request->ip());
+
+            // Nếu có payment URL (VNPay), redirect đến cổng thanh toán
+            if (!empty($orderSummary->paymentUrl)) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Đang chuyển đến cổng thanh toán...',
+                    'redirect' => $orderSummary->paymentUrl,
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
