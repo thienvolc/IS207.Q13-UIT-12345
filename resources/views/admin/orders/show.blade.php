@@ -49,6 +49,10 @@
         </p>
       </div>
       <div class="d-flex gap-2">
+        <a href="{{ route('admin.transactions.index', ['order_id' => $orderId]) }}"
+          class="btn btn-outline-success btn-sm">
+          <i class="fa fa-credit-card me-1"></i> Giao dịch
+        </a>
         <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary btn-sm">
           <i class="fa fa-arrow-left me-1"></i> Quay lại
         </a>

@@ -54,8 +54,7 @@ Route::middleware(['auth'])
         Route::get('reports/export/customers', [\App\Http\Controllers\Admin\Report\ReportController::class, 'exportCustomers'])->name('reports.export.customers');
         Route::get('reports/export/transactions', [\App\Http\Controllers\Admin\Report\ReportController::class, 'exportTransactions'])->name('reports.export.transactions');
 
-        Route::get('posts', function () {
-            return view('admin.posts');
-        })->name('posts.index');
+        // Blog Posts Management
+        Route::resource('blogs', \App\Http\Controllers\Admin\Content\BlogController::class);
 
     });

@@ -1,0 +1,50 @@
+@base_url = http://127.0.0.1:8000
+@admin_token = admin-1
+
+### List all blog posts (Admin)
+GET {{base_url}}/api/admin/blogs
+    ?page=1&size=10
+    &q=
+    &status=
+    &sort_field=created_at&sort_order=desc
+Authorization: Bearer {{admin_token}}
+Accept: application/json
+
+### Get blog post by ID
+GET {{base_url}}/api/admin/blogs/1
+Authorization: Bearer {{admin_token}}
+Accept: application/json
+
+### Create blog post
+POST {{base_url}}/api/admin/blogs
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "title": "Hướng dẫn chọn tai nghe gaming",
+  "meta_title": "Hướng dẫn chọn tai nghe gaming 2025",
+  "summary": "Bài viết hướng dẫn cách chọn tai nghe gaming phù hợp",
+  "content": "## Giới thiệu\n\nTai nghe gaming là thiết bị không thể thiếu...\n\n## Các tiêu chí chọn\n\n1. **Chất lượng âm thanh**\n2. **Độ thoải mái**\n3. **Microphone**",
+  "conclusion": "Hy vọng bài viết giúp bạn chọn được tai nghe phù hợp",
+  "status": 1
+}
+
+### Update blog post
+PUT {{base_url}}/api/admin/blogs/1
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "title": "Updated: Hướng dẫn chọn tai nghe gaming",
+  "status": 2,
+  "published_at": "2025-12-18T23:00:00Z"
+}
+
+### Publish blog post
+POST {{base_url}}/api/admin/blogs/1/publish
+Authorization: Bearer {{admin_token}}
+Accept: application/json
+
+### Delete blog post
+#DELETE {{base_url}}/api/admin/blogs/1
+#Authorization: Bearer {{admin_token}}

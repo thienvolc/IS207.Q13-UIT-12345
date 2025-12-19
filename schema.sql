@@ -70,6 +70,7 @@ CREATE TABLE blog_posts
     conclusion VARCHAR(255),
     status     TINYINT UNSIGNED DEFAULT 1 CHECK (status BETWEEN 1 AND 3),
 #     draft,published,archived
+    published_at DATETIME NULL,
     created_at   DATETIME NOT NULL,
     updated_at   DATETIME NOT NULL,
     created_by   INT NULL,
