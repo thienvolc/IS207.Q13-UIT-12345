@@ -83,12 +83,116 @@
     box-shadow: 0 2px 12px rgba(255, 111, 145, 0.15);
     outline: none;
 }
+@media (max-width: 991px) {
+    .product-detail-wrapper {
+        padding: 20px 0;
+    }
+
+    .product-detail-section {
+        padding: 0 15px;
+    }
+}
+
 @media (max-width: 768px) {
     .product-detail-image__main img {
         height: 220px !important;
     }
+
     .product-detail-gallery__item {
         width: 64px !important;
         height: 64px !important;
+    }
+
+    .product-detail-info {
+        padding: 15px;
+    }
+
+    .product-detail-title {
+        font-size: 20px !important;
+    }
+
+    .product-detail-price {
+        font-size: 22px !important;
+    }
+
+    .product-detail-description {
+        font-size: 13px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .product-detail-section {
+        padding: 0 10px;
+    }
+
+    .product-detail-image__main {
+        margin-bottom: 15px;
+    }
+
+    .product-detail-image__main img {
+        height: 200px !important;
+    }
+
+    .product-detail-gallery {
+        gap: 8px;
+    }
+
+    .product-detail-gallery__item {
+        width: 56px !important;
+        height: 56px !important;
+    }
+
+    .product-detail-info {
+        padding: 12px;
+    }
+
+    .product-detail-title {
+        font-size: 18px !important;
+        margin-bottom: 10px;
+    }
+
+    .product-detail-price {
+        font-size: 20px !important;
+    }
+
+    .product-detail-price-old {
+        font-size: 14px !important;
+    }
+
+    .product-detail-description {
+        font-size: 13px !important;
+    }
+
+    .product-detail-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .product-detail-actions .btn {
+        width: 100% !important;
+    }
+
+    /* Specs table responsive */
+    .product-specs-table {
+        font-size: 13px;
+    }
+
+    .product-specs-table th,
+    .product-specs-table td {
+        padding: 10px !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .product-detail-image__main img {
+        height: 180px !important;
+    }
+
+    .product-detail-title {
+        font-size: 16px !important;
+    }
+
+    .product-detail-price {
+        font-size: 18px !important;
     }
 }

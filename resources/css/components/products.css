@@ -606,3 +606,151 @@ button.btn-add-cart:hover,
     border: none;
     color: var(--white);
 }
+/* ================================================
+   RESPONSIVE STYLES
+   ================================================ */
+
+/* Tablet (max-width: 991px) */
+@media (max-width: 991px) {
+    /* Tabs */
+    .nav-classic {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .nav-classic .nav-link {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+
+    /* Product grid - 2 columns on tablet */
+    .product-carousel-wrapper .grid-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px;
+    }
+
+    .grid__col-3 {
+        width: 50% !important;
+    }
+
+    /* Sidebar deals - stack below */
+    .deal {
+        width: 100% !important;
+        order: 2;
+        margin-top: 20px;
+    }
+
+    .tabs-section {
+        width: 100% !important;
+        order: 1;
+    }
+}
+
+/* Mobile (max-width: 575px) */
+@media (max-width: 575px) {
+    /* Tabs */
+    .tabs-nav-wrapper {
+        margin-bottom: 15px;
+    }
+
+    .nav-classic {
+        gap: 5px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .nav-classic::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-classic .nav-link {
+        font-size: 13px;
+        padding: 8px 14px;
+        white-space: nowrap;
+    }
+
+    /* Product grid - 2 columns on mobile */
+    .product-carousel-wrapper .grid-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+
+    .grid__col-3 {
+        width: 50% !important;
+    }
+
+    /* Product cards compact */
+    .product-item {
+        padding: 8px !important;
+    }
+
+    .product-item-image {
+        height: 140px !important;
+    }
+
+    .product-item-name {
+        font-size: 13px !important;
+        -webkit-line-clamp: 2 !important;
+    }
+
+    .product-item-price {
+        font-size: 14px !important;
+    }
+
+    .product-item-price-old {
+        font-size: 11px !important;
+    }
+
+    /* Tabs section */
+    .tabs-section {
+        padding: 0 10px;
+    }
+
+    /* Pagination */
+    .tab-pagination {
+        gap: 8px;
+    }
+
+    .tab-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    .tab-dot.active {
+        width: 18px;
+        height: 6px;
+    }
+}
+
+/* Small Mobile (max-width: 375px) */
+@media (max-width: 375px) {
+    .nav-classic .nav-link {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .product-item-image {
+        height: 120px !important;
+    }
+
+    .product-item-name {
+        font-size: 12px !important;
+    }
+
+    .product-item-price {
+        font-size: 13px !important;
+    }
+}
+
+/* ================================================
+   BEST SELLERS CAROUSEL RESPONSIVE
+   ================================================ */
+
+/* Hide Best Sellers on Tablet & Mobile */
+@media (max-width: 991px) {
+    .product__carousel-wrap {
+        display: none !important;
+    }
+}

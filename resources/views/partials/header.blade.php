@@ -10,7 +10,7 @@
       <button class="mbar__icon" type="button" data-bs-toggle="collapse" data-bs-target="#mSearchCollapse">
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
-      <a href="/account" class="mbar__icon"><i class="fa-regular fa-user"></i></a>
+      <a href="/account/profile" class="mbar__icon"><i class="fa-regular fa-user"></i></a>
       <a href="{{ route('cart.page') }}" class="mbar__icon position-relative">
         <i class="bi bi-handbag-fill"></i>
         <span class="mbar__badge">2</span>

@@ -102,14 +102,97 @@
 /* ============================================ */
 /* OFFCANVAS MENU */
 /* ============================================ */
+
+/* Offcanvas Header */
+.offcanvas-header {
+    background: linear-gradient(135deg, #ff6f91, #ff9671);
+    color: white;
+    padding: 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.offcanvas-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.offcanvas-header .btn-close {
+    background-color: white !important;
+    opacity: 0.9 !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    margin-left: auto !important;
+    margin-right: 8px !important;
+}
+
+.offcanvas-header .btn-close:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Offcanvas Body */
+.offcanvas-body {
+    padding: 20px;
+}
+
+/* User Info Section */
+.off-user-info {
+    background: linear-gradient(135deg, #fff5f7, #fffbfc) !important;
+    border: 2px solid #ff6f91 !important;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+}
+
+.off-user-info img {
+    border: 2px solid #ff6f91;
+}
+
+.off-user-info .fw-bold {
+    color: #333;
+    font-size: 15px;
+}
+
+.off-user-info .text-muted {
+    font-size: 13px;
+}
+
+/* Menu Links */
 .off-link {
     display: block;
-    padding: 8px 6px;
+    padding: 12px 10px;
     color: #333;
     text-decoration: none;
     font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-size: 15px;
 }
 
 .off-link:hover {
-    color: var(--primary, #ff4f67);
+    color: #ff6f91;
+    background: #fff5f7;
+    padding-left: 15px;
+}
+
+.off-link i {
+    width: 20px;
+    color: #ff6f91;
+}
+
+/* Offcanvas Dividers */
+.offcanvas-body hr {
+    margin: 15px 0;
+    border-color: #e9ecef;
+}
+
+.offcanvas-body h6 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 15px 0 10px;
 }

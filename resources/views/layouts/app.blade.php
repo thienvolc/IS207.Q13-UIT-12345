@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title','PinkCapy')</title>
+    <link rel="icon" href="{{ asset('img/logo.svg') }}" type="image/x-icon">
     <!-- CSS chính -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -34,8 +35,12 @@
 
     <!-- Global Variables -->
     <script>
-        window.isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+        window.isAuthenticated = {
+            {
+                auth() - > check() ? 'true' : 'false'
+            }
+        };
     </script>
-    
+
     @stack('scripts')
 </body>

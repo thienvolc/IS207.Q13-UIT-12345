@@ -148,7 +148,7 @@
 /* Clear button */
 .search-clear-btn {
     position: absolute;
-    right: 180px;
+    right: 34%;
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -527,4 +527,36 @@
 
 .header-user-menu .dropdown-item.text-primary:hover {
     background-color: #dbeafe;
+}
+/* ================================================
+   RESPONSIVE STYLES
+   ================================================ */
+
+/* Tablet & Below (max-width: 991px) */
+@media (max-width: 991px) {
+    /* Hide desktop header elements on tablet/mobile */
+    .header-topbar,
+    .header-row,
+    .under-nav {
+        display: none !important;
+    }
+
+    /* Mobile bar will show via d-lg-none class in HTML */
+}
+
+/* Mobile (max-width: 575px) */
+@media (max-width: 575px) {
+    /* Desktop header already hidden by 991px breakpoint */
+    .header-topbar,
+    .header-row,
+    .under-nav {
+        display: none !important;
+    }
+}
+
+/* Small Mobile (max-width: 375px) */
+@media (max-width: 375px) {
+    .mbar__brand-img {
+        max-width: 100px;
+    }
 }
