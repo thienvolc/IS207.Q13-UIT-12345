@@ -1,0 +1,20 @@
+@base_url = http://127.0.0.1:8000
+
+### List published blog posts
+GET {{base_url}}/api/blogs
+    ?offset=0&limit=10
+    &q=
+    &sort_field=published_at&sort_order=desc
+Accept: application/json
+
+### Search blog posts by keyword
+GET {{base_url}}/api/blogs?q=tai+nghe&limit=5
+Accept: application/json
+
+### Get blog post by slug
+GET {{base_url}}/api/blogs/top-tai-nghe-chống-ồn-tốt-nhất-2025
+Accept: application/json
+
+### Get blog post by slug (example 2)
+GET {{base_url}}/api/blogs/huong-dan-chon-tai-nghe-gaming
+Accept: application/json

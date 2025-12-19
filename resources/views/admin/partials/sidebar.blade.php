@@ -57,8 +57,8 @@
     <div class="sidebar-nav-section">
       <div class="sidebar-nav-label">Nội dung</div>
 
-      <a href="{{ route('admin.posts.index') }}"
-        class="nav-link {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}">
+      <a href="{{ route('admin.blogs.index') }}"
+        class="nav-link {{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
         <i class="fa fa-newspaper"></i>
         <span>Bài viết</span>
       </a>
