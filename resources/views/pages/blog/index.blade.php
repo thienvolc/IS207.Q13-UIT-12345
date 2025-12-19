@@ -15,7 +15,7 @@
 <div class="grid">
     <!-- Header Section -->
     <div class="row align-items-center text-center mb-4">
-        <h1 class="blog-title mb-2">TIN TỨC MỚI</h1>
+        <h1 class="blog-title mb-2 fw-bold">TIN TỨC MỚI</h1>
         <p class="text-muted mb-0 fs-5">Khám phá những bài viết mới nhất về công nghệ</p>
     </div>
     <div class="text-md-end mt-3 mb-4">
