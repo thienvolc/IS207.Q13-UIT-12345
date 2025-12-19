@@ -29,7 +29,7 @@
         </span>
       </div>
 
-      <a href="/san-pham/tai-nghe-pinkcapy" class="btn-cta">Mua ngay</a>
+      <a href="/san-pham/" class="btn-cta">Mua ngay</a>
 
       <div class="hero__dots" aria-hidden="true">
         <span class="dot is-active" data-index="0"></span>
@@ -56,30 +56,45 @@
       {{-- DATA THẬT - Categories từ Aiven Cloud DB --}}
       {{-- ============================================ --}}
       @php
-      // HARDCODE TẠM: Banner images (categories chưa có field 'image')
-      // TODO: Thêm field 'banner_image' vào bảng categories
-      $bannerImages = [
-      '/img/rcm1.png',
-      '/img/rcm2.jpg',
-      '/img/rcm3.jpg',
-      '/img/rcm4.png'
+      // HARDCODE TẠM: Banner images và titles
+      $bannerData = [
+        [
+          'image' => '/img/hero3.png',
+          'title' => 'ÂM THANH',
+          'slug' => 'tai-nghe'
+        ],
+        [
+          'image' => '/img/hero2.png',
+          'title' => 'BÀN PHÍM',
+          'slug' => 'banphim'
+        ],
+        [
+          'image' => '/img/rcm3.jpg',
+          'title' => 'PHỤ KIỆN',
+          'slug' => 'phu-kien'
+        ],
+        [
+          'image' => '/img/hero4.png',
+          'title' => 'ĐỒNG HỒ THÔNG MINH',
+          'slug' => 'dong-ho'
+        ]
       ];
       @endphp
 
-      @foreach($bannerCategories as $index => $category)
+      @foreach($bannerData as $banner)
       <div class="grid__col-3">
-        <a href="{{ route('products.index') }}?category={{ $category->slug }}" class="recommends-item">
+        <a href="{{ route('products.index') }}?category={{ $banner['slug'] }}" class="recommends-item">
           <div class="recommends-item-wrap">
             <div class="grid__col-6">
-              <img src="{{ $bannerImages[$index] ?? '/img/default-banner.png' }}"
-                alt="{{ $category->title }}"
+              <img src="{{ $banner['image'] }}"
+                alt="{{ $banner['title'] }}"
                 class="img-fluid">
             </div>
             <div class="grid__col-6">
               <div class="recommends-item-title">
                 MUA NGAY
                 <strong>DEAL HOT</strong>
-                DÀNH CHO {{ strtoupper($category->title) }}
+                DÀNH CHO {{ $banner['title'] }}
               </div>
               <div class="recommends-item-link-show">Xem chi tiết
                 <span class="recommends-item-icon"><i class="bi bi-arrow-right-circle"></i></span>

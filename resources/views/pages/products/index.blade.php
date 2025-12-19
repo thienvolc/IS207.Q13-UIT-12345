@@ -35,7 +35,7 @@
         </h1>
         <p class="text-muted">Tìm thấy {{ $searchProductsResponse->count }} sản phẩm</p>
         @else
-        <h1 class="title-lg fw-bold mb-3">Tất cả sản phẩm</h1>
+        <h1 class="title-lg fw-bold mb-3 text-center">TẤT CẢ SẢN PHẨM</h1>
         @endif
 
         <!-- Filter Bar -->

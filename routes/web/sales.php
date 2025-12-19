@@ -15,6 +15,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->prefix('api/web')->group(function () {
     Route::get('/cart', [CartController::class, 'getCart'])->name('cart.api.get');
     Route::post('/cart/items', [CartController::class, 'addItem'])->name('cart.api.add');
+    Route::put('/cart/items/{id}', [CartController::class, 'updateQuantity'])->name('cart.api.update');
     Route::delete('/cart/items/{id}', [CartController::class, 'removeItem'])->name('cart.api.remove');
     Route::delete('/cart/clear', [CartController::class, 'clearCart'])->name('cart.api.clear');
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.api.checkout');

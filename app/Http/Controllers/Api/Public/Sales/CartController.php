@@ -32,6 +32,16 @@ class CartController extends AppController
     }
 
     /**
+     * [PUT] /me/carts/items/{cart_item_id}
+     */
+    public function updateQuantity(int $cart_item_id): ResponseDTO
+    {
+        $quantity = request()->validate(['quantity' => 'required|integer|min:1|max:9999'])['quantity'];
+        $item = $this->cartService->updateQuantity($cart_item_id, (int)$quantity);
+        return $this->success($item);
+    }
+
+    /**
      * [DELETE] /me/carts/items/{cart_item_id}
      */
     public function removeItem(int $cart_item_id): ResponseDTO

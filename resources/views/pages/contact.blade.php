@@ -15,7 +15,7 @@
 
     <!-- Header Section -->
     <div class="contact-header mb-5">
-        <h1 class="title-lg fw-bold mb-3 text-center">Liên hệ với chúng tôi</h1>
+        <h1 class="title-lg fw-bold mb-3 text-center">LIÊN HỆ VỚI CHÚNG TÔI</h1>
         <p class="text-center text-muted fs-5 mb-0">Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn</p>
     </div>
 

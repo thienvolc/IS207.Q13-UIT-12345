@@ -14,9 +14,9 @@
 
     <!-- Header -->
     <div class="text-center mb-5">
-        <h1 class="title-lg fw-bold">
+        <h1 class="title-lg fw-bold ">
             <i class="fa-solid fa-gift text-danger"></i>
-            Khuyến mãi đặc biệt
+            KHUYẾN MÃI ĐẶC BIỆT
         </h1>
         <p class="text-muted">Săn ngay các deal hot, giảm giá cực sốc!</p>
     </div>

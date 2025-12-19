@@ -84,6 +84,36 @@ class CartController extends AppController
     }
 
     /**
+     * PUT /api/web/cart/items/{id} - Cập nhật số lượng sản phẩm (AJAX)
+     */
+    public function updateQuantity(int $cartItemId, Request $request): JsonResponse
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1|max:9999',
+        ]);
+
+        try {
+            $item = $this->cartService->updateQuantity($cartItemId, (int)$request->quantity);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã cập nhật số lượng sản phẩm.',
+                'data' => $item->toArray(),
+            ]);
+        } catch (BusinessException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể cập nhật số lượng.',
+            ], 500);
+        }
+    }
+
+    /**
      * DELETE /api/web/cart/items/{id} - Xóa sản phẩm khỏi giỏ (AJAX)
      */
     public function removeItem(int $cartItemId): JsonResponse

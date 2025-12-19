@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="cart-page-wrapper mb-5">
-    <div class="container">
+    <div class="grid">
         <!-- Breadcrumb -->
         <div class="mb-4">
             @include('partials.breadcrumb', [
@@ -55,7 +55,7 @@
                                     <img src="{{ $imageUrl }}" alt="{{ $item->productName }}">
                                 </a>
                             </div>
-                            <div class="cart-item-info">
+                            <div class="cart-item-info  ">
                                 <h4 class="cart-item-name">
                                     <a href="{{ route('products.show', $item->productSlug ?? 'product') }}">{{ $item->productName ?? 'Sản phẩm #' . $item->productId }}</a>
                                 </h4>
@@ -183,24 +183,28 @@
         }
         
         try {
-            const response = await fetch('{{ route("cart.api.add") }}', {
-                method: 'POST',
+            const url = '{{ route("cart.api.update", ["id" => ":id"]) }}'.replace(':id', itemId);
+            const response = await fetch(url, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
                 body: JSON.stringify({
-                    product_id: productId,
                     quantity: parseInt(newQty)
                 })
             });
             
             if (response.ok) {
                 location.reload();
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Không thể cập nhật số lượng');
             }
         } catch (error) {
             console.error('Error:', error);
+            alert('Có lỗi xảy ra khi cập nhật số lượng');
         }
     }
     

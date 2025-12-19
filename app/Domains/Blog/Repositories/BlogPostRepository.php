@@ -69,6 +69,21 @@ class BlogPostRepository
             ->firstOr(fn() => throw new BusinessException(ResponseCode::NOT_FOUND));
     }
 
+    public function getByUserId(int $userId)
+    {
+        return BlogPost::query()
+            ->where('created_by', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getAllPosts()
+    {
+        return BlogPost::query()
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
     public function create(array $data): BlogPost
     {
         return BlogPost::create($data);

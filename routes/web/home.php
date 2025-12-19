@@ -8,4 +8,5 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/gioi-thieu', fn() => view('pages.about'))->name('about');
 Route::get('/lien-he', fn() => view('pages.contact'))->name('contact');
 Route::get('/tin-tuc', [BlogPostController::class, 'index'])->name('blog.index');
+Route::get('/tin-tuc/{slug}', [BlogPostController::class, 'show'])->name('blog.show');
 Route::get('/khuyen-mai', fn() => view('pages.super-deal'))->name('super-deal');

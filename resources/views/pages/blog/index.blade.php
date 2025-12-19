@@ -12,98 +12,203 @@
     ])
 </div>
 
-<div class="grid pb-5">
-    <!-- Page Title -->
-    <div class="blog-header text-center mb-5">
-        <h1 class="blog-main-title">Tin tức & Đánh giá</h1>
-        <p class="blog-subtitle">Cập nhật tin tức công nghệ, đánh giá sản phẩm và hướng dẫn sử dụng</p>
+<div class="grid">
+    <!-- Header Section -->
+    <div class="row align-items-center text-center mb-4">
+        <h1 class="blog-title mb-2">TIN TỨC MỚI</h1>
+        <p class="text-muted mb-0 fs-5">Khám phá những bài viết mới nhất về công nghệ</p>
+    </div>
+    <div class="text-md-end mt-3 mb-4">
+        <a href="{{ route('blog.create') }}" class="btn btn-primary btn-create-post">
+            <i class="bi bi-plus-lg"></i> Tạo bài viết
+        </a>
     </div>
 
-    <!-- Featured Post (bài viết mới nhất) -->
+    <!-- Featured Post -->
     @if($posts->count())
     @php $featured = $posts->first(); @endphp
-    <div class="featured-post mb-5">
-        <div class="row g-0">
-            <div class="col-lg-6">
-                <div class="featured-image">
-                    <img src="{{ $featured->thumb ?? 'https://via.placeholder.com/800x500' }}" alt="Featured Post" class="img-fluid">
-                    <span class="badge-featured">Nổi bật</span>
+    <div class="featured-post mb-4">
+        <div class="card border-0 overflow-hidden">
+            <div class="row g-0">
+                <div class="col-md-5">
+                    <img src="{{ $featured->thumb ?? 'https://via.placeholder.com/600x400' }}" 
+                         alt="{{ $featured->title }}" 
+                         class="img-fluid object-fit-cover">
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="featured-content">
-                    <div class="post-meta mb-3">
-                        <span class="post-category">{{ $featured->summary }}</span>
-                        <span class="post-date"><i class="fa-regular fa-clock"></i> {{ $featured->created_at->diffForHumans() }}</span>
+                <div class="col-md-7">
+                    <div class="card-body p-4">
+                        <span class="badge bg-danger mb-2 fs-5" style="padding: 10px">Nổi bật</span>
+                        <h2 class="card-title mb-3 fw-bold">
+                            <a href="{{ route('blog.show', $featured->slug) }}" class="text-dark text-decoration-none">
+                                {{ $featured->title }}
+                            </a>
+                        </h2>
+                        <p class="card-text text-muted mb-3 fs-5">{{ Str::limit($featured->summary, 150) }}</p>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            <span class="me-3">{{ $featured->created_at->format('d/m/Y') }}</span>
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span>Admin</span>
+                        </div>
+                        <a href="{{ route('blog.show', $featured->slug) }}" class="btn btn-outline-primary">
+                            Đọc thêm <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
                     </div>
-                    <h2 class="featured-title">{{ $featured->title }}</h2>
-                    <p class="featured-excerpt">{{ $featured->summary }}</p>
-                    <a href="#" class="btn btn-primary">Đọc tiếp <i class="fa-solid fa-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </div>
     </div>
     @endif
 
-    <!-- Categories Filter -->
-    <div class="blog-filters mb-4">
-        <div class="filter-label">Danh mục:</div>
-        <div class="filter-buttons">
-            <button class="filter-btn active" data-category="all">
-                Tất cả
-            </button>
-            <button class="filter-btn" data-category="review">
-                <i class="fa-solid fa-star"></i> Đánh giá
-            </button>
-            <button class="filter-btn" data-category="news">
-                <i class="fa-regular fa-newspaper"></i> Tin tức
-            </button>
-            <button class="filter-btn" data-category="guide">
-                <i class="fa-solid fa-book"></i> Hướng dẫn
-            </button>
-            <button class="filter-btn" data-category="tech">
-                <i class="fa-solid fa-microchip"></i> Công nghệ
-            </button>
-        </div>
-    </div>
-
     <!-- Blog Posts Grid -->
-    <div class="row g-4 mb-5">
-        @foreach($posts->skip(1) as $post)
+    <div class="row g-3 mb-4">
+        @forelse($posts->skip(1) as $post)
         <div class="col-lg-4 col-md-6">
-            <article class="blog-card">
-                <div class="blog-card-image">
-                    <img src="{{ $post->thumb ?? 'https://via.placeholder.com/400x250' }}" alt="Blog Post" class="img-fluid">
-                    <span class="post-badge">{{ $post->summary }}</span>
-                </div>
-                <div class="blog-card-content">
-                    <div class="post-meta">
-                        <span class="post-date"><i class="fa-regular fa-clock"></i> {{ $post->created_at->diffForHumans() }}</span>
+            <article class="blog-card card">
+                <a href="{{ route('blog.show', $post->slug) }}" class="text-decoration-none">
+                    <img src="{{ $post->thumb ?? 'https://via.placeholder.com/400x250' }}" 
+                         alt="{{ $post->title }}" 
+                         class="card-img-top" 
+                         style="height: 200px;; object-fit: cover;">
+                </a>
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        <span>{{ $post->created_at->format('d/m/Y') }}</span>
                     </div>
-                    <h3 class="post-title">
-                        <a href="#">{{ $post->title }}</a>
+                    <h3 class="card-title h5 mb-2 fw-bold">
+                        <a href="{{ route('blog.show', $post->slug) }}" class="text-primary text-decoration-none post-link">
+                            {{ Str::limit($post->title, 60) }}
+                        </a>
                     </h3>
-                    <p class="post-excerpt">{{ $post->summary }}</p>
-                    <div class="post-footer">
-                        <div class="post-author">
-                            <i class="fa-solid fa-user-circle"></i> Admin
-                        </div>
-                        <a href="#" class="read-more">Đọc tiếp <i class="fa-solid fa-chevron-right"></i></a>
-                    </div>
+                    <p class="card-text mb-3">{{ Str::limit($post->summary, 80) }}</p>
+                    <a href="{{ route('blog.show', $post->slug) }}" class="btn btn-info text-muted">
+                        Xem chi tiết
+                    </a>
                 </div>
             </article>
         </div>
-        @endforeach
+        @empty
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="bi bi-journal-text text-muted" style="font-size: 3rem;"></i>
+                <h4 class="mt-3 text-muted">Chưa có bài viết nào</h4>
+                <p class="text-muted">Hãy là người đầu tiên đăng bài viết!</p>
+            </div>
+        </div>
+        @endforelse
     </div>
-
+    
     <!-- Pagination -->
     @if($posts->hasPages())
-    <nav aria-label="Blog pagination">
-        {{ $posts->links() }}
-    </nav>
-    @endif
-    <div class="mb-3 text-end">
-        <a href="{{ url('/blog/create') }}" class="btn btn-primary">Đăng bài mới</a>
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Blog pagination">
+            {{ $posts->links('pagination::bootstrap-5') }}
+        </nav>
     </div>
+    @endif
 </div>
+
+@push('styles')
+<style>
+    .blog-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-create-post {
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+    }
+
+    .featured-post .card {
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .featured-post .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .featured-post .card-title a:hover {
+        color: #0d6efd !important;
+    }
+
+    .blog-card {
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .blog-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+    }
+
+    .blog-card .card-img-top {
+        border-radius: 10px 10px 0 0;
+        transition: transform 0.3s ease;
+    }
+
+    .blog-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    .blog-card .post-link:hover {
+        color: #0d6efd !important;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    /* Pagination Styling */
+    .pagination {
+        gap: 0.5rem;
+    }
+
+    .pagination .page-link {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        padding: 0.5rem 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+        transform: translateY(-2px);
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        font-weight: 600;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+
+    @media (max-width: 768px) {
+        .blog-title {
+            font-size: 1.5rem;
+        }
+        
+        .featured-post .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .pagination .page-link {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    }
+</style>
+@endpush
 @endsection

@@ -57,7 +57,30 @@ class HomeController extends Controller
 
         $newProducts = array_slice($products, 0, 8);
         $featuredProducts = array_slice($products, 8, 16);
-        $saleProducts = array_slice($products, 16, 24);
+        
+        // Lấy sản phẩm đang giảm giá (discount > 0)
+        $allProducts = $this->readService->searchPublic(new PublicSearchProductsDTO(
+            query: null,
+            categoryIdOrSlug: null,
+            tagId: null,
+            priceMin: null,
+            priceMax: null,
+            offset: 1,
+            limit: 100,
+            sortField: "created_at",
+            sortOrder: "desc"
+        ))->data;
+        
+        $saleProducts = array_filter($allProducts, function($product) {
+            return isset($product->discount) && $product->discount > 0;
+        });
+        $saleProducts = array_values(array_slice($saleProducts, 0, 8));
+        
+        // Nếu không có sản phẩm giảm giá, lấy sản phẩm thường
+        if (empty($saleProducts)) {
+            $saleProducts = array_slice($products, 16, 8);
+        }
+        
         $bestSellers = array_slice($products, 24, 40);
 
         return view('pages.home', compact(

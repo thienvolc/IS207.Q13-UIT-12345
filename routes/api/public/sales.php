@@ -11,6 +11,7 @@ $auth = AuthMiddleware::class;
 Route::prefix('me/carts')->middleware($auth)->controller(CartController::class)->group(function () {
     Route::get('/', 'index');
     Route::post('items', 'addItem');
+    Route::put('items/{cart_item_id}', 'updateQuantity');
     Route::delete('items/{cart_item_id}', 'removeItem');
     Route::delete('clear', 'clearCart');
 });

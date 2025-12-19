@@ -28,6 +28,10 @@
                             <i class="bi bi-box-seam"></i>
                             <span>Đơn hàng của tôi</span>
                         </a>
+                        <a href="{{ route('account.my-posts') }}" class="profile-nav-item">
+                            <i class="bi bi-journal-text"></i>
+                            <span>Bài viết của tôi</span>
+                        </a>
                         <a href="{{ route('account.password') }}" class="profile-nav-item">
                             <i class="bi bi-shield-lock"></i>
                             <span>Đổi mật khẩu</span>
@@ -182,9 +186,6 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-check-circle"></i> Lưu thay đổi
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" id="resetBtn">
-                                    <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
-                                </button>
                             </div>
                         </form>
                     </div>
@@ -201,7 +202,6 @@
         const avatarInput = document.getElementById('avatar');
         const avatarPreview = document.getElementById('avatarPreview');
         const avatarIcon = document.getElementById('avatarIcon');
-        const resetBtn = document.getElementById('resetBtn');
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
         // Store original data for reset functionality
@@ -316,30 +316,6 @@
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
             }
-        });
-
-        // Reset form
-        resetBtn.addEventListener('click', function() {
-            document.getElementById('first_name').value = originalData.first_name;
-            document.getElementById('middle_name').value = originalData.middle_name;
-            document.getElementById('last_name').value = originalData.last_name;
-            document.getElementById('phone').value = originalData.phone;
-            document.getElementById('profile').value = originalData.profile;
-
-            if (originalData.avatar) {
-                avatarPreview.src = originalData.avatar;
-                avatarPreview.style.display = 'block';
-                if (avatarIcon) {
-                    avatarIcon.style.display = 'none';
-                }
-            } else {
-                avatarPreview.style.display = 'none';
-                if (avatarIcon) {
-                    avatarIcon.style.display = 'block';
-                }
-            }
-
-            avatarInput.value = '';
         });
 
         // Helper function to show alerts

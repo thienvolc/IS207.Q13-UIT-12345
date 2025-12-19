@@ -74,6 +74,26 @@ readonly class CartService
         });
     }
 
+    public function updateQuantity(int $cartItemId, int $quantity): CartItemDTO
+    {
+        $userId = $this->userId();
+
+        return DB::transaction(function () use ($userId, $cartItemId, $quantity) {
+            $cartItem = $this->cartItemRepository->getByIdAndUserOrFail($cartItemId, $userId);
+            $product = $this->productRepository->getActiveByIdOrFail($cartItem->product_id);
+
+            $this->productAvailabilityService->assertStockAvailable($product, $quantity);
+
+            $cartItem->update([
+                'quantity'  => $quantity,
+                'price'     => $product->price,
+                'discount'  => $product->discount ?? 0,
+            ]);
+
+            return $this->cartMapper->toItemDTO($cartItem);
+        });
+    }
+
     private function createOrIncrementQuantityCartItem(Cart $cart, Product $product, AddCartItemDTO $dto): CartItem
     {
         $existingItem = $this->cartItemRepository->findOneByCartIdAndProductId($cart->cart_id, $dto->productId);

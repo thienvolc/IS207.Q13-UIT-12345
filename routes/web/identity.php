@@ -25,4 +25,5 @@ Route::middleware('auth')->prefix('account')->group(function () {
     Route::get('/password', fn() => view('pages.account.password'))->name('account.password');
     Route::post('/password', [AuthController::class, 'updatePassword'])->name('account.password.update');
     Route::get('/orders', [\App\Http\Controllers\Web\Identity\OrderController::class, 'index'])->name('account.orders');
+    Route::get('/my-posts', fn() => view('pages.account.my-posts'))->name('account.my-posts');
 });

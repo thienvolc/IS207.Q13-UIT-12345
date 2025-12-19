@@ -11,9 +11,8 @@
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
       <a href="/account/profile" class="mbar__icon"><i class="fa-regular fa-user"></i></a>
-      <a href="{{ route('cart.page') }}" class="mbar__icon position-relative">
+      <a href="/cart" class="mbar__icon position-relative">
         <i class="bi bi-handbag-fill"></i>
-        <span class="mbar__badge">2</span>
       </a>
     </div>
   </nav>
@@ -82,7 +81,8 @@
         </a>
         <ul class="dropdown-menu header-user-menu" aria-labelledby="userDropdown">
           <li><a class="dropdown-item" href="{{ route('account.profile') }}"><i class="bi bi-person me-2"></i>Tài khoản của tôi</a></li>
-          <li><a class="dropdown-item" href="{{ route('cart.page') }}"><i class="bi bi-box-seam me-2"></i>Đơn mua</a></li>
+          <li><a class="dropdown-item" href="/account/orders"><i class="bi bi-box-seam me-2"></i>Đơn mua</a></li>
+          <li><a class="dropdown-item" href="{{ route('account.my-posts') }}"><i class="bi bi-journal-text me-2"></i>Bài viết của tôi</a></li>
           @if(Auth::user()->is_admin)
           <li>
             <hr class="dropdown-divider">

@@ -110,9 +110,13 @@
 .cart-item-name {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
     margin: 0 0 8px 0;
     line-height: 1.4;
+}
+
+.cart-item-name a {
+    text-decoration: none;
+    color: #333;
 }
 
 .cart-item-variant {
@@ -218,19 +222,13 @@
 }
 
 .btn-icon {
-    width: 36px;
-    height: 36px;
+    font-size: 15px;
     border: none;
     background: transparent;
-    color: #999;
+    color: #ff0000;
     cursor: pointer;
     transition: all 0.3s;
     border-radius: 6px;
-}
-
-.btn-icon:hover {
-    background: #fff5f5;
-    color: #ff6f91;
 }
 
 /* Cart Actions */
@@ -256,24 +254,22 @@
 }
 
 .cart-select-all label {
+    font-size: 12px;
     font-weight: 500;
-    color: #333;
     cursor: pointer;
-    margin: 0;
+    margin: auto;
 }
 
 .btn-text {
+    font-size: 12px;
     background: none;
     border: none;
-    color: #666;
+    color: #ff0000;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s;
 }
 
-.btn-text:hover {
-    color: #ff6f91;
-}
 
 /* Cart Summary Card */
 .cart-summary-card {

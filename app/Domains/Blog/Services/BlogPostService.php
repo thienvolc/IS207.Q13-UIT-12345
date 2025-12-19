@@ -114,6 +114,18 @@ readonly class BlogPostService
         });
     }
 
+    public function getPostsByCurrentUser(): array
+    {
+        $userId = $this->userId();
+        
+        // Lấy bài viết của user hiện tại
+        $posts = $this->repository->getByUserId($userId);
+        
+        return $posts->map(
+            fn($post) => $this->mapper->toAdminDTO($post)
+        )->toArray();
+    }
+
     private function prepareCreateData(CreateBlogPostDTO $dto): array
     {
         $userId = $this->userId();

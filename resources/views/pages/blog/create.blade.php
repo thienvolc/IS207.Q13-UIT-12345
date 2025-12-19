@@ -8,18 +8,40 @@
     <div class="card shadow-lg w-100" style="max-width:600px;">
         <div class="card-body p-4">
             <h1 class="mb-4 text-center text-primary fw-bold">Đăng bài viết mới</h1>
-            <form id="blog-create-form" enctype="multipart/form-data">
+            
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fa-solid fa-check-circle me-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            <form action="{{ route('blog.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
                 <div class="mb-3">
                     <label for="title" class="form-label fw-semibold">Tiêu đề bài viết</label>
-                    <input type="text" class="form-control rounded-3" id="title" name="title" required placeholder="Nhập tiêu đề...">
+                    <input type="text" class="form-control rounded-3" id="title" name="title" required placeholder="Nhập tiêu đề..." value="{{ old('title') }}">
                 </div>
                 <div class="mb-3">
                     <label for="summary" class="form-label fw-semibold">Tóm tắt</label>
-                    <textarea class="form-control rounded-3" id="summary" name="summary" rows="2" placeholder="Tóm tắt ngắn gọn..."></textarea>
+                    <textarea class="form-control rounded-3" id="summary" name="summary" rows="2" placeholder="Tóm tắt ngắn gọn...">{{ old('summary') }}</textarea>
                 </div>
                 <div class="mb-3">
                     <label for="content" class="form-label fw-semibold">Nội dung</label>
-                    <textarea class="form-control rounded-3" id="content" name="content" rows="8" required placeholder="Nội dung bài viết..."></textarea>
+                    <textarea class="form-control rounded-3" id="content" name="content" rows="8" required placeholder="Nội dung bài viết...">{{ old('content') }}</textarea>
                 </div>
                 <div class="mb-3">
                     <label for="thumb" class="form-label fw-semibold">Ảnh đại diện</label>
@@ -31,22 +53,12 @@
                     </button>
                 </div>
             </form>
-            <div id="blog-create-result" class="mt-4"></div>
         </div>
     </div>
 </div>
 @endsection
 
-@push('scripts')
-<script>
-    document.getElementById('blog-create-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        // TODO: Gọi API backend khi có
-        document.getElementById('blog-create-result').innerHTML = '<div class="alert alert-info">Tính năng gửi bài sẽ hoạt động khi backend có API!</div>';
-    });
-</script>
+@push('styles')
 <style>
     .card {
         border-radius: 18px;
