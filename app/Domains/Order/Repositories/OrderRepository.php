@@ -12,6 +12,42 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class OrderRepository
 {
+    public function createFromCheckoutCart(\App\Domains\Cart\Entities\Cart $cart, string $paymentMethod, ?string $note): Order
+    {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($cart, $paymentMethod, $note) {
+            $order = Order::create([
+                'user_id' => $cart->user_id,
+                'status' => \App\Domains\Order\Constants\OrderStatus::PENDING_PAYMENT,
+                'sub_total' => $cart->sub_total,
+                'grand_total' => $cart->grand_total,
+                'first_name' => $cart->first_name,
+                'last_name' => $cart->last_name,
+                'phone' => $cart->phone,
+                'email' => $cart->email,
+                'line1' => $cart->line1,
+                'line2' => $cart->line2 ?? null,
+                'city' => $cart->city,
+                'province' => $cart->province,
+                'country' => $cart->country,
+                'note' => $note,
+                'payment_method' => $paymentMethod,
+                'orders_at' => now(),
+            ]);
+
+            foreach ($cart->items as $item) {
+                $order->items()->create([
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product->name ?? 'Product', // Fallback or strict? Assuming items loaded
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'total' => $item->total,
+                ]);
+            }
+
+            return $order;
+        });
+    }
+
     public function create(array $data): Order
     {
         return Order::create($data);

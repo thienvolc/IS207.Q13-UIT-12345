@@ -9,6 +9,7 @@ use App\Domains\Checkout\Services\CheckoutService;
 use App\Domains\Order\DTOs\Commands\PlaceOrderDTO;
 use App\Domains\Order\Services\OrderService;
 use App\Exceptions\BusinessException;
+use App\Domains\Payment\Services\PaymentService;
 use App\Http\Controllers\AppController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class CartController extends AppController
         private readonly CartService $cartService,
         private readonly CheckoutService $checkoutService,
         private readonly OrderService $orderService,
+        private readonly PaymentService $paymentService,
     ) {
     }
 
@@ -277,6 +279,50 @@ class CartController extends AppController
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * GET /checkout/result - Xử lý kết quả thanh toán (VNPay...)
+     */
+    public function paymentResult(Request $request)
+    {
+        $params = $request->all();
+
+        // 1. Kiểm tra VNPay Logic
+        if ($request->has('vnp_TxnRef')) {
+            try {
+                $success = $this->paymentService->processVNPayReturn($params);
+
+                if ($success) {
+                    return redirect()->route('order.success')->with('success', 'Thanh toán VNPay thành công!');
+                } else {
+                    return redirect()->route('checkout.page')->with('error', 'Thanh toán VNPay thất bại hoặc bị hủy.');
+                }
+            } catch (\Exception $e) {
+                return redirect()->route('checkout.page')->with('error', 'Lỗi xác thực thanh toán: ' . $e->getMessage());
+            }
+        }
+
+        // 2. Kiểm tra PayOS Logic
+        if (($request->has('orderCode') || $request->has('order_id')) && $request->has('status')) {
+            $success = $this->paymentService->processPayOSReturn($params);
+
+            if ($success) {
+                return redirect()->route('order.success')->with('success', 'Thanh toán PayOS thành công!');
+            } else {
+                return redirect()->route('checkout.page')->with('error', 'Thanh toán PayOS thất bại hoặc bị hủy.');
+            }
+        }
+
+        return redirect()->route('home');
+    }
+
+    /**
+     * GET /checkout/cancel - Xử lý hủy thanh toán (PayOS...)
+     */
+    public function paymentCancel(Request $request)
+    {
+        return redirect()->route('checkout.page')->with('error', 'Bạn đã hủy thanh toán.');
     }
 
     /**

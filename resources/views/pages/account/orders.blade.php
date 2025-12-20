@@ -85,12 +85,20 @@
                                                 </div>
                                                 <div class="order-items">
                                                     @foreach($order->items->take(2) as $item)
+                                                        @php
+                                                            $thumb = $item->product?->thumb;
+                                                            if ($thumb && !str_starts_with($thumb, 'http')) {
+                                                                $thumb = 'https://broad-snowflake-e396.ttt2042005.workers.dev/proxy?img=' . $thumb;
+                                                            }
+                                                        @endphp
                                                         <div class="d-flex align-items-center mb-2">
-                                                            <img src="{{ $item->product?->thumb ?? '/img/default-product.png' }}" alt=""
+                                                            <img src="{{ $thumb ?? '/img/default-product.png' }}" alt=""
                                                                 class="me-2 rounded"
                                                                 style="width: 50px; height: 50px; object-fit: cover;">
                                                             <div class="flex-grow-1">
-                                                                <div class="fw-medium">{{ $item->product?->title ?? 'Sản phẩm' }}</div>
+                                                                <div class="fw-medium"
+                                                                    style="line-height: 1.6; padding-top: 10px; padding-bottom: 2px;">
+                                                                    {{ $item->product?->title ?? 'Sản phẩm' }}</div>
                                                                 <small class="text-muted">x{{ $item->quantity }}</small>
                                                             </div>
                                                             <div class="text-primary fw-bold">
@@ -110,9 +118,15 @@
                                                             class="text-danger fw-bold ms-2">{{ number_format($order->grand_total, 0, ',', '.') }}đ</span>
                                                     </div>
                                                     <div>
-                                                        <a href="/account/orders/{{ $order->order_id }}"
+                                                        <a href="{{ route('account.orders.show', $order->order_id) }}"
                                                             class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-                                                        @if($order->status === 0)
+
+                                                        @if($order->status == 1)
+                                                            @if(($order->payment_method ?? '') !== 'cod')
+                                                                <a href="{{ route('account.orders.repay', $order->order_id) }}"
+                                                                    class="btn btn-primary btn-sm ms-2">Thanh toán lại</a>
+                                                            @endif
+
                                                             <form action="/account/orders/{{ $order->order_id }}/cancel" method="POST"
                                                                 class="d-inline">
                                                                 @csrf

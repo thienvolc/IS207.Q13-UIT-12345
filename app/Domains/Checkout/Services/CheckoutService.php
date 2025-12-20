@@ -31,7 +31,8 @@ readonly class CheckoutService
 
             $this->productAvailabilityService->lockStockAndValidateAvailability($cart->items);
 
-            // Tạo checkout cart với shipping data
+            // Re-create checkout cart structure locally if needed, or pass data.
+            // Actually, we must persist Checkout Cart first?
             $checkoutCart = $this->cartRepository->createCheckoutCartForUser($userId, $cartItems);
             $shippingData = $dto->getShippingData();
             $checkoutCart->update($shippingData);

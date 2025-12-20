@@ -90,17 +90,32 @@ class OrderMapper
         );
     }
 
+    private const THUMBNAIL_PREFIX = "https://broad-snowflake-e396.ttt2042005.workers.dev/proxy?img=";
+
     private function toProductDTO(object $product): ProductDTO
     {
         return new ProductDTO(
             productId: $product->product_id,
             title: $product->title,
             slug: $product->slug,
-            thumb: $product->thumb,
+            thumb: $this->padThumbnailPrefix($product->thumb),
             price: (float) $product->price,
             discount: (float) $product->discount,
             quantity: $product->quantity,
             status: $product->status,
         );
+    }
+
+    private function padThumbnailPrefix(?string $thumb): ?string
+    {
+        if ($thumb === null) {
+            return null;
+        }
+
+        if (str_starts_with($thumb, 'http://') || str_starts_with($thumb, 'https://')) {
+            return $thumb;
+        }
+
+        return self::THUMBNAIL_PREFIX . $thumb;
     }
 }

@@ -14,13 +14,12 @@
 
     // Status badges similar to index
     $statusLabels = [
-        'paid' => ['label' => 'Thành công', 'class' => 'success-subtle text-success'],
-        'completed' => ['label' => 'Thành công', 'class' => 'success-subtle text-success'],
-        '1' => ['label' => 'Thành công', 'class' => 'success-subtle text-success'],
-        'pending' => ['label' => 'Đang xử lý', 'class' => 'warning-subtle text-warning'],
-        '2' => ['label' => 'Đang xử lý', 'class' => 'warning-subtle text-warning'],
-        'failed' => ['label' => 'Thất bại', 'class' => 'danger-subtle text-danger'],
-        '0' => ['label' => 'Thất bại', 'class' => 'danger-subtle text-danger'],
+        '1' => ['label' => 'Khởi tạo', 'class' => 'info-subtle text-info'], // INITIATED
+        '2' => ['label' => 'Đang chờ', 'class' => 'warning-subtle text-warning'], // PENDING
+        '3' => ['label' => 'Thành công', 'class' => 'success-subtle text-success'], // SUCCESS
+        '4' => ['label' => 'Thất bại', 'class' => 'danger-subtle text-danger'], // FAILED
+        '5' => ['label' => 'Đã hủy', 'class' => 'secondary-subtle text-secondary'], // CANCELLED
+        '6' => ['label' => 'Hết hạn', 'class' => 'dark-subtle text-dark'], // EXPIRED
     ];
 
     $statusInfo = $statusLabels[(string) $status] ?? ['label' => 'Không xác định', 'class' => 'secondary-subtle text-secondary'];

@@ -12,7 +12,7 @@ class VNPayParamsBuilder
     {
         $vnCalendar = Carbon::now('Asia/Ho_Chi_Minh');
         $createDate = $vnCalendar->format('YmdHis');
-        $expireDate = $vnCalendar->addMinutes(config('vnpay.payment_timeout'))->format('YmdHis');
+        $expireDate = $vnCalendar->addMinutes((int) config('vnpay.payment_timeout'))->format('YmdHis');
 
         $amount = bcmul($dto->amount, '100', 0);
 
@@ -22,7 +22,7 @@ class VNPayParamsBuilder
             VNPayParams::TMN_CODE => config('vnpay.tmn_code'),
             VNPayParams::AMOUNT => $amount,
             VNPayParams::CURRENCY_CODE => config('vnpay.currency'),
-            VNPayParams::TXN_REF => (string) $dto->orderId,
+            VNPayParams::TXN_REF => $dto->txnRef ?? (string) $dto->orderId,
             VNPayParams::RETURN_URL => config('vnpay.return_url'),
             VNPayParams::ORDER_TYPE => config('vnpay.order_type'),
             VNPayParams::ORDER_INFO => $dto->orderInfo,

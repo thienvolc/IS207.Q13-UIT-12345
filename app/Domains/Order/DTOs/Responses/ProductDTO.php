@@ -24,6 +24,7 @@ readonly class ProductDTO implements BaseDTO
             'title' => $this->title,
             'slug' => $this->slug,
             'thumb' => $this->thumb,
+            'sku' => $this->sku,
             'price' => $this->price,
             'discount' => $this->discount,
             'quantity' => $this->quantity,

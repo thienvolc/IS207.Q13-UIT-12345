@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.page');
     Route::get('/checkout', [CartController::class, 'showCheckout'])->name('checkout.page');
+    Route::get('/checkout/result', [CartController::class, 'paymentResult'])->name('checkout.result');
+    Route::get('/checkout/cancel', [CartController::class, 'paymentCancel'])->name('checkout.cancel');
     Route::get('/order/success', [CartController::class, 'orderSuccess'])->name('order.success');
 });
 

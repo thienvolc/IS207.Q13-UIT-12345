@@ -40,9 +40,12 @@
                         <label class="form-label small text-muted">Trạng thái</label>
                         <select name="status" class="form-select">
                             <option value="">Tất cả</option>
-                            <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Thành công</option>
-                            <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Thất bại</option>
-                            <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Đang xử lý</option>
+                            <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Khởi tạo</option>
+                            <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Đang chờ</option>
+                            <option value="3" {{ request('status') == '3' ? 'selected' : '' }}>Thành công</option>
+                            <option value="4" {{ request('status') == '4' ? 'selected' : '' }}>Thất bại</option>
+                            <option value="5" {{ request('status') == '5' ? 'selected' : '' }}>Đã hủy</option>
+                            <option value="6" {{ request('status') == '6' ? 'selected' : '' }}>Hết hạn</option>
                         </select>
                     </div>
                     <div class="col-12 col-sm-12 col-md-2 d-flex gap-2">
@@ -115,16 +118,20 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if($transaction->status == 1 || $transaction->status == 'completed' || $transaction->status == 'paid')
-                                        <span class="badge bg-success-subtle text-success"><i class="fas fa-check-circle me-1"></i>
-                                            Thành công</span>
-                                    @elseif($transaction->status == 2 || $transaction->status == 'pending')
-                                        <span class="badge bg-warning-subtle text-warning"><i class="fas fa-clock me-1"></i> Đang xử
-                                            lý</span>
-                                    @else
-                                        <span class="badge bg-danger-subtle text-danger"><i class="fas fa-times-circle me-1"></i>
-                                            Thất bại</span>
-                                    @endif
+                                    @php
+                                        $statusConfig = match ((int) $transaction->status) {
+                                            1 => ['text' => 'Khởi tạo', 'class' => 'bg-info-subtle text-info', 'icon' => 'fa-hourglass-start'], // INITIATED
+                                            2 => ['text' => 'Đang chờ', 'class' => 'bg-warning-subtle text-warning', 'icon' => 'fa-clock'], // PENDING
+                                            3 => ['text' => 'Thành công', 'class' => 'bg-success-subtle text-success', 'icon' => 'fa-check-circle'], // SUCCESS
+                                            4 => ['text' => 'Thất bại', 'class' => 'bg-danger-subtle text-danger', 'icon' => 'fa-times-circle'], // FAILED
+                                            5 => ['text' => 'Đã hủy', 'class' => 'bg-secondary-subtle text-secondary', 'icon' => 'fa-ban'], // CANCELLED
+                                            6 => ['text' => 'Hết hạn', 'class' => 'bg-dark-subtle text-dark', 'icon' => 'fa-exclamation-circle'], // EXPIRED
+                                            default => ['text' => 'Không xác định', 'class' => 'bg-light text-dark border', 'icon' => 'fa-question-circle']
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $statusConfig['class'] }}">
+                                        <i class="fas {{ $statusConfig['icon'] }} me-1"></i> {{ $statusConfig['text'] }}
+                                    </span>
                                 </td>
                                 <td class="text-muted small">
                                     {{ \Carbon\Carbon::parse($transaction->createdAt)->format('H:i d/m/Y') }}

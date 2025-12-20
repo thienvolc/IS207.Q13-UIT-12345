@@ -23,8 +23,10 @@ class PayOSAdapter implements PaymentAdapterInterface
 
     public function initPayment(InitPaymentDTO $dto): InitPaymentResponseDTO
     {
+        $orderCode = $dto->txnRef ? (int) $dto->txnRef : $dto->orderId;
+
         $paymentData = [
-            PayOSParams::ORDER_CODE => $dto->orderId,
+            PayOSParams::ORDER_CODE => $orderCode,
             PayOSParams::AMOUNT => (int) $dto->amount,
             PayOSParams::DESCRIPTION => $dto->orderInfo,
             PayOSParams::ITEMS => [
@@ -40,11 +42,16 @@ class PayOSAdapter implements PaymentAdapterInterface
 
         $paymentLink = $this->payOS->paymentRequests->create($paymentData);
 
-        Log::info('PayOS Create Payment Response', $paymentLink);
+        // Fix: Log context must be array
+        Log::info('PayOS Create Payment Response', ['response' => (array)$paymentLink]);
 
+        // Fix: Access object property or array
+        // Assuming CreatePaymentLinkResponse has public properties or ArrayAccess
+        $response = (array)$paymentLink;
+ 
         return new InitPaymentResponseDTO(
             orderId: $dto->orderId,
-            paymentUrl: $paymentLink[PayOSParams::CHECKOUT_URL],
+            paymentUrl: $response[PayOSParams::CHECKOUT_URL] ?? $paymentLink->checkoutUrl ?? '',
         );
     }
 

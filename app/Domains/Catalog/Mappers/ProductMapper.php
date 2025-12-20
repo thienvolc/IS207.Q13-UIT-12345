@@ -144,6 +144,10 @@ readonly class ProductMapper
             return null;
         }
 
+        if (str_starts_with($thumb, 'http://') || str_starts_with($thumb, 'https://')) {
+            return $thumb;
+        }
+
         return self::THUMBNAIL_PREFIX . $thumb;
     }
 }

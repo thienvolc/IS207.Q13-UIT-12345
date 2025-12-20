@@ -139,9 +139,7 @@
                             class="fw-medium text-decoration-none text-primary">
                             {{ $item->product->title }}
                           </a>
-                          @if($item->product->sku)
-                            <small class="text-muted d-block">[{{ $item->product->sku }}]</small>
-                          @endif
+
                         @else
                           <span class="fw-medium text-muted">Sản phẩm đã bị xóa</span>
                         @endif

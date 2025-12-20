@@ -15,13 +15,16 @@ class CartMapper
     {
         $items = $this->toItemDTOs($cart->items);
         $totalQuantity = $items->sum('quantity');
-        $totalPrice = (float)$items->sum(fn($i) => $i->price * $i->quantity);
+        $subtotal = (float) $items->sum(fn($i) => $i->price * $i->quantity); // Gross
+        $totalDiscount = (float) $items->sum(fn($i) => $i->discount * $i->quantity);
+        $totalPrice = $subtotal - $totalDiscount; // Net
 
         return new CartDTO(
             cartId: $cart->cart_id,
             userId: $cart->user_id,
             totalQuantity: $totalQuantity,
             totalPrice: $totalPrice,
+            totalDiscount: $totalDiscount,
             status: $cart->status,
             items: $items->toArray(),
             updatedAt: $cart->updated_at?->toDateTimeString(),
@@ -43,18 +46,17 @@ class CartMapper
     {
         $product = $cartItem->product;
         if (!$product) {
-            // Trả về null, hoặc có thể throw exception, nhưng tốt nhất là filter ở trên
-            return null;
+            throw new \RuntimeException("CartItem #{$cartItem->cart_item_id} has no product");
         }
         return new CartItemDTO(
             itemId: $cartItem->cart_item_id,
             productId: $cartItem->product_id,
             quantity: $cartItem->quantity,
-            price: (float)$product->price,
+            price: (float) $product->price,
             productName: $product->title ?? null,
             productSlug: $product->slug ?? null,
             productImage: $product->thumb ?? null,
-            discount: (float)($product->discount ?? 0),
+            discount: (float) ($product->discount ?? 0),
         );
     }
 }

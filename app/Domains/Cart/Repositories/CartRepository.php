@@ -29,7 +29,7 @@ class CartRepository
     {
         $cart = Cart::create([
             'user_id' => $userId,
-            'status'  => CartStatus::ACTIVE,
+            'status' => CartStatus::ACTIVE,
         ]);
 
         $cart->load(['items.product']);
@@ -41,7 +41,8 @@ class CartRepository
     {
         CartItem::whereHas('cart', function ($query) use ($userId) {
             $query->where('user_id', $userId)
-                  ->where('status', CartStatus::ACTIVE);})
+                ->where('status', CartStatus::ACTIVE);
+        })
             ->delete();
 
         return $this->createActiveForUser($userId);
@@ -65,12 +66,29 @@ class CartRepository
         $cartId = $cart->cart_id;
 
         $copyItems = $items->map(function (CartItem $item) use ($cartId) {
-            $replica = $item->replicate();
-            $replica->cart_id = $cartId;
-            return $replica;
+            return [
+                'cart_id' => $cartId,
+                'product_id' => $item->product_id,
+                'sku' => $item->sku,
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+                'discount' => $item->discount ?? 0,
+                'is_active' => $item->is_active ?? true,
+                'note' => $item->note,
+            ];
         });
 
         CartItem::insert($copyItems->toArray());
+
+        // Calculate Total
+        $total = $copyItems->sum(function ($item) {
+            return ($item['price'] * $item['quantity']) - ($item['discount'] ?? 0);
+        });
+
+        $cart->update([
+            'sub_total' => $total,
+            'grand_total' => $total, // Assuming no extra fees yet
+        ]);
 
         $cart->load("items");
 

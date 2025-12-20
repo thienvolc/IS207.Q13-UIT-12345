@@ -60,13 +60,13 @@
                                     <a href="{{ route('products.show', $item->productSlug ?? 'product') }}">{{ $item->productName ?? 'Sản phẩm #' . $item->productId }}</a>
                                 </h4>
                                 <div class="cart-item-price">
-                                    <span class="price-current">{{ number_format($item->price, 0, ',', '.') }}₫</span>
-                                    @if($item->discount > 0)
                                     @php
-                                        $originalPrice = $item->price / (1 - $item->discount / 100);
+                                        $netPrice = $item->price - $item->discount;
                                     @endphp
-                                    <span class="price-original">{{ number_format($originalPrice, 0, ',', '.') }}₫</span>
-                                    <span class="price-discount">-{{ $item->discount }}%</span>
+                                    <span class="price-current">{{ number_format($netPrice, 0, ',', '.') }}₫</span>
+                                    @if($item->discount > 0)
+                                    <span class="price-original text-muted text-decoration-line-through me-2">{{ number_format($item->price, 0, ',', '.') }}₫</span>
+                                    <span class="badge bg-danger">Giảm {{ number_format($item->discount, 0, ',', '.') }}₫</span>
                                     @endif
                                 </div>
                             </div>
@@ -122,11 +122,11 @@
                     <div class="price-details">
                         <div class="price-row">
                             <span>Tạm tính (<span id="summary-items-count">{{ count($cart->items) }}</span> sản phẩm)</span>
-                            <span class="price-value" id="subtotal">{{ number_format($cart->totalPrice, 0, ',', '.') }}₫</span>
+                            <span class="price-value" id="subtotal">{{ number_format($cart->totalPrice + $cart->totalDiscount, 0, ',', '.') }}₫</span>
                         </div>
                         <div class="price-row">
                             <span>Giảm giá</span>
-                            <span class="price-value text-danger" id="discount">-0₫</span>
+                            <span class="price-value text-danger" id="discount">-{{ number_format($cart->totalDiscount, 0, ',', '.') }}₫</span>
                         </div>
                         <div class="price-row">
                             <span>Phí vận chuyển</span>

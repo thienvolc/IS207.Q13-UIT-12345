@@ -17,6 +17,7 @@ use App\Domains\Order\DTOs\Commands\PlaceOrderDTO;
 use App\Domains\Order\DTOs\Commands\UpdateOrderShippingDTO;
 use App\Domains\Order\DTOs\Commands\UpdateOrderStatusDTO;
 use App\Domains\Order\DTOs\Queries\AdminSearchOrdersDTO;
+use App\Domains\Transaction\Constants\TransactionStatus;
 use App\Domains\Order\DTOs\Queries\UserSearchOrdersDTO;
 use App\Domains\Order\DTOs\Responses\OrderDTO;
 use App\Domains\Order\DTOs\Responses\OrderStatusDTO;
@@ -32,7 +33,7 @@ use App\Infra\Utils\Pagination\PaginationUtil;
 use App\Infra\Utils\Pagination\Sort;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Ramsey\Collection\Collection;
+use Illuminate\Database\Eloquent\Collection;
 
 readonly class OrderService
 {
@@ -77,21 +78,25 @@ readonly class OrderService
 
             $this->productAvailabilityService->lockStockAndValidateAvailability($cart->items);
 
-            // Xử lý theo payment method
-            $paymentUrl = null;
-            $orderStatus = OrderStatus::PROCESSING; // COD orders go straight to processing
-
-            if ($dto->paymentMethod === 'vnpay') {
-                $orderStatus = OrderStatus::PENDING_PAYMENT;
-            }
+            // Determine initial order status
+            $orderStatus = match ($dto->paymentMethod) {
+                'vnpay', 'payos', 'banking' => OrderStatus::PENDING_PAYMENT,
+                default => OrderStatus::PROCESSING, // COD default
+            };
 
             $order = $this->createOrder($cart, $dto->promo, $orderStatus);
             $this->completeCart($cart);
 
-            // Chỉ gọi VNPay nếu payment method là vnpay
+            // Initiate Payment & Create Transaction
+            $paymentUrl = null;
             if ($dto->paymentMethod === 'vnpay') {
                 $paymentResult = $this->paymentService->initVNPayPayment($order, $ipAddress);
                 $paymentUrl = $paymentResult->paymentUrl;
+            } elseif ($dto->paymentMethod === 'payos' || $dto->paymentMethod === 'banking') {
+                $paymentResult = $this->paymentService->initPayOSPayment($order);
+                $paymentUrl = $paymentResult->paymentUrl;
+            } elseif ($dto->paymentMethod === 'cod') {
+                $this->paymentService->initCODPayment($order);
             }
 
             return $this->orderMapper->toSummaryDTO($order, $paymentUrl);
@@ -175,6 +180,13 @@ readonly class OrderService
 
             $order->update(['status' => $dto->status]);
 
+            // Sync Transaction Status
+            if ($dto->status === OrderStatus::PAID) {
+                $this->paymentService->updateStatusByOrderId($order->order_id, TransactionStatus::SUCCESS);
+            } elseif ($dto->status === OrderStatus::CANCELLED) {
+                $this->paymentService->updateStatusByOrderId($order->order_id, TransactionStatus::CANCELLED);
+            }
+
             return $this->orderMapper->toStatusDTO($order);
         });
     }
@@ -188,6 +200,9 @@ readonly class OrderService
                 $this->stockReservationService->restoreAllProductStockInOrder($order);
             }
             $order->update(['status' => OrderStatus::CANCELLED]);
+
+            // Sync Transaction
+            $this->paymentService->updateStatusByOrderId($order->order_id, TransactionStatus::CANCELLED);
 
             // TODO: Process refund if payment was made
 

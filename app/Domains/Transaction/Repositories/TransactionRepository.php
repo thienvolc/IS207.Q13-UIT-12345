@@ -50,12 +50,22 @@ class TransactionRepository
         return Transaction::create($data);
     }
 
-    public function updateByOrderId(int $orderId, array $data): void
+    public function updateByOrderId(int $orderId, array $data): ?Transaction
+    {
+        $txn = Transaction::where('order_id', $orderId)
+            ->latest()
+            ->first();
+
+        $txn?->update($data);
+        return $txn;
+    }
+
+    public function cancelPendingTransactions(int $orderId, int $excludeTransactionId): void
     {
         Transaction::where('order_id', $orderId)
-            ->latest()
-            ->first()
-                ?->update($data);
+            ->where('transaction_id', '!=', $excludeTransactionId)
+            ->where('status', \App\Domains\Transaction\Constants\TransactionStatus::INITIATED)
+            ->update(['status' => \App\Domains\Transaction\Constants\TransactionStatus::FAILED]);
     }
 
     public function getSuccessfulByOrderId(int $orderId): ?Transaction

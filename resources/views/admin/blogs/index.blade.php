@@ -94,9 +94,9 @@
                                     <input type="checkbox" class="form-check-input row-checkbox" value="{{ $id }}">
                                 </td>
                                 <td>
-                                    <img src="{{ $thumb ?? 'https://via.placeholder.com/60x60?text=No+Image' }}"
+                                    <img src="{{ $thumb ?: asset('img/product_placeholder.png') }}"
                                         alt="{{ $title }}" class="rounded" style="width: 60px; height: 60px; object-fit: cover;"
-                                        onerror="this.src='https://via.placeholder.com/60x60?text=No+Image'">
+                                        onerror="this.src='{{ asset('img/product_placeholder.png') }}'">
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column">

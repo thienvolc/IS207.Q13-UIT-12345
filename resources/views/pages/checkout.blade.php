@@ -180,7 +180,11 @@
                         <div class="price-details mt-5">
                             <div class="price-row">
                                 <span>Tạm tính</span>
-                                <span>{{ number_format($cart->totalPrice, 0, ',', '.') }}₫</span>
+                                <span>{{ number_format($cart->totalPrice + $cart->totalDiscount, 0, ',', '.') }}₫</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Giảm giá</span>
+                                <span class="text-danger">-{{ number_format($cart->totalDiscount, 0, ',', '.') }}₫</span>
                             </div>
                             <div class="price-row">
                                 <span>Phí vận chuyển</span>

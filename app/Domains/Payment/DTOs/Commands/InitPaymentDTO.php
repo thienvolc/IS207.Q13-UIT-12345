@@ -9,6 +9,7 @@ readonly class InitPaymentDTO
         public string $amount,
         public string $orderInfo,
         public string $ipAddress,
+        public ?string $txnRef = null,
     ) {
     }
 }
