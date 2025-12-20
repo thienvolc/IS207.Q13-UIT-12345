@@ -176,6 +176,47 @@
 <script>
     const csrfToken = '{{ csrf_token() }}';
     
+    // Custom confirmation dialog
+    function showConfirmDialog(title, message, onConfirm) {
+        // Create modal backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'confirm-dialog-backdrop';
+        backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.className = 'confirm-dialog';
+        modal.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:400px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.15);';
+        
+        modal.innerHTML = `
+            <h5 style="margin:0 0 12px;font-size:1.25rem;font-weight:600;color:#333;">${title}</h5>
+            <p style="margin:0 0 24px;color:#666;font-size:1rem;">${message}</p>
+            <div style="display:flex;gap:12px;justify-content:flex-end;">
+                <button class="btn-cancel" style="padding:10px 20px;border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer;font-size:1rem;">Hủy</button>
+                <button class="btn-confirm" style="padding:10px 20px;border:none;background:linear-gradient(135deg,#ff6f91,#ff9671);color:#fff;border-radius:8px;cursor:pointer;font-size:1rem;">Xác nhận</button>
+            </div>
+        `;
+        
+        backdrop.appendChild(modal);
+        document.body.appendChild(backdrop);
+        
+        // Handle cancel
+        modal.querySelector('.btn-cancel').addEventListener('click', () => {
+            backdrop.remove();
+        });
+        
+        // Handle confirm
+        modal.querySelector('.btn-confirm').addEventListener('click', () => {
+            backdrop.remove();
+            onConfirm();
+        });
+        
+        // Close on backdrop click
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) backdrop.remove();
+        });
+    }
+    
     async function updateQuantity(itemId, productId, newQty) {
         if (newQty < 1) {
             removeItem(itemId);
@@ -208,45 +249,53 @@
         }
     }
     
-    async function removeItem(itemId) {
-        if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
-        
-        try {
-            const url = '{{ route("cart.api.remove", ["id" => ":id"]) }}'.replace(':id', itemId);
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
+    function removeItem(itemId) {
+        showConfirmDialog(
+            'Xóa sản phẩm',
+            'Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?',
+            async () => {
+                try {
+                    const url = '{{ route("cart.api.remove", ["id" => ":id"]) }}'.replace(':id', itemId);
+                    const response = await fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
                 }
-            });
-            
-            if (response.ok) {
-                location.reload();
             }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        );
     }
     
-    async function clearCart() {
-        if (!confirm('Bạn có chắc muốn xóa tất cả sản phẩm?')) return;
-        
-        try {
-            const response = await fetch('{{ route("cart.api.clear") }}', {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
+    function clearCart() {
+        showConfirmDialog(
+            'Xóa tất cả',
+            'Bạn có chắc muốn xóa tất cả sản phẩm khỏi giỏ hàng?',
+            async () => {
+                try {
+                    const response = await fetch('{{ route("cart.api.clear") }}', {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
                 }
-            });
-            
-            if (response.ok) {
-                location.reload();
             }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        );
     }
 </script>
 @endpush

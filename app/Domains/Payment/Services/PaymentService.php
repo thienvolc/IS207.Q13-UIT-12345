@@ -126,6 +126,9 @@ class PaymentService
 
     public function initVNPayPayment(Order $order, string $ipAddress): InitPaymentResponseDTO
     {
+        // Cancel any existing pending transactions to avoid confusion
+        $this->transactionRepository->cancelPendingTransactions($order->order_id);
+
         $this->createTransaction($order, PaymentProvider::VNPAY);
 
         // Generate unique TxnRef to allow retries (avoid duplicate ref at Gateway)
@@ -144,6 +147,9 @@ class PaymentService
 
     public function initPayOSPayment(Order $order): InitPaymentResponseDTO
     {
+        // Cancel any existing pending transactions
+        $this->transactionRepository->cancelPendingTransactions($order->order_id);
+
         $txn = $this->createTransaction($order, PaymentProvider::PAYOS);
 
         // Use Transaction ID as Unique Order Code (Safe Integer)

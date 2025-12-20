@@ -329,35 +329,34 @@ class CartManager {
     }
 
     async handleRemoveItem(itemId) {
-        if (!confirm("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?"))
-            return;
+        this.showConfirmDialog('Xóa sản phẩm', 'Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?', async () => {
+            try {
+                const url = this.config.urls.removeItem.replace(":id", itemId);
+                const response = await fetch(url, {
+                    method: "DELETE",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": this.config.csrfToken,
+                    },
+                });
 
-        try {
-            const url = this.config.urls.removeItem.replace(":id", itemId);
-            const response = await fetch(url, {
-                method: "DELETE",
-                headers: {
-                    Accept: "application/json",
-                    "X-CSRF-TOKEN": this.config.csrfToken,
-                },
-            });
+                const data = await response.json();
 
-            const data = await response.json();
-
-            if (data.success) {
-                this.selectedItems.delete(itemId);
-                this.showToast("Đã xóa sản phẩm khỏi giỏ hàng.");
-                await this.loadCart();
-            } else {
-                this.showToast(
-                    data.message || "Không thể xóa sản phẩm.",
-                    "error",
-                );
+                if (data.success) {
+                    this.selectedItems.delete(itemId);
+                    this.showToast("Đã xóa sản phẩm khỏi giỏ hàng.");
+                    await this.loadCart();
+                } else {
+                    this.showToast(
+                        data.message || "Không thể xóa sản phẩm.",
+                        "error",
+                    );
+                }
+            } catch (error) {
+                console.error("Remove item error:", error);
+                this.showToast("Đã có lỗi xảy ra.", "error");
             }
-        } catch (error) {
-            console.error("Remove item error:", error);
-            this.showToast("Đã có lỗi xảy ra.", "error");
-        }
+        });
     }
 
     async handleDeleteSelected() {
@@ -510,6 +509,37 @@ class CartManager {
             toast.classList.remove("show");
             setTimeout(() => toast.remove(), 300);
         }, 3000);
+    }
+
+    showConfirmDialog(title, message, onConfirm) {
+        const backdrop = document.createElement('div');
+        backdrop.className = 'confirm-dialog-backdrop';
+        backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
+        
+        const modal = document.createElement('div');
+        modal.className = 'confirm-dialog';
+        modal.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:400px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.15);';
+        
+        modal.innerHTML = `
+            <h5 style="margin:0 0 12px;font-size:1.25rem;font-weight:600;color:#333;">${title}</h5>
+            <p style="margin:0 0 24px;color:#666;font-size:1rem;">${message}</p>
+            <div style="display:flex;gap:12px;justify-content:flex-end;">
+                <button class="btn-cancel" style="padding:10px 20px;border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer;font-size:1rem;">Hủy</button>
+                <button class="btn-confirm" style="padding:10px 20px;border:none;background:linear-gradient(135deg,#ff6f91,#ff9671);color:#fff;border-radius:8px;cursor:pointer;font-size:1rem;">Xác nhận</button>
+            </div>
+        `;
+        
+        backdrop.appendChild(modal);
+        document.body.appendChild(backdrop);
+        
+        modal.querySelector('.btn-cancel').addEventListener('click', () => backdrop.remove());
+        modal.querySelector('.btn-confirm').addEventListener('click', () => {
+            backdrop.remove();
+            onConfirm();
+        });
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) backdrop.remove();
+        });
     }
 
     formatCurrency(amount) {

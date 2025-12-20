@@ -2,6 +2,38 @@
 // Cart Management - Add to Cart Functionality
 // ============================================
 
+// Custom confirmation dialog
+function showConfirmDialog(title, message, onConfirm) {
+    const backdrop = document.createElement('div');
+    backdrop.className = 'confirm-dialog-backdrop';
+    backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    
+    const modal = document.createElement('div');
+    modal.className = 'confirm-dialog';
+    modal.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:400px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.15);';
+    
+    modal.innerHTML = `
+        <h5 style="margin:0 0 12px;font-size:1.25rem;font-weight:600;color:#333;">${title}</h5>
+        <p style="margin:0 0 24px;color:#666;font-size:1rem;">${message}</p>
+        <div style="display:flex;gap:12px;justify-content:flex-end;">
+            <button class="btn-cancel" style="padding:10px 20px;border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer;font-size:1rem;">Hủy</button>
+            <button class="btn-confirm" style="padding:10px 20px;border:none;background:linear-gradient(135deg,#ff6f91,#ff9671);color:#fff;border-radius:8px;cursor:pointer;font-size:1rem;">Xác nhận</button>
+        </div>
+    `;
+    
+    backdrop.appendChild(modal);
+    document.body.appendChild(backdrop);
+    
+    modal.querySelector('.btn-cancel').addEventListener('click', () => backdrop.remove());
+    modal.querySelector('.btn-confirm').addEventListener('click', () => {
+        backdrop.remove();
+        onConfirm();
+    });
+    backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) backdrop.remove();
+    });
+}
+
 // Check if user is logged in
 function isUserLoggedIn() {
     // Check from server-side rendered variable
@@ -291,13 +323,14 @@ function initCartPageEvents() {
         });
     });
 
-    // Delete item
+    // Delete item with confirmation dialog
     document.querySelectorAll(".btn-delete").forEach((btn) => {
         btn.addEventListener("click", function () {
-            if (confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
-                this.closest(".cart-item").remove();
+            const cartItem = this.closest(".cart-item");
+            showConfirmDialog('Xóa sản phẩm', 'Bạn có chắc muốn xóa sản phẩm này?', () => {
+                cartItem.remove();
                 updateCartSummary();
-            }
+            });
         });
     });
 
@@ -312,13 +345,13 @@ function initCartPageEvents() {
                 alert("Vui lòng chọn sản phẩm cần xóa!");
                 return;
             }
-            if (confirm("Bạn có chắc muốn xóa các sản phẩm đã chọn?")) {
+            showConfirmDialog('Xóa sản phẩm đã chọn', 'Bạn có chắc muốn xóa các sản phẩm đã chọn?', () => {
                 checkedItems.forEach((cb) => {
                     const cartItem = cb.closest(".cart-item");
                     cartItem?.remove();
                 });
                 updateCartSummary();
-            }
+            });
         });
     }
 

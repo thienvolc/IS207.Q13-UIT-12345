@@ -18,11 +18,6 @@
         <h1 class="blog-title mb-2 fw-bold">TIN TỨC MỚI</h1>
         <p class="text-muted mb-0 fs-5">Khám phá những bài viết mới nhất về công nghệ</p>
     </div>
-    <div class="text-md-end mt-3 mb-4">
-        <a href="{{ route('blog.create') }}" class="btn btn-primary btn-create-post">
-            <i class="bi bi-plus-lg"></i> Tạo bài viết
-        </a>
-    </div>
 
     <!-- Featured Post -->
     @if($posts->count())

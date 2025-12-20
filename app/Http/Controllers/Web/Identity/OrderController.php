@@ -31,38 +31,43 @@ class OrderController extends Controller
 
     public function repay($id)
     {
-        \Illuminate\Support\Facades\Log::info("Repay requested for Order ID: $id" . " by User: " . (Auth::id() ?? 'Guest'));
+        $userId = Auth::id();
+        \Illuminate\Support\Facades\Log::info("Repay requested for Order ID: $id by User: " . ($userId ?? 'Guest'));
 
-        $user = Auth::user();
-
-        if (!$user) {
+        if (!$userId) {
             \Illuminate\Support\Facades\Log::error('Repay: User not authenticated');
             return redirect()->route('login');
         }
 
         try {
-            $order = $user->orders()->where('order_id', $id)->firstOrFail();
+            // Direct query to avoid potentially broken User relation
+            $order = \App\Domains\Order\Entities\Order::where('order_id', $id)
+                ->where('user_id', $userId)
+                ->firstOrFail();
 
-            \Illuminate\Support\Facades\Log::info("Order retrieved. Status: {$order->status}, Payment Method: {$order->payment_method}");
+            \Illuminate\Support\Facades\Log::info("Order matches. Status: {$order->status}, Method: {$order->payment_method}");
 
-            if ($order->status !== \App\Domains\Order\Constants\OrderStatus::PENDING_PAYMENT) {
-                \Illuminate\Support\Facades\Log::warning("Repay failed: Order $id not pending.");
-                return redirect()->back()->with('error', 'Đơn hàng không thể thanh toán lại.');
+            // Check status (Normalized) - PENDING_PAYMENT = 1
+            if ((int) $order->status !== 1) {
+                \Illuminate\Support\Facades\Log::warning("Repay failed: Order $id status is {$order->status}, expected 1.");
+                return redirect()->back()->with('error', 'Đơn hàng không thể thanh toán lại (Trạng thái được cập nhật).');
             }
 
-            if ($order->payment_method === \App\Domains\Payment\Constants\PaymentProvider::VNPAY) {
-                \Illuminate\Support\Facades\Log::info("Repay VNPay for Order $id");
-                $response = $this->paymentService->initVNPayPayment($order, request()->ip());
+            $method = strtolower($order->payment_method ?? '');
+
+            if ($method === 'vnpay') {
+                \Illuminate\Support\Facades\Log::info("Repay VNPAY matched. Initializing...");
+                $ip = request()->ip() ?? '127.0.0.1';
+                $response = $this->paymentService->initVNPayPayment($order, $ip);
+                \Illuminate\Support\Facades\Log::info("VNPay Redirect URL: " . $response->paymentUrl);
                 return redirect($response->paymentUrl);
-            } elseif (
-                $order->payment_method === \App\Domains\Payment\Constants\PaymentProvider::PAYOS
-                || $order->payment_method === \App\Domains\Payment\Constants\PaymentProvider::BANKING
-            ) {
-                \Illuminate\Support\Facades\Log::info("Repay PayOS (Banking) for Order $id");
+            } elseif ($method === 'payos' || $method === 'banking') {
+                \Illuminate\Support\Facades\Log::info("Repay PAYOS matches. Initializing...");
                 $response = $this->paymentService->initPayOSPayment($order);
                 \Illuminate\Support\Facades\Log::info("PayOS Redirect URL: " . $response->paymentUrl);
                 return redirect($response->paymentUrl);
             } else {
+                \Illuminate\Support\Facades\Log::warning("Repay Method Mismatch: $method");
                 return redirect()->back()->with('error', 'Phương thức thanh toán không hỗ trợ thanh toán online.');
             }
         } catch (\Throwable $e) {

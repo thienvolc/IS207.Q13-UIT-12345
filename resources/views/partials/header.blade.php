@@ -62,6 +62,11 @@
       </ul>
     </div>
 
+    <!-- Bài viết Button -->
+    <a href="{{ route('blog.index') }}" class="header-blog-btn">
+      <i class="bi bi-newspaper"></i> Bài viết
+    </a>
+
     <form action="{{ route('products.index') }}" method="GET" class="header-search">
       <span class="header-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
       <input type="text" name="search" class="header-search-input" placeholder="Bạn muốn mua gì hôm nay?"

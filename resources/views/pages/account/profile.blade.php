@@ -44,8 +44,8 @@
 
                                 <!-- Avatar Upload Box -->
                                 <div class="avatar-upload-box">
-                                    <img src="{{ Auth::user()->profile?->avatar ?? 'https://ui-avatars.com/api/?name=' . Auth::user()->name . '&background=d70018&color=fff' }}"
-                                        alt="Avatar Preview" class="avatar-preview-small" id="avatarPreview">
+                                    <img src="{{ Auth::user()->profile?->avatar ?? 'https://ui-avatars.com/api/?name=' . Auth::user()->name . '&background=d70018&color=fff&size=80' }}"
+                                        alt="Avatar Preview" class="avatar-preview-small" id="avatarPreview" width="80" height="80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
                                     <div class="flex-grow-1">
                                         <h5 class="mb-1">Ảnh đại diện</h5>
                                         <p class="text-muted small mb-2">Định dạng PNG, JPG. Tối đa 2MB.</p>

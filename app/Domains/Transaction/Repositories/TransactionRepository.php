@@ -60,12 +60,16 @@ class TransactionRepository
         return $txn;
     }
 
-    public function cancelPendingTransactions(int $orderId, int $excludeTransactionId): void
+    public function cancelPendingTransactions(int $orderId, ?int $excludeTransactionId = null): void
     {
-        Transaction::where('order_id', $orderId)
-            ->where('transaction_id', '!=', $excludeTransactionId)
-            ->where('status', \App\Domains\Transaction\Constants\TransactionStatus::INITIATED)
-            ->update(['status' => \App\Domains\Transaction\Constants\TransactionStatus::FAILED]);
+        $query = Transaction::where('order_id', $orderId)
+            ->where('status', \App\Domains\Transaction\Constants\TransactionStatus::INITIATED);
+
+        if ($excludeTransactionId) {
+            $query->where('transaction_id', '!=', $excludeTransactionId);
+        }
+
+        $query->update(['status' => \App\Domains\Transaction\Constants\TransactionStatus::FAILED]);
     }
 
     public function getSuccessfulByOrderId(int $orderId): ?Transaction

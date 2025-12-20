@@ -20,42 +20,103 @@
                         </div>
 
                         <div class="profile-card-body">
+                            @if(session('success'))
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    {{ session('success') }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            @endif
+                            @if(session('error'))
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ session('error') }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            @endif
+
+                            @php
+                                $pendingOrders = $orders->where('status', 1);
+                                $processingOrders = $orders->where('status', 2);
+                                $shippingOrders = $orders->where('status', 3);
+                                $completedOrders = $orders->where('status', 4);
+                                $cancelledOrders = $orders->where('status', 5);
+
+                                // Define status texts and classes if not passed from controller
+                                $statusTexts = $statusTexts ?? [
+                                    1 => 'Chờ xác nhận',
+                                    2 => 'Đang xử lý',
+                                    3 => 'Đang giao',
+                                    4 => 'Hoàn thành',
+                                    5 => 'Đã hủy',
+                                    6 => 'Hoàn tiền',
+                                    7 => 'Trả hàng',
+                                    8 => 'Đã hủy'
+                                ];
+                                $statusClasses = $statusClasses ?? [
+                                    1 => 'bg-warning text-dark',
+                                    2 => 'bg-info text-white',
+                                    3 => 'bg-primary',
+                                    4 => 'bg-success',
+                                    5 => 'bg-danger',
+                                    6 => 'bg-secondary',
+                                    7 => 'bg-secondary',
+                                    8 => 'bg-danger'
+                                ];
+                            @endphp
+
                             <!-- Order Status Tabs -->
                             <ul class="nav nav-pills mb-4" id="orderTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="all-tab" data-bs-toggle="pill"
                                         data-bs-target="#all-orders" type="button">
                                         Tất cả
+                                        @if($orders->count() > 0)
+                                            <span class="badge bg-secondary ms-1">{{ $orders->count() }}</span>
+                                        @endif
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="pending-tab" data-bs-toggle="pill"
                                         data-bs-target="#pending-orders" type="button">
                                         Chờ xác nhận
+                                        @if($pendingOrders->count() > 0)
+                                            <span class="badge bg-warning text-dark ms-1">{{ $pendingOrders->count() }}</span>
+                                        @endif
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="processing-tab" data-bs-toggle="pill"
                                         data-bs-target="#processing-orders" type="button">
                                         Đang xử lý
+                                        @if($processingOrders->count() > 0)
+                                            <span class="badge bg-info ms-1">{{ $processingOrders->count() }}</span>
+                                        @endif
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="shipping-tab" data-bs-toggle="pill"
                                         data-bs-target="#shipping-orders" type="button">
                                         Đang giao
+                                        @if($shippingOrders->count() > 0)
+                                            <span class="badge bg-primary ms-1">{{ $shippingOrders->count() }}</span>
+                                        @endif
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="completed-tab" data-bs-toggle="pill"
                                         data-bs-target="#completed-orders" type="button">
                                         Hoàn thành
+                                        @if($completedOrders->count() > 0)
+                                            <span class="badge bg-success ms-1">{{ $completedOrders->count() }}</span>
+                                        @endif
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="cancelled-tab" data-bs-toggle="pill"
                                         data-bs-target="#cancelled-orders" type="button">
                                         Đã hủy
+                                        @if($cancelledOrders->count() > 0)
+                                            <span class="badge bg-danger ms-1">{{ $cancelledOrders->count() }}</span>
+                                        @endif
                                     </button>
                                 </li>
                             </ul>
@@ -143,34 +204,64 @@
                                     @endif
                                 </div>
                                 <div class="tab-pane fade" id="pending-orders" role="tabpanel">
-                                    <div class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-1"></i>
-                                        <p>Không có đơn hàng chờ xác nhận</p>
-                                    </div>
+                                    @if($pendingOrders->isEmpty())
+                                        <div class="text-center py-5 text-muted">
+                                            <i class="bi bi-inbox fs-1"></i>
+                                            <p>Không có đơn hàng chờ xác nhận</p>
+                                        </div>
+                                    @else
+                                        @foreach($pendingOrders as $order)
+                                            @include('pages.account.partials.order-card', ['order' => $order, 'statusClasses' => $statusClasses, 'statusTexts' => $statusTexts])
+                                        @endforeach
+                                    @endif
                                 </div>
                                 <div class="tab-pane fade" id="processing-orders" role="tabpanel">
-                                    <div class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-1"></i>
-                                        <p>Không có đơn hàng đang xử lý</p>
-                                    </div>
+                                    @if($processingOrders->isEmpty())
+                                        <div class="text-center py-5 text-muted">
+                                            <i class="bi bi-inbox fs-1"></i>
+                                            <p>Không có đơn hàng đang xử lý</p>
+                                        </div>
+                                    @else
+                                        @foreach($processingOrders as $order)
+                                            @include('pages.account.partials.order-card', ['order' => $order, 'statusClasses' => $statusClasses, 'statusTexts' => $statusTexts])
+                                        @endforeach
+                                    @endif
                                 </div>
                                 <div class="tab-pane fade" id="shipping-orders" role="tabpanel">
-                                    <div class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-1"></i>
-                                        <p>Không có đơn hàng đang giao</p>
-                                    </div>
+                                    @if($shippingOrders->isEmpty())
+                                        <div class="text-center py-5 text-muted">
+                                            <i class="bi bi-inbox fs-1"></i>
+                                            <p>Không có đơn hàng đang giao</p>
+                                        </div>
+                                    @else
+                                        @foreach($shippingOrders as $order)
+                                            @include('pages.account.partials.order-card', ['order' => $order, 'statusClasses' => $statusClasses, 'statusTexts' => $statusTexts])
+                                        @endforeach
+                                    @endif
                                 </div>
                                 <div class="tab-pane fade" id="completed-orders" role="tabpanel">
-                                    <div class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-1"></i>
-                                        <p>Không có đơn hàng hoàn thành</p>
-                                    </div>
+                                    @if($completedOrders->isEmpty())
+                                        <div class="text-center py-5 text-muted">
+                                            <i class="bi bi-inbox fs-1"></i>
+                                            <p>Không có đơn hàng hoàn thành</p>
+                                        </div>
+                                    @else
+                                        @foreach($completedOrders as $order)
+                                            @include('pages.account.partials.order-card', ['order' => $order, 'statusClasses' => $statusClasses, 'statusTexts' => $statusTexts])
+                                        @endforeach
+                                    @endif
                                 </div>
                                 <div class="tab-pane fade" id="cancelled-orders" role="tabpanel">
-                                    <div class="orders-empty">
-                                        <i class="bi bi-inbox"></i>
-                                        <p>Không có đơn hàng đã hủy</p>
-                                    </div>
+                                    @if($cancelledOrders->isEmpty())
+                                        <div class="orders-empty">
+                                            <i class="bi bi-inbox"></i>
+                                            <p>Không có đơn hàng đã hủy</p>
+                                        </div>
+                                    @else
+                                        @foreach($cancelledOrders as $order)
+                                            @include('pages.account.partials.order-card', ['order' => $order, 'statusClasses' => $statusClasses, 'statusTexts' => $statusTexts])
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
                         </div>

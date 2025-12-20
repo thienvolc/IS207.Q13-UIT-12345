@@ -4,16 +4,18 @@
             @if(Auth::user()->profile?->avatar)
                 <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar">
             @else
-                <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}&background=d70018&color=fff"
+                <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}&background=d70018&color=fff&rounded=true"
                     alt="Avatar">
             @endif
         </div>
-        <div class="profile-user-name">
-            {{ Auth::user()->profile?->first_name ?? Auth::user()->name }}
-            {{ Auth::user()->profile?->last_name ?? '' }}
-        </div>
-        <div class="profile-user-email">
-            {{ Auth::user()->email }}
+        <div class="profile-user-details">
+            <div class="profile-user-name">
+                {{ Auth::user()->profile?->first_name ?? Auth::user()->name }}
+                {{ Auth::user()->profile?->last_name ?? '' }}
+            </div>
+            <div class="profile-user-email">
+                {{ Auth::user()->email }}
+            </div>
         </div>
     </div>
     <div class="profile-usermenu">
