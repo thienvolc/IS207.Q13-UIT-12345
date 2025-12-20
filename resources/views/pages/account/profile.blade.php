@@ -4,63 +4,25 @@
 
 @section('content')
     <div class="profile-page-container">
-        <div class="grid py-5">
-            <div class="grid-row">
-                <!-- Sidebar Menu -->
-                <div class="grid__col-3">
-                    <div class="profile-sidebar">
-                        <div class="profile-avatar-section">
-                            <div class="profile-avatar">
-                                @if(Auth::user()->profile?->avatar)
-                                    <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar">
-                                @else
-                                    <i class="bi bi-person-circle"></i>
-                                @endif
-                            </div>
-                            <h4 class="profile-name">{{ Auth::user()->profile?->first_name ?? '' }}
-                                {{ Auth::user()->profile?->last_name ?? '' }}</h4>
-                        </div>
-                        <nav class="profile-nav">
-                            <a href="{{ route('account.profile') }}" class="profile-nav-item active">
-                                <i class="bi bi-person"></i>
-                                <span>Thông tin cá nhân</span>
-                            </a>
-                            <a href="{{ route('account.orders') }}" class="profile-nav-item">
-                                <i class="bi bi-box-seam"></i>
-                                <span>Đơn hàng của tôi</span>
-                            </a>
-                            <a href="{{ route('account.my-posts') }}" class="profile-nav-item">
-                                <i class="bi bi-journal-text"></i>
-                                <span>Bài viết của tôi</span>
-                            </a>
-                            <a href="{{ route('account.password') }}" class="profile-nav-item">
-                                <i class="bi bi-shield-lock"></i>
-                                <span>Đổi mật khẩu</span>
-                            </a>
-                            <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                                @csrf
-                                <button type="submit" class="profile-nav-item profile-nav-logout">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                    <span>Đăng xuất</span>
-                                </button>
-                            </form>
-                        </nav>
-                    </div>
+        <div class="container py-5">
+            <div class="row">
+                <!-- Sidebar Menu (Admin Style) -->
+                <div class="col-lg-3 mb-4 mb-lg-0">
+                    @include('pages.account.partials.sidebar')
                 </div>
 
                 <!-- Main Content -->
-                <div class="grid__col-9">
-                    <div class="profile-content-card">
-                        <div class="profile-card-header">
-                            <h3>Thông tin cá nhân</h3>
-                            <p class="text-muted">Quản lý thông tin cá nhân của bạn</p>
+                <div class="col-lg-9">
+                    <div class="profile-content">
+                        <div class="profile-header">
+                            <h3><i class="bi bi-person-gear"></i> Thông tin cá nhân</h3>
+                            <p class="text-muted mb-0">Quản lý và cập nhật thông tin tài khoản của bạn</p>
                         </div>
 
-                        <div class="profile-card-body">
+                        <div class="profile-body">
                             @if(session('success'))
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    {{ session('success') }}
+                                    <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
                             @endif
@@ -77,96 +39,87 @@
                                 </div>
                             @endif
 
-                            <form id="profileForm" enctype="multipart/form-data">
+                            <form id="profileForm" enctype="multipart/form-data" class="profile-form">
                                 @csrf
 
-                                <!-- Avatar Upload -->
-                                <div class="grid-row mb-4">
-                                    <div class="grid__col-12">
-                                        <div class="avatar-upload-section">
-                                            <div class="avatar-preview">
-                                                @if(Auth::user()->profile?->avatar)
-                                                    <img src="{{ Auth::user()->profile->avatar }}" alt="Avatar"
-                                                        id="avatarPreview">
-                                                @else
-                                                    <img src="" alt="Avatar" id="avatarPreview" style="display: none;">
-                                                    <i class="bi bi-person-circle" id="avatarIcon"></i>
-                                                @endif
-                                            </div>
-                                            <div class="avatar-upload-info">
-                                                <label for="avatar" class="btn btn-outline-primary btn-sm">
-                                                    <i class="bi bi-camera"></i> Chọn ảnh
-                                                </label>
-                                                <input type="file" name="avatar" id="avatar" class="d-none"
-                                                    accept="image/*">
-                                                <p class="text-muted mt-2 mb-0">Dung lượng tối đa 2MB. Định dạng: JPG, PNG
-                                                </p>
-                                            </div>
+                                <!-- Avatar Upload Box -->
+                                <div class="avatar-upload-box">
+                                    <img src="{{ Auth::user()->profile?->avatar ?? 'https://ui-avatars.com/api/?name=' . Auth::user()->name . '&background=d70018&color=fff' }}"
+                                        alt="Avatar Preview" class="avatar-preview-small" id="avatarPreview">
+                                    <div class="flex-grow-1">
+                                        <h5 class="mb-1">Ảnh đại diện</h5>
+                                        <p class="text-muted small mb-2">Định dạng PNG, JPG. Tối đa 2MB.</p>
+                                        <label for="avatar" class="btn btn-sm btn-outline-primary btn-upload-avatar">
+                                            <i class="bi bi-cloud-upload"></i> Tải ảnh mới
+                                        </label>
+                                        <input type="file" name="avatar" id="avatar" class="d-none" accept="image/*">
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="first_name" class="form-label">Họ</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i
+                                                    class="bi bi-person"></i></span>
+                                            <input type="text" name="first_name" id="first_name"
+                                                class="form-control border-start-0 ps-0"
+                                                value="{{ Auth::user()->profile?->first_name ?? '' }}" placeholder="Nguyễn">
                                         </div>
                                     </div>
-                                </div>
-
-                                <!-- Họ, Tên đệm, Tên -->
-                                <div class="grid-row mb-3">
-                                    <div class="grid__col-4">
-                                        <label for="first_name" class="form-label">
-                                            <i class="bi bi-person"></i> Họ
-                                        </label>
-                                        <input type="text" name="first_name" id="first_name" class="form-control"
-                                            value="{{ Auth::user()->profile?->first_name ?? '' }}" placeholder="Nguyễn">
+                                    <div class="col-md-4">
+                                        <label for="middle_name" class="form-label">Tên đệm</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i
+                                                    class="bi bi-person"></i></span>
+                                            <input type="text" name="middle_name" id="middle_name"
+                                                class="form-control border-start-0 ps-0"
+                                                value="{{ Auth::user()->profile?->middle_name ?? '' }}" placeholder="Văn">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="last_name" class="form-label">Tên</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i
+                                                    class="bi bi-person"></i></span>
+                                            <input type="text" name="last_name" id="last_name"
+                                                class="form-control border-start-0 ps-0"
+                                                value="{{ Auth::user()->profile?->last_name ?? '' }}" placeholder="An">
+                                        </div>
                                     </div>
 
-                                    <div class="grid__col-4">
-                                        <label for="middle_name" class="form-label">
-                                            <i class="bi bi-person"></i> Tên đệm
-                                        </label>
-                                        <input type="text" name="middle_name" id="middle_name" class="form-control"
-                                            value="{{ Auth::user()->profile?->middle_name ?? '' }}" placeholder="Văn">
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                                            <input type="email" id="email" class="form-control bg-light"
+                                                value="{{ Auth::user()->email }}" readonly>
+                                        </div>
+                                        <div class="form-text text-muted"><i class="bi bi-info-circle"></i> Email không thể
+                                            thay đổi</div>
                                     </div>
 
-                                    <div class="grid__col-4">
-                                        <label for="last_name" class="form-label">
-                                            <i class="bi bi-person"></i> Tên
-                                        </label>
-                                        <input type="text" name="last_name" id="last_name" class="form-control"
-                                            value="{{ Auth::user()->profile?->last_name ?? '' }}" placeholder="A">
-                                    </div>
-                                </div>
-
-                                <!-- Email và Số điện thoại -->
-                                <div class="grid-row mb-3">
-                                    <div class="grid__col-6">
-                                        <label for="email" class="form-label">
-                                            <i class="bi bi-envelope"></i> Email
-                                        </label>
-                                        <input type="email" id="email" class="form-control"
-                                            value="{{ Auth::user()->email }}" readonly>
-                                        <small class="text-muted">Email không thể thay đổi</small>
+                                    <div class="col-md-6">
+                                        <label for="phone" class="form-label">Số điện thoại</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i
+                                                    class="bi bi-telephone"></i></span>
+                                            <input type="tel" name="phone" id="phone"
+                                                class="form-control border-start-0 ps-0"
+                                                value="{{ Auth::user()->phone ?? '' }}" placeholder="0912...">
+                                        </div>
                                     </div>
 
-                                    <div class="grid__col-6">
-                                        <label for="phone" class="form-label">
-                                            <i class="bi bi-telephone"></i> Số điện thoại
-                                        </label>
-                                        <input type="tel" name="phone" id="phone" class="form-control"
-                                            value="{{ Auth::user()->phone ?? '' }}" placeholder="0123456789">
-                                    </div>
-                                </div>
-
-                                <!-- Giới thiệu -->
-                                <div class="grid-row mb-3">
-                                    <div class="grid__col-12">
-                                        <label for="profile" class="form-label">
-                                            <i class="bi bi-card-text"></i> Giới thiệu
-                                        </label>
+                                    <div class="col-12">
+                                        <label for="profile" class="form-label">Giới thiệu</label>
                                         <textarea name="profile" id="profile" class="form-control" rows="3"
-                                            placeholder="Viết vài dòng về bản thân...">{{ Auth::user()->profile?->bio ?? '' }}</textarea>
+                                            placeholder="Chia sẻ đôi điều về bạn...">{{ Auth::user()->profile?->bio ?? '' }}</textarea>
                                     </div>
                                 </div>
 
-                                <div class="profile-form-actions">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-check-circle"></i> Lưu thay đổi
+                                <div class="mt-4 pt-3 border-top">
+                                    <button type="submit" class="btn btn-profile-save">
+                                        <i class="bi bi-save"></i> Lưu thay đổi
                                     </button>
                                 </div>
                             </form>
@@ -323,10 +276,10 @@
                     const alertDiv = document.createElement('div');
                     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
                     alertDiv.innerHTML = `
-                    <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
+                                                                            <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                                                                            ${message}
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                                        `;
 
                     const cardBody = document.querySelector('.profile-card-body');
                     cardBody.insertBefore(alertDiv, cardBody.firstChild);

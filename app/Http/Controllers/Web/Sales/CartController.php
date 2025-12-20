@@ -190,6 +190,8 @@ class CartController extends AppController
      */
     public function checkout(Request $request): JsonResponse
     {
+        \Illuminate\Support\Facades\Log::info('Checkout Request received', ['user_id' => \Illuminate\Support\Facades\Auth::id(), 'is_auth' => \Illuminate\Support\Facades\Auth::check()]);
+
         $request->validate([
             'items' => 'required|array|min:1',
             'items.*' => 'integer',
@@ -264,6 +266,11 @@ class CartController extends AppController
                 'message' => $e->getMessage(),
             ], 400);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Checkout Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all(),
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Không thể thanh toán. Vui lòng thử lại.',

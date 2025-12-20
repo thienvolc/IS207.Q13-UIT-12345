@@ -25,7 +25,7 @@
 
     <!-- CSS chính (Load sau Bootstrap để override) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    @stack('styles')
 </head>
 
 <body class="pinkcapy">
