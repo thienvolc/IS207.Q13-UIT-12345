@@ -32,7 +32,7 @@
 <a name="thanhvien"></a>
 | STT    | MSSV          | Họ và Tên              | Github                                               | Email                   |
 | ------ |:-------------:| ----------------------:|-----------------------------------------------------:|-------------------------:
-| 1      | 23521812      | Nguyễn Trường Vũ       |[doringu-123](https://github.com/doringu-123)           |23521812@gm.uit.edu.vn   |
+| 1      | 23521812      | Nguyễn Trường Vũ       |[doringu-123](https://github.com/vu-leonguyen)           |23521812@gm.uit.edu.vn   |
 | 2      | 23521517      | Đặng Hữu Thọ       |[HthoReyy](https://github.com/HthoReyy)                 |23521517@gm.uit.edu.vn   |
 | 3      | 23520230      | Nguyễn Lê Bảo Đăng        |[](https://github.com/)     |23520230@gm.uit.edu.vn   |
 | 4      | 23520997      | Phạm Minh Ngân        |[](https://github.com/)     |23520997@gm.uit.edu.vn   |
